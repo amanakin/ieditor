@@ -5,16 +5,30 @@
 #include <event.h>
 #include <graphlib.h>
 
-Event::MouseClickEvent::MouseClickEvent(const Vector2i& pos, Mouse::Button button) :
-    pos(pos), button(button)
+Event::MouseEvent::Click::Click(Mouse::Button button) :
+    button(button)
 {}
 
-Event::MouseHoverEvent::MouseHoverEvent(const Vector2i& from, const Vector2i& to) :
-    from(from), to(to)
+Event::MouseEvent::Hover::Hover(const Vector2i& newPos) :
+    newPos(newPos)
 {}
 
-Event::MouseDragEvent::MouseDragEvent(const Vector2i& from, const Vector2i& to, Mouse::Button button) :
-    from(from), to(to), button(button)
+Event::MouseEvent::Drag::Drag(const Vector2i& newPos, Mouse::Button button) :
+    newPos(newPos), button(button)
+{}
+
+//*************************************************************
+
+Event::MouseEvent::MouseEvent(const Vector2i& pos, const Click& click) :
+    pos(pos), click(click)
+{}
+
+Event::MouseEvent::MouseEvent(const Vector2i& pos, const Hover& hover) :
+    pos(pos), hover(hover)
+{}
+
+Event::MouseEvent::MouseEvent(const Vector2i& pos, const Drag& drag) :
+    pos(pos), drag(drag)
 {}
 
 //*************************************************************
@@ -26,17 +40,8 @@ Event::Event(const Type type) :
     type(type)
 {}
 
-Event::Event(const Type type, const MouseClickEvent& mouseClick) :
-    type(type), mouseClick(mouseClick)
-{}
-
-Event::Event(const Type type, const MouseHoverEvent& mouseHover) :
-    type(type), mouseHover(mouseHover)
-{}
-
-
-Event::Event(const Type type, const MouseDragEvent& mouseDrag) : 
-    type(type), mouseDrag(mouseDrag)
+Event::Event(const Type type, const Event::MouseEvent& mouseEvent) :
+    type(type), mouse(mouseEvent)
 {}
 
 Event::Event(const Type type, const Keyboard::Key& key) :
@@ -49,8 +54,6 @@ EventManager::EventManager(MLWindow* window) :
     window(window) {
     
     assert(window != nullptr);
-
-    printf("event manager ok\n");
 
     mousePos = window->getMousePosition();
 
@@ -85,14 +88,14 @@ bool EventManager::pollEvent(Event& event) {
                 isButtonPressed[idx] = true;
                 
                 event.type = Event::Type::MouseButtonPressed;
-                event.mouseClick = Event::MouseClickEvent(newMousePos, button);
+                event.mouse = Event::MouseEvent(newMousePos, Event::MouseEvent::Click(button));
 
                 return true;
             } else {
                 
                 if (isMousePosChanged) {
                     event.type = Event::Type::MouseButtonDragged;
-                    event.mouseDrag = Event::MouseDragEvent(mousePos, newMousePos, button);
+                    event.mouse = Event::MouseEvent(mousePos, Event::MouseEvent::Drag(newMousePos, button));
 
                     mousePos = newMousePos;
 
@@ -105,7 +108,7 @@ bool EventManager::pollEvent(Event& event) {
                 isButtonPressed[button] = false;
 
                 event.type = Event::Type::MouseButtonReleased;
-                event.mouseClick = Event::MouseClickEvent(newMousePos, button);
+                event.mouse = Event::MouseEvent(newMousePos, Event::MouseEvent::Click(button));
 
                 return true;
             }
@@ -140,7 +143,7 @@ bool EventManager::pollEvent(Event& event) {
 
     if (isMousePosChanged) {
         event.type = Event::Type::MouseHovered;
-        event.mouseHover = Event::MouseHoverEvent(mousePos, newMousePos);
+        event.mouse = Event::MouseEvent(mousePos, Event::MouseEvent::Hover(newMousePos));
 
         mousePos = newMousePos;
 

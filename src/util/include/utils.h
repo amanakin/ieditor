@@ -23,4 +23,8 @@ bool IsInsideRect(const Vector2i& hit, const Vector2i& pos, const Vector2i& size
 bool AreCrossing(const Vector2f& pos1, const Vector2f& dir1,
                  const Vector2f& pos2, const Vector2f& dir2);
 
+Vector2i ConvertVector2fToVecto2i(const Vector2f& vector);
+
+Vector2f ConvertVector2iToVecto2f(const Vector2i& vector);
+
 #endif // UTILS_HEADER

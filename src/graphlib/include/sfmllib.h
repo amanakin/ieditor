@@ -1,8 +1,6 @@
 #ifndef SFMLLIB_HEADER
 #define SFMLLIB_HEADER
 
-#include <queue>
-
 #include <SFML/Graphics.hpp>
 
 #include "vector2.h"
@@ -12,6 +10,7 @@
 //*************************************************************
 
 struct MLWindow;
+struct MLLayout;
 
 //*************************************************************
 
@@ -27,6 +26,7 @@ struct MLCircle {
     float    getRadius()   const;
 
     void draw(MLWindow& window) const;
+    void draw(MLLayout& layout) const;
 
 private:
     sf::CircleShape circle;
@@ -50,6 +50,7 @@ struct MLRect {
     float    getAngle()    const;
 
     void draw(MLWindow& window) const;
+    void draw(MLLayout& layout) const;
 
 private:
     sf::RectangleShape rect;
@@ -86,6 +87,7 @@ struct MLText {
     Vector2i  getPosition() const; 
 
     void draw(MLWindow& window) const;
+    void draw(MLLayout& layout) const;
 
 private:
     sf::Text text;
@@ -94,20 +96,56 @@ private:
 
 //*************************************************************
 
-struct MLTexture {
-    MLTexture(const char* filename, const Vector2i& size, const Vector2i& pos);
+struct MLSprite;
 
+struct MLTexture {
+    MLTexture(const char* filename);
+
+    Vector2i getSize() const;
+
+    friend MLSprite;
+
+private:
+    sf::Texture texture;
+};
+
+//*************************************************************
+
+struct MLSprite {
+    // Sprite of new size, scaled
+    MLSprite(const MLTexture& texture, const Vector2i& size,
+             const Vector2i& pos);
+    // Sprite of size of texture
+    MLSprite(const MLTexture& texture, const Vector2i& pos);
+    
     void setPosition(const Vector2i& pos);
-    void setSize(const Vector2i& size);
     
     Vector2i getPosition() const;
     Vector2i getSize()     const;
 
     void draw(MLWindow& window) const;
+    void draw(MLLayout& layout) const;
 
 private:
-    sf::Texture texture;
     sf::Sprite sprite;
+};
+
+//*************************************************************
+
+struct MLLayout {
+    MLLayout(const Vector2i& size, const Color& bg);
+    // Layout with zero apacity
+    MLLayout(const Vector2i& size);
+
+    void draw(MLWindow& window, const Vector2i& pos) const;
+
+    friend MLCircle;
+    friend MLRect;
+    friend MLText;
+    friend MLSprite;
+
+private:
+    sf::RenderTexture renderTexture;
 };
 
 //*************************************************************
@@ -134,7 +172,8 @@ struct MLWindow {
     friend MLCircle;
     friend MLRect;
     friend MLText;
-    friend MLTexture;
+    friend MLSprite;
+    friend MLLayout;
 
 private:
     sf::RenderWindow windowSFML;

@@ -2,31 +2,90 @@
 
 #include "button.h"
 
-// Кнопки из любых приложений (скриншот),
-// и подгрузка текстуры (файла)
+//*************************************************************
 
-AbstractButton::AbstractButton(
-    const Vector2i& size, const Vector2i& pos,
-    const Color& color) :
-    Widget(size, pos),
-    bg(color), isPressed(false)
+DrawableRectangle::DrawableRectangle(const Color& color) :
+    bg(color)
 {}
-
-void AbstractButton::update()
-{}
-
-void AbstractButton::draw(MLWindow& window, const Vector2i& abs) {
     
-    MLRect shadow(abs + Vector2i(5, 5), size, Colors::BLACK);
-    MLRect rect(abs, size, bg);
-    if (isPressed) {
-        rect.setPosition(abs + Vector2i(2, 2));
-    }
-    shadow.draw(window);
+void DrawableRectangle::draw(MLWindow& window, const Vector2i& absPos) {
+    MLRect rect(size, absPos, bg);
+
     rect.draw(window);
 }
 
-bool AbstractButton::onKeyboard(const Event& event) {
+DrawableTexture::DrawableTexture(const MLTexture& texture) :
+    bg(texture, size, Vector2i(0, 0))
+{}
+
+void DrawableTexture::draw(MLWindow& window, const Vector2i& absPos) {
+    bg.setPosition(absPos);
+
+    bg.draw(window);
+}
+
+//*************************************************************
+
+TestableCircle::TestableCircle(float radius) :
+    radius(radius)
+{}
+
+bool TestableCircle::testMouse(const Vector2i& relPosEvent) {
+    return (relPosEvent - Vector2i(radius, radius)).getLen() <= radius;
+}
+
+bool TestableRectangle::testMouse(const Vector2i& relPosEvent) {
+    return IsInsideRect(relPosEvent, Vector2i(0, 0), size);
+}
+
+//*************************************************************
+
+Movable::Movable(Widget* movableWidget) :
+    movableWidget(movableWidget)
+{}
+
+bool Movable::onMouse(const Event& event, const Vector2i& absPosWidget) {
+    if (event.type == Event::Type::MouseButtonDragged &&
+        event.mouse.drag.button == Mouse::Button::Left) {
+        movableWidget->pos += event.mouse.drag.newPos - event.mouse.pos;
+
+        return true;
+    }
+
     return false;
 }
 
+//*************************************************************
+
+bool Hoverable::onMouse(const Event& event, const Vector2i& absPosWidget) {
+    if (event.type == Event::Type::MouseButtonDragged) {
+        if (!IsInsideRect(event.mouse.drag.newPos, absPosWidget, size)) {
+            isHover = false;
+        } else {
+            isHover = true;
+        }
+
+        return true;
+    }
+
+    if (event.type == Event::Type::MouseHovered) {
+        if (!IsInsideRect(event.mouse.hover.newPos, absPosWidget, size)) {
+            isHover = false;
+        } else {
+            isHover = true;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+//*************************************************************
+
+ButtonToMove::ButtonToMove(const Vector2i& size, const Vector2i& pos, Widget* movableWidget) :
+    Widget(size, pos),
+    Movable(movableWidget),
+    DrawableRectangle(Colors::BLUE),
+    TestableRectangle()
+{}

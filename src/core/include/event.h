@@ -5,7 +5,7 @@
 
 #include <vector2.h>
 
-struct Mouse {
+namespace Mouse {
     enum Button {
         Left,
         Right,
@@ -15,7 +15,7 @@ struct Mouse {
 
 //*************************************************************
 
-struct Keyboard {
+namespace Keyboard {
     enum Key {
         W,
         A,
@@ -32,26 +32,36 @@ struct Keyboard {
 //*************************************************************
 
 struct Event {
-    struct MouseClickEvent {
-        MouseClickEvent(const Vector2i& pos, Mouse::Button button);
+    struct MouseEvent {
+        struct Click {
+            Click(Mouse::Button button);
 
+            Mouse::Button button;
+        };
+
+        struct Hover {
+            Hover(const Vector2i& newPos);
+
+            Vector2i newPos;
+        };
+
+        struct Drag {
+            Drag(const Vector2i& newPos, Mouse::Button button);
+
+            Vector2i newPos;
+            Mouse::Button button;
+        };
+
+        MouseEvent(const Vector2i& pos, const Click& click);
+        MouseEvent(const Vector2i& pos, const Hover& hover);
+        MouseEvent(const Vector2i& pos, const Drag& drag);
+
+        union {
+            Click click;
+            Hover hover;
+            Drag drag;
+        };
         Vector2i pos;
-        Mouse::Button button;
-    };
-
-    struct MouseHoverEvent {
-        MouseHoverEvent(const Vector2i& from, const Vector2i& to);
-
-        Vector2i from;
-        Vector2i to;
-    };
-
-    struct MouseDragEvent {
-        MouseDragEvent(const Vector2i& from, const Vector2i& to, Mouse::Button button);
-
-        Vector2i from;
-        Vector2i to;
-        Mouse::Button button;
     };
 
     enum class Type {
@@ -71,17 +81,13 @@ struct Event {
 
     Event();
     Event(const Type);
-    Event(const Type, const MouseClickEvent&);
-    Event(const Type, const MouseHoverEvent&);
-    Event(const Type, const MouseDragEvent&);
+    Event(const Type, const MouseEvent&);
     Event(const Type, const Keyboard::Key&);
 
     Type type;
     
     union {
-        MouseClickEvent mouseClick;
-        MouseHoverEvent mouseHover;
-        MouseDragEvent mouseDrag;
+        MouseEvent mouse;
         Keyboard::Key key;
     };
 };

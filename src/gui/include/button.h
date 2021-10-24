@@ -6,76 +6,138 @@
 #include <graphlib.h>
 #include <text.h>
 
-struct AbstractButton: public Widget {
-    AbstractButton(
-        const Vector2i& size, const Vector2i& pos,
-        const Color& color);
+//*************************************************************
+
+struct DrawableRectangle: virtual public Widget {
+    DrawableRectangle(const Color& color);
     
-    void update()                                    override;
-    void draw(MLWindow& window, const Vector2i& abs) override;
-    bool onKeyboard(const Event& event)              override;
+    virtual void draw(MLWindow& window, const Vector2i& absPos) override;
 
     Color bg;
-    bool isPressed;
+};
+
+struct DrawableTexture: virtual public Widget {
+    DrawableTexture(const MLTexture& texture);
+
+    virtual void draw(MLWindow& window, const Vector2i& absPos) override;
+
+    MLSprite bg;
+};
+
+//*************************************************************
+
+struct TestableCircle: virtual public Widget {
+    TestableCircle(float radius);
+
+    virtual bool testMouse(const Vector2i& relPosEvent) override;
+
+    int radius; 
+};
+
+struct TestableRectangle: virtual public Widget {
+    virtual bool testMouse(const Vector2i& relPosEvent) override;
 };
 
 //*************************************************************
 
 template <typename Handler>
-struct Button: public AbstractButton {
-    Button(Handler handler, const Vector2i& size, 
-           const Vector2i& pos, const Color& color);
+struct Clickable: virtual public Widget {
+    Clickable(Handler handler) :
+        handler(handler)
+    {}
 
-    bool onMouse(const Event& event, const Vector2i& abs) override;
+    virtual bool onMouse(const Event& event, const Vector2i& absPosWidget) override {
+        if (event.type == Event::Type::MouseButtonPressed) {
+            handler();
+            return true;
+        }
+
+        return false;
+    }
 
     Handler handler;
 };
 
-template <typename Handler>
-Button<Handler>::Button(
-    Handler handler, const Vector2i& size, 
-    const Vector2i& pos, const Color& color) :
-    AbstractButton(size, pos, color),
-    handler(handler)
-{}
+//*************************************************************
+
+struct Movable: virtual public Widget {
+    Movable(Widget* movableWidget);
+
+    virtual bool onMouse(const Event& event, const Vector2i& absPosWidget) override;
+
+    Widget* movableWidget;
+};
+
+//*************************************************************
+
+struct Hoverable: virtual public Widget {
+
+    bool onMouse(const Event& event, const Vector2i& absPosWidget) override;
+
+    bool isHover;
+};
+
+//*************************************************************
 
 template <typename Handler>
-bool Button<Handler>::onMouse(const Event& event, const Vector2i& rel) {
-    if (event.type == Event::Type::MouseButtonPressed) {
-        handler();
-        isPressed = true;
-        return true;
+struct ButtonTextureCircle: virtual public Widget,             public Hoverable,
+                                    public Clickable<Handler>, public TestableCircle,
+                                    public DrawableTexture {
+    ButtonTextureCircle(Handler handler, const MLTexture& texture, int radius, const Vector2i& pos, const Color& bg) :
+        Widget(Vector2i(2 * radius, 2 * radius), pos), 
+        Hoverable(), Clickable<Handler>(handler),
+        TestableCircle(radius), DrawableTexture(texture),
+        bg(bg)
+    {} 
+
+    bool onMouse(const Event& event, const Vector2i& absPosWidget) override {
+        return Clickable<Handler>::onMouse(event, absPosWidget) || Hoverable::onMouse(event, absPosWidget);
     }
 
-    if (event.type == Event::Type::MouseButtonReleased) {
-        isPressed = false;
+    void draw(MLWindow& window, const Vector2i& absPosWidget) override {
+        if (isHover) {
+            MLRect rect(size, absPosWidget, bg);
+            rect.draw(window);
+        }
+
+        DrawableTexture::draw(window, absPosWidget);
     }
 
-    return false;
-}
-
-/*template <typename Handler>
-struct ButtonText: public WidgetManager {
-    ButtonText(Handler handler,
-           const Vector2i& size, const Vector2i& pos,
-           const Color& bg, const char* text,
-           int fontSize, const Color& textColor,
-           const MLFont& font);
+    Color bg;
 };
 
 template <typename Handler>
-ButtonText<Handler>::ButtonText(
-    Handler handler,
-    const Vector2i& size, const Vector2i& pos,
-    const Color& bg, const char* text,
-    int fontSize, const Color& textColor,
-    const MLFont& font) :
-    WidgetManager(size, pos)
-    {
-    subWidgets.push_back(new Button<Handler>(handler, size, Vector2i(0, 0), bg));
-    subWidgets.push_back(new Text(text, Vector2i(0, 0), fontSize, textColor, font));
-}*/
+struct ButtonTextureRectangle: virtual public Widget,     public Hoverable,
+                               public Clickable<Handler>, public TestableRectangle,
+                               public DrawableTexture {
+    ButtonTextureRectangle(Handler handler, const MLTexture& texture, const Vector2i& size, const Vector2i& pos, const Color& bg) :
+        Widget(size, pos),
+        Hoverable(), Clickable<Handler>(handler),
+        DrawableTexture(texture), TestableRectangle(),
+        bg(bg)
+    {}
+
+    bool onMouse(const Event& event, const Vector2i& absPosWidget) override {
+        return Clickable<Handler>::onMouse(event, absPosWidget) || Hoverable::onMouse(event, absPosWidget);
+    }
+
+    void draw(MLWindow& window, const Vector2i& absPosWidget) override {
+        if (isHover) {
+            MLRect rect(size, absPosWidget, bg);
+            rect.draw(window);
+        }
+
+        DrawableTexture::draw(window, absPosWidget);
+    }
+
+    Color bg;
+};
+                    
 
 //*************************************************************
+
+struct ButtonToMove: virtual public Widget, public Movable, public DrawableRectangle, TestableRectangle {
+    ButtonToMove(const Vector2i& size, const Vector2i& pos, Widget* movableWidget);
+};  
 
 #endif // BUTTON_HEADER

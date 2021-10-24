@@ -35,6 +35,8 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/app.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/button.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/text.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/texture.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/presets.cc
 )
 
 find_package(SFML 2 COMPONENTS system window graphics network audio REQUIRED)
@@ -42,7 +44,6 @@ find_package(SFML 2 COMPONENTS system window graphics network audio REQUIRED)
 add_executable(ieditor ${SOURCES})
 
 target_link_libraries(ieditor sfml-graphics sfml-window sfml-system)
-
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

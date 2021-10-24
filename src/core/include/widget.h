@@ -9,19 +9,22 @@
 struct Widget {    
     Widget(const Vector2i& size, const Vector2i& pos = Vector2i(0, 0),
            bool isActive = true, Widget* parent = nullptr);
+    Widget();
     
     virtual ~Widget();
 
     // Update online widgets
-    virtual void update() = 0;
+    virtual void update();
 
     // Draw in absolute position
-    virtual void draw(MLWindow& window, const Vector2i& abs) = 0;
+    virtual void draw(MLWindow& window, const Vector2i& absPosWidget);
     
-    virtual bool onMouse(const Event& event, const Vector2i& abs) = 0;
-    virtual bool testMouse(const Vector2i& abs)                   = 0;
-    
-    virtual bool onKeyboard(const Event& event)                   = 0;
+    // Event and absolute position of widget
+    virtual bool onMouse(const Event& event, const Vector2i& absPosWidget);
+    // Relative pos of mouse event
+    virtual bool testMouse(const Vector2i& relPosEvent);
+
+    virtual bool onKeyboard(const Event& event);
 
     // Relative position
     Vector2i pos;
@@ -35,18 +38,19 @@ struct Widget {
 struct WidgetManager: public Widget {
     
     WidgetManager(const Vector2i& size, const Vector2i& pos = Vector2i(0, 0),
-                  bool isActive = true, Widget* parent = nullptr);
+                  bool isActive = true, Widget* parent = nullptr, const Color& bg = Color(0, 0, 0, 0));
     ~WidgetManager();
 
-    void update()                                    override;
-    void draw(MLWindow& window, const Vector2i& abs) override;
+    void update()                                             override;
+    void draw(MLWindow& window, const Vector2i& absPosWidget) override;
     
-    bool onMouse(const Event& event, const Vector2i& abs) override;
-    bool testMouse(const Vector2i& abs)                   override;
+    bool onMouse(const Event& event, const Vector2i& absPosWidget) override;
+    bool testMouse(const Vector2i& relPosEvent)                    override;
 
     bool onKeyboard(const Event& event)                   override;
 
     std::vector<Widget*> subWidgets;
+    Color bg;
 };
 
 #endif // WIDGET_HEADER

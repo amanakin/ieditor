@@ -1,9 +1,9 @@
 #include <app.h>
 
 int main() {
-    App app(Vector2i(1920, 1080));
+    App app(Vector2i(1600, 900));
 
-    printf("app created\n");
+    app.setBackGround(Colors::AQUA);
 
     app.start();
 }

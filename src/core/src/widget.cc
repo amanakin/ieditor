@@ -11,14 +11,39 @@ Widget::Widget(const Vector2i& size, const Vector2i& pos,
     isActive(isActive), parent(parent)
 {}
 
+Widget::Widget() 
+{}
+
 Widget::~Widget() 
 {}
+
+void Widget::update() {
+    return;
+}
+
+void Widget::draw(MLWindow& window, const Vector2i& absPosWidget) {
+    return;
+}
+
+bool Widget::onMouse(const Event& event, const Vector2i& absPosWidget) {
+    return false;
+}
+
+bool Widget::testMouse(const Vector2i& relPosEvent) {
+    return false;
+}
+
+bool Widget::onKeyboard(const Event& event) {
+    return false;
+}
+
 
 //*************************************************************
 
 WidgetManager::WidgetManager(const Vector2i& size, const Vector2i& pos,
-                             bool isActive, Widget* parent) :
-    Widget(size, pos, isActive, parent)
+                             bool isActive, Widget* parent, const Color& bg) :
+    Widget(size, pos, isActive, parent),
+    bg(bg)
 {}
 
 WidgetManager::~WidgetManager() {
@@ -35,19 +60,22 @@ void WidgetManager::update() {
     }
 }
 
-void WidgetManager::draw(MLWindow& window, const Vector2i& abs) {
+void WidgetManager::draw(MLWindow& window, const Vector2i& absPosWidget) {
+    MLRect rect(size, absPosWidget, bg);
+    rect.draw(window);
+
     for (auto& subWidget: subWidgets) { 
         if (subWidget->isActive) {
-            subWidget->draw(window, subWidget->pos + abs);
+            subWidget->draw(window, subWidget->pos + absPosWidget);
         }
     }
 }
 
-bool WidgetManager::onMouse(const Event& event, const Vector2i& abs) {
+bool WidgetManager::onMouse(const Event& event, const Vector2i& absPosWidget) {
     for (auto& subWidget: subWidgets) {
-        if (subWidget->isActive                        &&
-            subWidget->testMouse(subWidget->pos + abs) &&
-            subWidget->onMouse(event, subWidget->pos + abs)) {
+        if (subWidget->isActive &&
+            subWidget->testMouse(event.mouse.pos - (subWidget->pos + absPosWidget)) &&
+            subWidget->onMouse(event, subWidget->pos + absPosWidget)) {
             return true;
         }
     }
@@ -55,10 +83,13 @@ bool WidgetManager::onMouse(const Event& event, const Vector2i& abs) {
     return false;
 }
 
-bool WidgetManager::testMouse(const Vector2i& abs) {
+bool WidgetManager::testMouse(const Vector2i& relPosEvent) {
+    if (!IsInsideRect(relPosEvent, Vector2i(0, 0), size)) {
+        return false;
+    }
+
     for (auto& subWidget: subWidgets) {
-        if (subWidget->isActive &&
-            testMouse(subWidget->pos + abs)) {
+        if (subWidget->testMouse(relPosEvent - subWidget->pos)) {
             return true;
         }
     }

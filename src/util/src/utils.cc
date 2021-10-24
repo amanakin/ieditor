@@ -67,3 +67,12 @@ bool AreCrossing(const Vector2f& pos1, const Vector2f& dir1,
 
     return (seg1Start * seg1End < 0 && seg2Start * seg2End < 0);
 }
+
+
+Vector2i ConvertVector2fToVecto2i(const Vector2f& vector) {
+    return Vector2i(vector.x, vector.y);
+}
+
+Vector2f ConvertVector2iToVecto2f(const Vector2i& vector) {
+    return Vector2f(vector.x, vector.y);
+}  
