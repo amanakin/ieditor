@@ -1,9 +1,8 @@
 #include <app.h>
 
 int main() {
-    App app(Vector2i(1600, 900));
+    App::createApp(Vector2i(1920, 1080));
+    App::getApp()->init();
 
-    app.setBackGround(Colors::AQUA);
-
-    app.start();
+    App::getApp()->run();
 }

@@ -92,8 +92,8 @@ void MLCircle::draw(MLWindow& window) const {
     window.windowSFML.draw(circle);
 } 
 
-void MLCircle::draw(MLLayout& layout) const {
-    layout.renderTexture.draw(circle);
+void MLCircle::draw(MLTexture& texture) const {
+    texture.renderTexture.draw(circle);
 }
 
 //*************************************************************
@@ -145,8 +145,8 @@ void MLRect::draw(MLWindow& window) const {
     window.windowSFML.draw(rect);
 } 
 
-void MLRect::draw(MLLayout& layout) const {
-    layout.renderTexture.draw(rect);
+void MLRect::draw(MLTexture& texture) const {
+    texture.renderTexture.draw(rect);
 } 
 
 //*************************************************************
@@ -212,41 +212,56 @@ void MLText::draw(MLWindow& window) const {
     window.windowSFML.draw(text);
 }
 
-void MLText::draw(MLLayout& layout) const {
-    layout.renderTexture.draw(text);
+void MLText::draw(MLTexture& texture) const {
+    texture.renderTexture.draw(text);
 }
 
 //*************************************************************
 //*************************************************************
 
-MLTexture::MLTexture(const char* filename) {
+MLPicture::MLPicture(const char* filename) {
     assert(texture.loadFromFile(filename));
 }
 
-Vector2i MLTexture::getSize() const {
+Vector2i MLPicture::getSize() const {
     return Vector2i(texture.getSize().x, texture.getSize().y);
 }
 
 //*************************************************************
 //*************************************************************
 
-MLSprite::MLSprite(const MLTexture& texture, const Vector2i& size,
+MLSprite::MLSprite(const MLPicture& picture, const Vector2i& size,
                    const Vector2i& pos) {
-    sprite.setTexture(texture.texture);
-    float scale = float(size.x) / texture.texture.getSize().x;
+    sprite.setTexture(picture.texture);
+    float scale = float(size.x) / picture.texture.getSize().x;
     sprite.setScale(sf::Vector2f(scale, scale));
     setPosition(pos);
 }
 
-MLSprite::MLSprite(const MLTexture& texture, const Vector2i& pos) {
-    sprite.setTexture(texture.texture);
+MLSprite::MLSprite(const MLPicture& picture, const Vector2i& pos) {
+    sprite.setTexture(picture.texture);
+    setPosition(pos);
+}
+
+MLSprite::MLSprite(const MLPicture& picture, const Vector2i& picPos,
+                   const Vector2i& size, const Vector2i& pos) {
+    sprite.setTexture(picture.texture);
+    sprite.setTextureRect(sf::IntRect(sf::Vector2i(picPos.x, picPos.y), sf::Vector2i(size.x, size.y)));
     setPosition(pos);
 }
 
 void MLSprite::setPosition(const Vector2i& pos) {
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
 }
-    
+
+void MLSprite::setColor(const Color& color) {
+    sprite.setColor(ConvertColorToSFMLColor(color));
+}
+
+void MLSprite::scale(const Vector2f scale) {
+    sprite.setScale(sf::Vector2f(scale.x, scale.y));
+}
+
 Vector2i MLSprite::getPosition() const {
     return ConvertSFMLVectorToVector(sprite.getPosition());
 }
@@ -259,33 +274,47 @@ void MLSprite::draw(MLWindow& window) const {
     window.windowSFML.draw(sprite);
 }
 
+void MLSprite::draw(MLTexture& texture) const {
+    texture.renderTexture.draw(sprite);
+}
+
 //*************************************************************
 //*************************************************************
 
-MLLayout::MLLayout(const Vector2i& size, const Color& bg) {
+MLTexture::MLTexture(const Vector2i& size, const Color& bg) :
+    bg(bg) {
     renderTexture.create(size.x, size.y);
-    renderTexture.clear(ConvertColorToSFMLColor(bg));
+    clear();
 }
 
-MLLayout::MLLayout(const Vector2i& size) {
-    renderTexture.create(size.x, size.y);
-    renderTexture.clear(sf::Color(0, 0, 0, 0));
+void MLTexture::draw(MLWindow& window, const Vector2i& pos) {
+    renderTexture.display();
+
+    sf::Sprite sprite(renderTexture.getTexture());
+    sprite.setPosition(ConvertVectorToSFMLVector(pos));
+
+    window.windowSFML.draw(sprite);
 }
 
-void MLLayout::draw(MLWindow& window, const Vector2i& pos) const {
+void MLTexture::draw(MLTexture& texture, const Vector2i& pos) {
+    renderTexture.display();
+
     sf::Sprite sprite(renderTexture.getTexture());
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
     
-    window.windowSFML.draw(sprite);
+    texture.renderTexture.draw(sprite);
+}
+
+void MLTexture::clear() {
+    renderTexture.clear(ConvertColorToSFMLColor(bg));
 }
 
 //*************************************************************
 //*************************************************************
 
 MLWindow::MLWindow(const Vector2i& size, const Vector2i& pos, const char* name) :
-    windowSFML(sf::VideoMode(size.x, size.y, sf::Style::Fullscreen), name) {
-    windowSFML.setFramerateLimit(60);
-}
+    windowSFML(sf::VideoMode(size.x, size.y, sf::Style::Fullscreen), name)
+{}
 
 void MLWindow::setPosition(const Vector2i& pos) {
     windowSFML.setPosition(sf::Vector2i(pos.x, pos.y));

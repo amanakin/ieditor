@@ -4,20 +4,54 @@
 #include <widget.h>
 #include <graphlib.h>
 
-struct App: public WidgetManager {
-    App(const Vector2i& size);
-    ~App();
+//*************************************************************
 
-    void start();
-    void stop();
-    void setBackGround(const Color& color);
+struct Settings {
+    Color drawColor;
+    float brushSize;
+};
 
-private:
+//*************************************************************
+
+struct StartWidget: public RootWidget {
+    StartWidget(const Vector2i& size, const Vector2i& pos, const Color& color = Colors::LIGHT_GREY);
+
+    void init() override;
+
+};
+
+//*************************************************************
+
+/*struct AnnoyingWidget: public  RootWidget {
+    AnnoyingWidget(const Vector2i& pos);
+
+    void init() override;
+
+    int count;
+};*/
+
+//*************************************************************
+
+struct App {
+    void operator=(const App&) = delete;
+    App(const App&) = delete;
+
+    static App* getApp();
+    static void createApp(const Vector2i& size);
+
+    void run();
     void init();
 
-    MLWindow window;
-    EventManager eventManager;
+    Settings settings;
     MLFont font;
+    MLWindow window;
+private:
+    App(const Vector2i& size);
+    static App* app;
+    
+    StartWidget* startWidget;
 };
+
+//*************************************************************
 
 #endif // APP_HEADER

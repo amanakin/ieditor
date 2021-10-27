@@ -2,31 +2,47 @@
 #define PRESETS_HEADER
 
 #include <widget.h>
+#include <interfaces.h>
+
+//*************************************************************
+
+struct WidgetRectangle: virtual public Widget, public IDrawableRectangle {
+    WidgetRectangle(const Vector2i& size, const Vector2i& pos, const Color& color);
+};
+
+struct WidgetPicture: virtual public Widget, public IDrawablePicture {
+    WidgetPicture(const Vector2i& size, const Vector2i& pos, const MLPicture& picture);
+};
+
+//*************************************************************
+
+extern const int TITLE_BAR_SIZE;
 
 struct DefaultWindow: public WidgetManager {
-    DefaultWindow(WidgetManager* parent, const Vector2i size, const Vector2i& pos);
+    DefaultWindow(const Vector2i& size, const Vector2i& pos, WidgetManager* parent);
 
-    WidgetManager* getWorkManager() {
-        return workManager;
-    }
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
 
-private:
     WidgetManager* workManager;
+    bool isPressed;
 };
+
+//*************************************************************
 
 struct Layout: public Widget {
 
     Layout(const Vector2i size,
            const Vector2i& pos);
 
-    void update();
-    void draw(MLWindow& window, const Vector2i& absPosWidget);
-    bool onMouse(const Event& event, const Vector2i& absPosWidget);
-    bool testMouse(const Vector2i& relPosEvent);
-    bool onKeyboard(const Event& event);
-
+    void draw(MLTexture& texture, const Vector2i& absPosWidget)    override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+    bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) override;
+    bool testMouse(const Vector2i& relPosEvent)                    override;
 private:
-    MLLayout layout;
+    MLTexture texture;
 };
+
+//*************************************************************
 
 #endif // PRESETS_HEADER

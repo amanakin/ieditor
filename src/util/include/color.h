@@ -18,6 +18,15 @@ struct Color: public Vector4f {
     uint32_t toInteger() const;
 };
 
+// Hue: [0, 360], sat: [0, 100], val: [0, 100], apacity: [0, 1]
+struct ColorHSVA: public Vector4f {
+    ColorHSVA(float hue, float saturation, float value, float apacity = 1);
+};
+
+Color ConvertHSVAToRGBA(const ColorHSVA& hsva);
+
+ColorHSVA ConvertRGBAToHSVA(const Color& rgba);
+
 //*************************************************************
 
 namespace Colors {

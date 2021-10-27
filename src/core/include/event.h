@@ -5,6 +5,8 @@
 
 #include <vector2.h>
 
+//*************************************************************
+
 namespace Mouse {
     enum Button {
         Left,
@@ -31,75 +33,63 @@ namespace Keyboard {
 
 //*************************************************************
 
-struct Event {
-    struct MouseEvent {
-        struct Click {
-            Click(Mouse::Button button);
-
-            Mouse::Button button;
-        };
-
-        struct Hover {
-            Hover(const Vector2i& newPos);
-
-            Vector2i newPos;
-        };
-
-        struct Drag {
-            Drag(const Vector2i& newPos, Mouse::Button button);
-
-            Vector2i newPos;
-            Mouse::Button button;
-        };
-
-        MouseEvent(const Vector2i& pos, const Click& click);
-        MouseEvent(const Vector2i& pos, const Hover& hover);
-        MouseEvent(const Vector2i& pos, const Drag& drag);
-
-        union {
-            Click click;
-            Hover hover;
-            Drag drag;
-        };
-        Vector2i pos;
-    };
-
+namespace Event {
+    
     enum class Type {
-        // mouseClick
+        // MouseClick
         MouseButtonPressed,
         MouseButtonReleased,
-        // mouseHover
+        // MouseHover
         MouseHovered,
-        // mouseDrag
+        // MouseDrag
         MouseButtonDragged,
-        // key
+        // KeyClick
         KeyboardKeyPressed,
         KeyboardKeyReleased,
-        // None
-        WindowClosed,
     };
 
-    Event();
-    Event(const Type);
-    Event(const Type, const MouseEvent&);
-    Event(const Type, const Keyboard::Key&);
+    struct MouseClick {
+        MouseClick(const Type type, const Vector2i& mousePos, const Mouse::Button button);
 
-    Type type;
-    
-    union {
-        MouseEvent mouse;
+        Type type;
+        Vector2i mousePos;
+        Mouse::Button button;
+    };
+
+    struct MouseHover {
+        MouseHover(const Vector2i& prevPos, const Vector2i& currPos);
+
+        Vector2i prevPos;
+        Vector2i currPos;
+    };
+
+    struct MouseDrag {
+        MouseDrag(const Vector2i& prevPos, const Vector2i& currPos, const Mouse::Button button);
+
+        Vector2i prevPos;
+        Vector2i currPos;    
+        Mouse::Button button;
+    };
+
+    struct KeyClick {
+        KeyClick(const Type type, const Keyboard::Key key);
+        
+        Type type;
         Keyboard::Key key;
     };
+
 };
 
 //*************************************************************
 
 struct MLWindow;
+struct RootWidget;
 
 struct EventManager {
-    EventManager(MLWindow* window);
+    EventManager(MLWindow* window, RootWidget* rootWidget);
 
-    bool pollEvent(Event& event);
+    // poll events and push them to widget
+    bool pollEvent();
 
 private:
     std::array<bool, Mouse::Button::SIZE> isButtonPressed;
@@ -108,6 +98,7 @@ private:
     Vector2i mousePos;
 
     MLWindow* window;
+    RootWidget* rootWidget;
 };
 
 //*************************************************************

@@ -35,8 +35,11 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/app.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/button.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/text.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/texture.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/pictures.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/presets.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/pickers.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/interfaces.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/slider.cc
 )
 
 find_package(SFML 2 COMPONENTS system window graphics network audio REQUIRED)

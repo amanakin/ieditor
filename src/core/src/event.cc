@@ -4,59 +4,36 @@
 
 #include <event.h>
 #include <graphlib.h>
+#include <widget.h>
 
-Event::MouseEvent::Click::Click(Mouse::Button button) :
-    button(button)
+//*************************************************************
+
+Event::MouseClick::MouseClick(const Type type, const Vector2i& mousePos, const Mouse::Button button) :
+    mousePos(mousePos), button(button), type(type)
 {}
 
-Event::MouseEvent::Hover::Hover(const Vector2i& newPos) :
-    newPos(newPos)
+Event::MouseHover::MouseHover(const Vector2i& prevPos, const Vector2i& currPos) :
+    prevPos(prevPos), currPos(currPos)
 {}
 
-Event::MouseEvent::Drag::Drag(const Vector2i& newPos, Mouse::Button button) :
-    newPos(newPos), button(button)
+Event::MouseDrag::MouseDrag(const Vector2i& prevPos, const Vector2i& currPos, const Mouse::Button button) :
+    prevPos(prevPos), currPos(currPos), button(button)
+{}
+
+Event::KeyClick::KeyClick(const Type type, const Keyboard::Key key) :
+    key(key), type(type)
 {}
 
 //*************************************************************
 
-Event::MouseEvent::MouseEvent(const Vector2i& pos, const Click& click) :
-    pos(pos), click(click)
-{}
-
-Event::MouseEvent::MouseEvent(const Vector2i& pos, const Hover& hover) :
-    pos(pos), hover(hover)
-{}
-
-Event::MouseEvent::MouseEvent(const Vector2i& pos, const Drag& drag) :
-    pos(pos), drag(drag)
-{}
-
-//*************************************************************
-
-Event::Event()
-{}
-
-Event::Event(const Type type) :
-    type(type)
-{}
-
-Event::Event(const Type type, const Event::MouseEvent& mouseEvent) :
-    type(type), mouse(mouseEvent)
-{}
-
-Event::Event(const Type type, const Keyboard::Key& key) :
-    type(type), key(key)
-{}
-
-//*************************************************************
-
-EventManager::EventManager(MLWindow* window) :
-    window(window) {
+EventManager::EventManager(MLWindow* window, RootWidget* rootWidget) :
+    window(window),
+    rootWidget(rootWidget) {
     
     assert(window != nullptr);
+    assert(rootWidget != nullptr);
 
     mousePos = window->getMousePosition();
-
 
     for (size_t idx = 0; idx < isKeyPressed.size(); ++idx) {
         isKeyPressed[idx] = window->isKeyPressed(static_cast<Keyboard::Key>(idx));
@@ -67,13 +44,7 @@ EventManager::EventManager(MLWindow* window) :
     }
 }
 
-bool EventManager::pollEvent(Event& event) {
-
-    if (!window->isOpen()) {
-        event.type == Event::Type::WindowClosed;
-
-        return true;
-    }
+bool EventManager::pollEvent() {
 
     Vector2i newMousePos = window->getMousePosition();
 
@@ -86,16 +57,23 @@ bool EventManager::pollEvent(Event& event) {
             
             if (!isButtonPressed[idx]) {
                 isButtonPressed[idx] = true;
-                
-                event.type = Event::Type::MouseButtonPressed;
-                event.mouse = Event::MouseEvent(newMousePos, Event::MouseEvent::Click(button));
+
+                rootWidget->onMouseClick(
+                    Event::MouseClick(Event::Type::MouseButtonPressed, newMousePos, button),
+                    rootWidget->pos
+                );
+
+                mousePos = newMousePos;
 
                 return true;
             } else {
                 
                 if (isMousePosChanged) {
-                    event.type = Event::Type::MouseButtonDragged;
-                    event.mouse = Event::MouseEvent(mousePos, Event::MouseEvent::Drag(newMousePos, button));
+                    
+                    rootWidget->onMouseDrag(
+                        Event::MouseDrag(mousePos, newMousePos, button),
+                        rootWidget->pos
+                    );
 
                     mousePos = newMousePos;
 
@@ -107,8 +85,12 @@ bool EventManager::pollEvent(Event& event) {
             if (isButtonPressed[button]) {
                 isButtonPressed[button] = false;
 
-                event.type = Event::Type::MouseButtonReleased;
-                event.mouse = Event::MouseEvent(newMousePos, Event::MouseEvent::Click(button));
+                rootWidget->onMouseClick(
+                    Event::MouseClick(Event::Type::MouseButtonReleased, newMousePos, button),
+                    rootWidget->pos
+                );
+
+                mousePos = newMousePos;
 
                 return true;
             }
@@ -122,9 +104,10 @@ bool EventManager::pollEvent(Event& event) {
 
             if (!isKeyPressed[idx]) {
                 isKeyPressed[idx] = true;
-
-                event.type = Event::Type::KeyboardKeyPressed;
-                event.key = key;
+                
+                rootWidget->onKeyboard(
+                    Event::KeyClick(Event::Type::KeyboardKeyPressed, key)
+                );
 
                 return true;
             }
@@ -133,8 +116,9 @@ bool EventManager::pollEvent(Event& event) {
             if (isKeyPressed[key]) { 
                 isKeyPressed[key] = false;
 
-                event.type = Event::Type::KeyboardKeyReleased;
-                event.key = key;
+                rootWidget->onKeyboard(
+                    Event::KeyClick(Event::Type::KeyboardKeyReleased, key)
+                );
 
                 return true;
             }
@@ -142,8 +126,11 @@ bool EventManager::pollEvent(Event& event) {
     }
 
     if (isMousePosChanged) {
-        event.type = Event::Type::MouseHovered;
-        event.mouse = Event::MouseEvent(mousePos, Event::MouseEvent::Hover(newMousePos));
+
+        rootWidget->onMouseHover(
+            Event::MouseHover(mousePos, newMousePos),
+            rootWidget->pos
+        );
 
         mousePos = newMousePos;
 
@@ -153,6 +140,5 @@ bool EventManager::pollEvent(Event& event) {
     return false;
 
 }
-
 
 //*************************************************************
