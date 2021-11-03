@@ -45,6 +45,7 @@ struct IHoverable: virtual public Widget {
 
     bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
     bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
+    
     bool isHover;
 };
 

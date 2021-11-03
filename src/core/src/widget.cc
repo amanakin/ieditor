@@ -8,20 +8,17 @@
 Widget::Widget(const Vector2i& size, const Vector2i& pos,
                WidgetManager* parent, bool isActive) :
     pos(pos), size(size),
-    isActive(isActive), parent(parent)
+    isActive(isActive), parent(parent),
+    toClose(false)
 {}
 
-Widget::Widget() 
-{}
+Widget::Widget() {}
 
-Widget::~Widget() 
-{}
+Widget::~Widget() {}
 
-void Widget::update() 
-{}
+void Widget::update() {}
 
-void Widget::draw(MLTexture& texture, const Vector2i& absPosWidget) 
-{}
+void Widget::draw(MLTexture& texture, const Vector2i& absPosWidget) {}
 
 bool Widget::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {return false;}
 bool Widget::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) {return false;}
@@ -46,9 +43,14 @@ WidgetManager::~WidgetManager() {
 }
 
 void WidgetManager::update() {
-    for (auto& subWidget: subWidgets) {
-        if (subWidget->isActive) {
-            subWidget->update();
+    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it) {
+        if ((*it)->toClose) {
+            delete *it;
+            subWidgets.erase(it);
+            break;
+        }
+        if ((*it)->isActive) {
+            (*it)->update();
         }
     }
 }
@@ -57,34 +59,36 @@ void WidgetManager::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     MLRect rect(size, absPosWidget, bg);
     rect.draw(texture);
 
-    for (auto& subWidget: subWidgets) { 
-        if (subWidget->isActive) {
-            subWidget->draw(texture, subWidget->pos + absPosWidget);
+    for (auto it = subWidgets.rbegin(); it != subWidgets.rend(); ++it) { 
+        if ((*it)->isActive) {
+            (*it)->draw(texture, (*it)->pos + absPosWidget);
         }
     }
 
     if (subWidgets.size() > 0) {
-        subWidgets[0]->draw(texture, subWidgets[0]->pos + absPosWidget);
+        (*subWidgets.begin())->draw(texture, (*subWidgets.begin())->pos + absPosWidget);
     }
 }
 
 bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
-    for (auto& subWidget: subWidgets) {
+    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it) {
+        Widget* subWidget = *it;
+
         if (subWidget->isActive &&
             subWidget->testMouse(mouseClick.mousePos - subWidget->pos - absPosWidget)) {
+            
             if (mouseClick.button == Mouse::Button::Left && mouseClick.type == Event::Type::MouseButtonPressed) {
-                std::swap(subWidget, subWidgets[0]);
-                if (subWidgets[0]->onMouseClick(mouseClick, subWidgets[0]->pos + absPosWidget)) {
+                subWidgets.erase(it);
+                subWidgets.push_front(subWidget);
+
+                if (subWidget->onMouseClick(mouseClick, subWidget->pos + absPosWidget)) {
                     return true;
-                } else {
-                    return false;
                 }
+                return false;
             }
 
             if (subWidget->onMouseClick(mouseClick, subWidget->pos + absPosWidget)) {
                 return true;
-            } else {
-                return false;
             }
         }
     }
@@ -116,7 +120,7 @@ bool WidgetManager::onMouseHover(const Event::MouseHover& mouseHover, const Vect
     return false;
 }
 
-bool WidgetManager::onKeyboard(const Event::KeyClick& key) {    
+bool WidgetManager::onKeyboard(const Event::KeyClick& key) {
     for (auto& subWidget: subWidgets) {
         if (subWidget->isActive &&
             subWidget->onKeyboard(key)) {

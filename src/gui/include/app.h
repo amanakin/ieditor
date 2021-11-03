@@ -9,6 +9,8 @@
 struct Settings {
     Color drawColor;
     float brushSize;
+
+    static constexpr float MaxBrushSize = 10;
 };
 
 //*************************************************************

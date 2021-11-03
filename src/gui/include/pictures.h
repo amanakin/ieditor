@@ -9,10 +9,13 @@ enum Picture {
     Slider,
     Window,
     Close,
+    CloseAnimated,
     Exit,
     Palette,
-    Exit3D,
+    Easel,
     Brush,
+    Button,
+    Spline,
     SIZE
 };
 

@@ -60,8 +60,8 @@ bool Slider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 //*************************************************************
 
 PlaneSlider::PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color& color) :
-    Widget(size, pos, nullptr),
-    currPos(Vector2i(0, 0)),
+    Widget(Vector2i(2 * SLIDER_RADIUS, 2 * SLIDER_RADIUS), pos, nullptr),
+    currPos(pos),
     bgSize(Vector2i(size.x - 2 * SLIDER_RADIUS, size.y - 2 * SLIDER_RADIUS)),
     bg(color),
     sprite(*PictureManager::getInstance()->getPicture(DefaultPictures::Slider),
@@ -69,14 +69,12 @@ PlaneSlider::PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color&
 {}
 
 void PlaneSlider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+    pos = currPos;
     MLRect back(bgSize, absPosWidget + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS), bg);
     back.draw(texture);
 
-    sprite.setPosition(absPosWidget + currPos);
+    sprite.setPosition(absPosWidget);
     sprite.draw(texture);
-
-    //MLRect all(size, absPosWidget, Colors::CRIMSON);
-    //all.draw(texture);
 }
 
 bool PlaneSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    {
@@ -95,11 +93,13 @@ bool PlaneSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i&
         currPos.y = bgSize.y;
     }
 
+    pos = currPos;
+
     return true;
 }
 
 bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
-    if (!IsInsideRect(mouseClick.mousePos, absPosWidget, size)) {
+    /*if (!IsInsideRect(mouseClick.mousePos, absPosWidget, size)) {
         return false;
     }
     
@@ -119,9 +119,10 @@ bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector
         currPos.y = 0;
     } else if (currPos.y > bgSize.y) {
         currPos.y = bgSize.y;
-    }
+    }*/
+    return false;
 
-    return true;
+    //return true;
 }
 
 //*************************************************************

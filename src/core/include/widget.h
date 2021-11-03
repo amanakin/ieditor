@@ -1,7 +1,7 @@
 #ifndef WIDGET_HEADER
 #define WIDGET_HEADER
 
-#include <vector>
+#include <list>
 
 #include <graphlib.h>
 #include <event.h>
@@ -36,6 +36,7 @@ struct Widget {
     Vector2i pos;
     Vector2i size;
     bool isActive;
+    bool toClose;
     WidgetManager* parent;
 };
 
@@ -58,7 +59,7 @@ struct WidgetManager: public Widget {
 
     bool testMouse(const Vector2i& relPosEvent) override;
 
-    std::vector<Widget*> subWidgets;
+    std::list<Widget*> subWidgets;
     Color bg;
 };
 

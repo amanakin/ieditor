@@ -19,16 +19,22 @@ struct ColorPickerGradient: WidgetManager {
     Slider* slider;
     PlaneSlider* planeSlider;
     MLTexture texture;
-    Color pickerColor;
 };
 
+//*************************************************************
 
-/*
-// 50x150
-struct BrushSizeSelector: public WidgetManager {
-    BrushSizeSelector(const Vector2i& pos);
+struct BrushSizePicker: public WidgetManager {
+    BrushSizePicker(const Vector2i& size, const Vector2i& pos);
     
+    float getBrushSize() const;
+    void setBrushSize(float brushSize);
+
+    void update() override;
+
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+
     Slider* slider;
-};*/
+};
 
 #endif // PALETTE_HEADER

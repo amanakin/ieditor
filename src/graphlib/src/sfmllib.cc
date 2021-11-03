@@ -313,8 +313,10 @@ void MLTexture::clear() {
 //*************************************************************
 
 MLWindow::MLWindow(const Vector2i& size, const Vector2i& pos, const char* name) :
-    windowSFML(sf::VideoMode(size.x, size.y, sf::Style::Fullscreen), name)
-{}
+    windowSFML(sf::VideoMode(size.x, size.y), name, sf::Style::Fullscreen)
+{
+    windowSFML.setVerticalSyncEnabled(true);
+}
 
 void MLWindow::setPosition(const Vector2i& pos) {
     windowSFML.setPosition(sf::Vector2i(pos.x, pos.y));

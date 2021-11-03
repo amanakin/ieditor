@@ -25,40 +25,75 @@ StartWidget::StartWidget(const Vector2i& size, const Vector2i& pos, const Color&
 {}
 
 void StartWidget::init() {
-    auto layoutButton = new ButtonPictureRectangle {
+    
+    auto exitButton = new ButtonAnimColor(
+        [this](){
+            this->stop();
+        },
+        *PictureManager::getInstance()->getPicture(DefaultPictures::Exit),
+        Colors::LIGHT_RED,
+        50,
+        Vector2i(0, 0)
+    );
+
+    subWidgets.push_back(exitButton);
+
+    auto layoutButton = new ButtonAnimColor(
         [this]() {
-            auto layoutWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300), this);
-            layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2i(490, 490), Vector2i(5, 5)));
+            auto layoutWindow = new DefaultWindow(Vector2i(700, 500), Vector2i(300, 300), this);
+            layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2i(690, 490), Vector2i(5, 5)));
             this->subWidgets.push_back(layoutWindow);
         },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Brush),
-        Vector2i(50, 50),
-        Vector2i(0, 60),
-        Colors::LIGHT_RED
-    };
+        *PictureManager::getInstance()->getPicture(DefaultPictures::Easel),
+        Colors::LIGHT_RED,
+        50,
+        Vector2i(0, 100)
+    );
 
     subWidgets.push_back(layoutButton);
 
-    auto colorPicker = new ButtonPictureRectangle(
+    auto colorPickerButton = new ButtonAnimColor(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(500, 200), Vector2i(100, 100), this);
-            pickerWindow->workManager->subWidgets.push_back(new ColorPickerGradient(Vector2i(500, 200), Vector2i(0, 0)));
+            auto pickerWindow = new DefaultWindow(Vector2i(700, 300), Vector2i(100, 100), this);
+            pickerWindow->workManager->subWidgets.push_back(new ColorPickerGradient(Vector2i(700, 300), Vector2i(0, 0)));
             this->subWidgets.push_back(pickerWindow);
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Palette),
-        Vector2i(50, 50),
-        Vector2i(0, 120),
-        Colors::LIGHT_RED
+        Colors::LIGHT_RED,
+        50,
+        Vector2i(0, 200)
     );
 
-    subWidgets.push_back(colorPicker);
+    subWidgets.push_back(colorPickerButton);
 
-    auto pickerWindow = new DefaultWindow(Vector2i(500, 200), Vector2i(100, 100), this);
-    pickerWindow->workManager->subWidgets.push_back(new ColorPickerGradient(Vector2i(500, 200), Vector2i(0, 0)));
-    subWidgets.push_back(pickerWindow);
-    subWidgets.push_back(new DefaultWindow(Vector2i(400, 400), Vector2i(300, 300), this));
+    auto brushSizePicker = new ButtonAnimColor(
+        [this]() {
+            auto pickerWindow = new DefaultWindow(Vector2i(100, 300), Vector2i(300, 300), this);
+            pickerWindow->workManager->subWidgets.push_back(new BrushSizePicker(Vector2i(100, 300), Vector2i(0, 0)));
+            this->subWidgets.push_back(pickerWindow);
+        },
+        *PictureManager::getInstance()->getPicture(DefaultPictures::Brush),
+        Colors::LIGHT_RED,
+        50,
+        Vector2i(0, 300)
+    );
 
-    //subWidgets.push_back(new ColorPickerGradient(Vector2i(50, 50)));
+    subWidgets.push_back(brushSizePicker);
+
+
+    auto spliner = new ButtonAnimColor(
+        [this]() {
+            auto pickerWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300), this);
+            pickerWindow->workManager->subWidgets.push_back(new Splines(Vector2i(500, 500), Vector2i(0, 0)));
+            this->subWidgets.push_back(pickerWindow);
+        },
+        *PictureManager::getInstance()->getPicture(DefaultPictures::Spline),
+        Colors::LIGHT_RED,
+        50,
+        Vector2i(0, 400)
+    );
+
+    subWidgets.push_back(spliner);
 }
 
 //*************************************************************

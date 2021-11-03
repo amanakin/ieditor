@@ -32,7 +32,7 @@ struct DefaultWindow: public WidgetManager {
 
 struct Layout: public Widget {
 
-    Layout(const Vector2i size,
+    Layout(const Vector2i& size,
            const Vector2i& pos);
 
     void draw(MLTexture& texture, const Vector2i& absPosWidget)    override;
@@ -41,6 +41,21 @@ struct Layout: public Widget {
     bool testMouse(const Vector2i& relPosEvent)                    override;
 private:
     MLTexture texture;
+};
+
+//*************************************************************
+
+struct PlaneSlider;
+
+struct Splines: public WidgetManager {
+    Splines(const Vector2i& size,
+            const Vector2i& pos);
+    
+    void draw(MLTexture& texture, const Vector2i& absPosWidget)    override;
+
+private:
+    MLTexture texture;
+    std::vector<PlaneSlider*> sliders;
 };
 
 //*************************************************************

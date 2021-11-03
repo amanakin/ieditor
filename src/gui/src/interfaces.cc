@@ -30,13 +30,7 @@ void IDrawablePicture::draw(MLTexture& texture, const Vector2i& absPos) {
 //*************************************************************
 
 bool ITestableRectangle::testMouse(const Vector2i& relPosEvent) {
-    if (IsInsideRect(relPosEvent, Vector2i(0, 0), size)) {
-        return true;
-    } else {
-        return false;
-    }
-    
-    //return IsInsideRect(relPosEvent, Vector2i(0, 0), size);
+    return IsInsideRect(relPosEvent, Vector2i(0, 0), size);
 }
 
 //*************************************************************
@@ -54,20 +48,20 @@ bool ITestableCircle::testMouse(const Vector2i& relPosEvent) {
 bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    {
     if (!testMouse(mouseDrag.currPos - absPosWidget)) {
         isHover = false;
-    } else {
-        isHover = true;
-    }
-
+        return false;
+    } 
+    
+    isHover = true;
     return true;
 }
 
 bool IHoverable::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {
     if (!testMouse(mouseHover.currPos - absPosWidget)) {
         isHover = false;
-    } else {
-        isHover = true;
+        return false;
     }
 
+    isHover = true;
     return true;
 }
 
@@ -91,7 +85,7 @@ bool IMovable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& ab
 
 bool IMovable::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
     if (mouseClick.button == Mouse::Button::Left) {
-        if (mouseClick.type == Event::Type::KeyboardKeyPressed) {
+        if (mouseClick.type == Event::Type::MouseButtonPressed) {
             isPressed = true;
         } else {
             isPressed = false;

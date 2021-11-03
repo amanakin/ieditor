@@ -4,7 +4,9 @@
 #include <utils.h>
 #include <app.h>
 
-void DrawPalette(MLTexture& texture, const Vector2i& size, const Vector2i& absPos, float hue) {
+//*************************************************************
+
+static void DrawPalette(MLTexture& texture, const Vector2i& size, const Vector2i& absPos, float hue) {
     MLRect pixel(Vector2i(ceil(size.x / 100.f), ceil(size.y / 100.f)), Vector2i(0, 0), Colors::BLACK);
 
     auto step = ConvertVector2iToVecto2f(size) * (1.f / 100);
@@ -18,7 +20,7 @@ void DrawPalette(MLTexture& texture, const Vector2i& size, const Vector2i& absPo
     }
 }
 
-void DrawHSV(MLTexture& texture, const Vector2i& size, const Vector2i& absPos){
+static void DrawHSV(MLTexture& texture, const Vector2i& size, const Vector2i& absPos){
     float width = size.y / 360.f;
     MLRect rect(Vector2i(size.x, ceil(width)), absPos, Colors::BLACK);
 
@@ -28,6 +30,8 @@ void DrawHSV(MLTexture& texture, const Vector2i& size, const Vector2i& absPos){
         rect.draw(texture);
     }
 }
+
+//*************************************************************
 
 ColorPickerGradient::ColorPickerGradient(const Vector2i& size, const Vector2i& pos) :
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
@@ -52,8 +56,6 @@ Color ColorPickerGradient::getColor() const {
 }
 
 void ColorPickerGradient::setColor(const Color& color) {
-    pickerColor = color;
-
     ColorHSVA hsva = ConvertRGBAToHSVA(color);
 
     slider->currPos = hsva.x / 360 * slider->height;
@@ -107,11 +109,47 @@ bool ColorPickerGradient::onMouseClick(const Event::MouseClick& mouseClick, cons
     return false;
 }
 
-/*WidthSelector::WidthSelector(const Vector2i& size, const Vector2i& pos) :
-    WidgetManager(size, pos)
-{
-    subWidgets.push_back(new WidgetManager(Vector2i(SLIDER_WIDTH, size.y - SLIDER_EDGE * 2), Vector2i(10, 10), Colors::BLACK));
+//*************************************************************
 
-    slider = new Slider(size.y - SLIDER_EDGE * 2, Vector2i(10, 10));
+BrushSizePicker::BrushSizePicker(const Vector2i& size, const Vector2i& pos) :
+    WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr) {
+
+    slider = new Slider(size.y - 5 * 2, Vector2i((size.x - 10) / 2 - SLIDER_RADIUS + 5, 5), Colors::CRIMSON);
     subWidgets.push_back(slider);
-}*/
+
+    setBrushSize(App::getApp()->settings.brushSize);
+}
+    
+float BrushSizePicker::getBrushSize() const {
+    return (float(slider->currPos) / slider->height) * Settings::MaxBrushSize;
+}
+
+void BrushSizePicker::setBrushSize(float brushSize) {
+    slider->currPos = (brushSize / Settings::MaxBrushSize) * slider->height;
+}
+
+void BrushSizePicker::update() {
+    if (getBrushSize() != App::getApp()->settings.brushSize) {
+        setBrushSize(App::getApp()->settings.brushSize);
+    }
+}
+
+bool BrushSizePicker::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+    if (WidgetManager::onMouseDrag(mouseDrag, absPosWidget)) {
+        App::getApp()->settings.brushSize = getBrushSize();
+        return true;
+    }
+
+    return false;
+}
+
+bool BrushSizePicker::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+    if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
+        App::getApp()->settings.brushSize = getBrushSize();
+        return true;
+    }
+
+    return false;
+}
+
+//*************************************************************

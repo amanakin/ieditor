@@ -7,6 +7,7 @@
 #include <pickers.h>
 #include <pictures.h>
 #include <app.h>
+#include <slider.h>
 
 //*************************************************************
 
@@ -97,7 +98,7 @@ struct WindowBackGround: public Widget {
             Vector2f(size.x - 2 * SIDE_PIXELS, size.y - TITLE_BAR_SIZE));
         center.draw(texture);
 
-        // ----------------------
+        // ---------------------- 
 
         MLSprite downSideBorder(
             *PictureManager::getInstance()->getPicture(DefaultPictures::Window),
@@ -135,31 +136,26 @@ DefaultWindow::DefaultWindow(const Vector2i& size, const Vector2i& pos, WidgetMa
     WidgetManager(size + Vector2i(0, TITLE_BAR_SIZE), pos, Color(0, 0, 0, 0), parent),
     isPressed(false) {
     assert(parent != nullptr);
-
+    
     workManager = new WidgetManager(size, Vector2i(0, TITLE_BAR_SIZE), Color(0, 0, 0, 0), this);
     subWidgets.push_back(workManager);
 
-    subWidgets.push_back(new WindowBackGround(size, Vector2i(0, 0)));
-
-    subWidgets.push_back(new ButtonPictureRectangle(
+    subWidgets.push_back(new ButtonAnimPicture(
         [parent, this]() {
-            printf("done\n");
             for (auto& subWidget: parent->subWidgets) {
                 if ((void*)subWidget == (void*)this) {
-                    printf("%lu\n", parent->subWidgets.size());
-                    std::swap(parent->subWidgets[parent->subWidgets.size() - 1], subWidget);
-                    delete parent->subWidgets[parent->subWidgets.size() - 1];
-                    parent->subWidgets.pop_back();
-                    
+                    subWidget->toClose = true;                    
                     break;
                 }
             }
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Close),
+        DefaultPictures::CloseAnimated,
         Vector2i(20, 20),
-        Vector2i(5, 5),
-        Color(0, 0, 0, 0)
+        Vector2i(5, 5)
     ));
+
+    subWidgets.push_back(new WindowBackGround(size, Vector2i(0, 0)));
 }
 
 
@@ -199,7 +195,7 @@ bool DefaultWindow::onMouseClick(const Event::MouseClick& mouseClick, const Vect
 
 //*************************************************************
 
-Layout::Layout(const Vector2i size,
+Layout::Layout(const Vector2i& size,
            const Vector2i& pos) :
     Widget(size, pos, nullptr),
     texture(size, Colors::WHITE)
@@ -211,9 +207,8 @@ void Layout::draw(MLTexture& texture, const Vector2i& abs) {
 
 bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
     auto paintDot = mouseClick.mousePos - absPosWidget;
-    paintDot.y = size.y - paintDot.y;
     int currSize = App::getApp()->settings.brushSize;
-    MLCircle dot(paintDot, currSize / 10, App::getApp()->settings.drawColor);
+    MLCircle dot(paintDot, currSize, App::getApp()->settings.drawColor);
     dot.draw(texture);
 
     return true;
@@ -223,10 +218,11 @@ bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& a
     MLCircle dot(mouseDrag.currPos - absPosWidget, App::getApp()->settings.brushSize, App::getApp()->settings.drawColor);
  
     auto delta =
-        ConvertVector2iToVecto2f(mouseDrag.currPos - mouseDrag.prevPos);
-    delta *= 1.f / 100;
+        ConvertVector2iToVecto2f(
+        mouseDrag.currPos - mouseDrag.prevPos);
+    delta *= 0.01f;
 
-    auto it = ConvertVector2iToVecto2f(mouseDrag.currPos - absPosWidget);
+    auto it = ConvertVector2iToVecto2f(mouseDrag.prevPos - absPosWidget);
 
     for (int i = 0; i < 100; i++, it += delta) {
         dot.setPosition(Vector2i(it.x, it.y));
@@ -235,8 +231,6 @@ bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& a
 
     return true;
 }
-
-
 
 bool Layout::testMouse(const Vector2i& relPosEvent) {
     if (IsInsideRect(relPosEvent, Vector2i(0, 0), size)) {
@@ -248,3 +242,80 @@ bool Layout::testMouse(const Vector2i& relPosEvent) {
 
 //*************************************************************
 
+float GetT(float t, float alpha, const Vector2i& p0, const Vector2i& p1 )
+{
+    auto d  = p1 - p0;
+    float a = DotProduct(d, d); 
+    float b = std::pow( a, alpha*.5f );
+    return (b + t);
+}
+
+void PrintVector(const Vector2i& vector) {
+    printf("vec: %d %d\n", vector.x, vector.y);
+}
+
+Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, const Vector2i& p3, float t /* between 0 and 1 */, float alpha=.5f /* between 0 and 1 */ )
+{
+    float t0 = 0.0f;
+    float t1 = GetT( t0, alpha, p0, p1 );
+    float t2 = GetT( t1, alpha, p1, p2 );
+    float t3 = GetT( t2, alpha, p2, p3 );
+
+    //printf("t0 = %f, t1 = %f, t2 = %f, t3 = %f\n", t0, t1, t2, t3);
+
+    t = std::lerp( t1, t2, t );
+    Vector2f A1 = ( t1-t )/( t1-t0 )*ConvertVector2iToVecto2f(p0) + ( t-t0 )/( t1-t0 )*ConvertVector2iToVecto2f(p1);
+    Vector2f A2 = ( t2-t )/( t2-t1 )*ConvertVector2iToVecto2f(p1) + ( t-t1 )/( t2-t1 )*ConvertVector2iToVecto2f(p2);
+    Vector2f A3 = ( t3-t )/( t3-t2 )*ConvertVector2iToVecto2f(p2) + ( t-t2 )/( t3-t2 )*ConvertVector2iToVecto2f(p3);
+    Vector2f B1 = ( t2-t )/( t2-t0 )*A1 + ( t-t0 )/( t2-t0 )*A2;
+    Vector2f B2 = ( t3-t )/( t3-t1 )*A2 + ( t-t1 )/( t3-t1 )*A3;
+    Vector2i C  = ConvertVector2fToVecto2i(( t2-t )/( t2-t1 )*B1 + ( t-t1 )/( t2-t1 )*B2);
+    
+    return C;
+}
+
+Splines::Splines(const Vector2i& size,
+            const Vector2i& pos) :
+    WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
+    texture(size, Colors::LIGHT_BLUE) {
+    
+    for (int i = 0; i < 4; i++) {
+        sliders.push_back(new PlaneSlider(size, Vector2i(0, 0), Color(0, 0, 0, 0)));
+        subWidgets.push_back(sliders[i]);
+        sliders[i]->currPos = Vector2i(20 * i, 20 * i);
+    }
+}    
+
+void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+    this->texture.clear();
+
+    std::vector<Vector2i> vectors(sliders.size() + 2);
+    for (size_t idx = 0; idx < sliders.size(); ++idx) {
+        vectors[idx + 1] = sliders[idx]->currPos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
+    }
+    vectors[0] = vectors[1] + Vector2i(-1, -1);
+    vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(1, 1);
+
+    MLCircle dot(Vector2i(0, 0), 1, Colors::BLACK);
+    for (size_t idx = 1; idx < vectors.size() - 2; ++idx) {
+        
+        for (int i = 0; i < vectors[idx + 1].x - vectors[idx].x; i++) {
+
+            //printf("delta = %d\n", vectors[idx + 1].x - vectors[idx].x);
+            
+            float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
+            auto pos = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
+            //printf("pos = %d, %d\n", pos.x, pos.y);
+            dot.setPosition(pos);
+            dot.draw(this->texture);
+        }
+        
+    }
+
+    this->texture.draw(texture, absPosWidget);
+
+    WidgetManager::draw(texture, absPosWidget);
+
+}
+
+//*************************************************************
