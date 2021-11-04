@@ -16,6 +16,7 @@ enum Picture {
     Brush,
     Button,
     Spline,
+    SplineSlider,
     SIZE
 };
 

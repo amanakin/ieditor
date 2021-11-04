@@ -3,7 +3,7 @@
 #include <cassert>
 #include <cstring>
 
-#define STUFF_FOLDER "/home/anton/Projects/ieditor/stuff/"
+#define STUFF_FOLDER "stuff/"
 #define PATH_MAX 4096
 
 #include <pictures.h>
@@ -20,6 +20,7 @@ const char* GetPictureName(DefaultPictures::Picture picture) {
     case DefaultPictures::Picture::Brush:         return "brush.png";
     case DefaultPictures::Picture::Button:        return "button.png";
     case DefaultPictures::Picture::Spline:        return "spline.png";
+    case DefaultPictures::Picture::SplineSlider:  return "spline_slider.png";
     default:
         assert("No such default picture");
         return "error";

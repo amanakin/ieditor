@@ -45,7 +45,16 @@ private:
 
 //*************************************************************
 
-struct PlaneSlider;
+struct SplineSlider: virtual public Widget, public ITestableRectangle {
+    // size - borders of the rectangle 
+    SplineSlider(const Vector2i& size, const Vector2i& pos);
+
+    void draw(MLTexture& texture, const Vector2i& absPosWidget)                       override;
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) override;
+    
+    Vector2i bgSize;
+    MLSprite sprite;
+};
 
 struct Splines: public WidgetManager {
     Splines(const Vector2i& size,
@@ -55,7 +64,7 @@ struct Splines: public WidgetManager {
 
 private:
     MLTexture texture;
-    std::vector<PlaneSlider*> sliders;
+    std::vector<SplineSlider*> sliders;
 };
 
 //*************************************************************

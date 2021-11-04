@@ -13,7 +13,7 @@
 //static const char* const STUFF_FOLDER = "/home/anton/Projects/ieditor/stuff/";
 //static const char* const FONT_FILENAME = "arial.ttf";
 
-#define STUFF_FOLDER "/home/anton/Projects/ieditor/stuff/"
+#define STUFF_FOLDER "stuff/"
 #define FONT_FILENAME "arial.ttf"
 
 static const char* const APP_NAME = "iEditor"; 
@@ -84,7 +84,7 @@ void StartWidget::init() {
     auto spliner = new ButtonAnimColor(
         [this]() {
             auto pickerWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300), this);
-            pickerWindow->workManager->subWidgets.push_back(new Splines(Vector2i(500, 500), Vector2i(0, 0)));
+            pickerWindow->workManager->subWidgets.push_back(new Splines(Vector2i(500 - 10, 500 - 10), Vector2i(5, 5)));
             this->subWidgets.push_back(pickerWindow);
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Spline),

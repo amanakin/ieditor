@@ -25,6 +25,10 @@ void Slider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
 }
 
 bool Slider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+    if (mouseDrag.button != Mouse::Button::Left) {
+        return false;
+    }
+
     int delta = mouseDrag.currPos.y - mouseDrag.prevPos.y;
     currPos += delta;
 
@@ -38,10 +42,6 @@ bool Slider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absP
 }
 
 bool Slider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
-    if (!IsInsideRect(mouseClick.mousePos, absPosWidget, size)) {
-        return false;
-    }
-
     if (mouseClick.button != Mouse::Button::Left || mouseClick.type != Event::Type::MouseButtonPressed) {
         return false;
     }
@@ -60,7 +60,7 @@ bool Slider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 //*************************************************************
 
 PlaneSlider::PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color& color) :
-    Widget(Vector2i(2 * SLIDER_RADIUS, 2 * SLIDER_RADIUS), pos, nullptr),
+    Widget(size, pos, nullptr),
     currPos(pos),
     bgSize(Vector2i(size.x - 2 * SLIDER_RADIUS, size.y - 2 * SLIDER_RADIUS)),
     bg(color),
@@ -69,15 +69,18 @@ PlaneSlider::PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color&
 {}
 
 void PlaneSlider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
-    pos = currPos;
     MLRect back(bgSize, absPosWidget + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS), bg);
     back.draw(texture);
 
-    sprite.setPosition(absPosWidget);
+    sprite.setPosition(absPosWidget + currPos);
     sprite.draw(texture);
 }
 
 bool PlaneSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    {
+    if (mouseDrag.button != Mouse::Button::Left) {
+        return false;
+    }
+    
     auto delta = mouseDrag.currPos - mouseDrag.prevPos;
     currPos += delta;
 
@@ -93,16 +96,10 @@ bool PlaneSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i&
         currPos.y = bgSize.y;
     }
 
-    pos = currPos;
-
     return true;
 }
 
-bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
-    /*if (!IsInsideRect(mouseClick.mousePos, absPosWidget, size)) {
-        return false;
-    }
-    
+bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {    
     if (mouseClick.button != Mouse::Button::Left || mouseClick.type != Event::Type::MouseButtonPressed) {
         return false;
     }
@@ -119,10 +116,9 @@ bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector
         currPos.y = 0;
     } else if (currPos.y > bgSize.y) {
         currPos.y = bgSize.y;
-    }*/
-    return false;
+    }
 
-    //return true;
+    return true;
 }
 
 //*************************************************************

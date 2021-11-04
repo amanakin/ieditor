@@ -206,6 +206,10 @@ void Layout::draw(MLTexture& texture, const Vector2i& abs) {
 }
 
 bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+    if (mouseClick.button != Mouse::Button::Left) {
+        return false;
+    }
+    
     auto paintDot = mouseClick.mousePos - absPosWidget;
     int currSize = App::getApp()->settings.brushSize;
     MLCircle dot(paintDot, currSize, App::getApp()->settings.drawColor);
@@ -215,6 +219,10 @@ bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 }
 
 bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) {
+    if (mouseDrag.button != Mouse::Button::Left) {
+        return false;
+    }
+    
     MLCircle dot(mouseDrag.currPos - absPosWidget, App::getApp()->settings.brushSize, App::getApp()->settings.drawColor);
  
     auto delta =
@@ -242,16 +250,49 @@ bool Layout::testMouse(const Vector2i& relPosEvent) {
 
 //*************************************************************
 
+SplineSlider::SplineSlider(const Vector2i& size, const Vector2i& pos) :
+    Widget(Vector2i(2 * SLIDER_RADIUS, 2 * SLIDER_RADIUS), pos, nullptr),
+    bgSize(Vector2i(size.x - 2 * SLIDER_RADIUS, size.y - 2 * SLIDER_RADIUS)),
+    sprite(*PictureManager::getInstance()->getPicture(DefaultPictures::SplineSlider),
+            Vector2i(SLIDER_RADIUS * 2, SLIDER_RADIUS * 2), pos)
+{}
+
+void SplineSlider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+    sprite.setPosition(absPosWidget);
+    sprite.draw(texture);
+}
+
+bool SplineSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    {
+    if (mouseDrag.button != Mouse::Button::Left) {
+        return false;
+    }
+    
+    auto delta = mouseDrag.currPos - mouseDrag.prevPos;
+
+    pos += delta;
+
+    if (pos.x < 0) {
+        pos.x = 0;
+    } else if (pos.x > bgSize.x) {
+        pos.x = bgSize.x;
+    }
+
+    if (pos.y < 0) {
+        pos.y = 0;
+    } else if (pos.y > bgSize.y) {
+        pos.y = bgSize.y;
+    }
+
+    return true;
+}
+
+
 float GetT(float t, float alpha, const Vector2i& p0, const Vector2i& p1 )
 {
     auto d  = p1 - p0;
     float a = DotProduct(d, d); 
     float b = std::pow( a, alpha*.5f );
     return (b + t);
-}
-
-void PrintVector(const Vector2i& vector) {
-    printf("vec: %d %d\n", vector.x, vector.y);
 }
 
 Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, const Vector2i& p3, float t /* between 0 and 1 */, float alpha=.5f /* between 0 and 1 */ )
@@ -280,9 +321,8 @@ Splines::Splines(const Vector2i& size,
     texture(size, Colors::LIGHT_BLUE) {
     
     for (int i = 0; i < 4; i++) {
-        sliders.push_back(new PlaneSlider(size, Vector2i(0, 0), Color(0, 0, 0, 0)));
+        sliders.push_back(new SplineSlider(size, Vector2i(20*(i  + 1), 20*(i  + 1))));
         subWidgets.push_back(sliders[i]);
-        sliders[i]->currPos = Vector2i(20 * i, 20 * i);
     }
 }    
 
@@ -291,7 +331,7 @@ void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
 
     std::vector<Vector2i> vectors(sliders.size() + 2);
     for (size_t idx = 0; idx < sliders.size(); ++idx) {
-        vectors[idx + 1] = sliders[idx]->currPos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
+        vectors[idx + 1] = sliders[idx]->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
     }
     vectors[0] = vectors[1] + Vector2i(-1, -1);
     vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(1, 1);
@@ -300,12 +340,10 @@ void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     for (size_t idx = 1; idx < vectors.size() - 2; ++idx) {
         
         for (int i = 0; i < vectors[idx + 1].x - vectors[idx].x; i++) {
-
-            //printf("delta = %d\n", vectors[idx + 1].x - vectors[idx].x);
             
             float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
             auto pos = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
-            //printf("pos = %d, %d\n", pos.x, pos.y);
+
             dot.setPosition(pos);
             dot.draw(this->texture);
         }

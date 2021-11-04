@@ -44,11 +44,11 @@ set(SOURCES
 
 find_package(SFML 2 COMPONENTS system window graphics network audio REQUIRED)
 
-add_executable(ieditor ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(ieditor sfml-graphics sfml-window sfml-system)
+target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
-
+file(COPY stuff DESTINATION .)
