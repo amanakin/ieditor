@@ -50,10 +50,28 @@ struct MLRect {
     float    getAngle()    const;
 
     void draw(MLWindow&  window) const;
-    void draw(MLTexture& layout) const;
+    void draw(MLTexture& texture) const;
 
 private:
     sf::RectangleShape rect;
+};
+
+//*************************************************************
+
+struct MLSegment {
+    MLSegment(const Vector2i& start, const Vector2i& end, const Color& color);
+
+    void setStart(const Vector2i& start);
+    void setEnd(const Vector2i& end);
+    void setColor(const Color& color);
+
+    Color getColor() const;
+
+    void draw(MLWindow& window) const;
+    void draw(MLTexture& texture) const;
+
+private:
+    std::array<sf::Vertex, 2> segment;
 };
 
 //*************************************************************
@@ -152,6 +170,7 @@ struct MLTexture {
     friend MLRect;
     friend MLText;
     friend MLSprite;
+    friend MLSegment;
 
 private:
     sf::RenderTexture renderTexture;
@@ -185,6 +204,7 @@ struct MLWindow {
     friend MLText;
     friend MLSprite;
     friend MLTexture;
+    friend MLSegment;
 
 private:
     sf::RenderWindow windowSFML;

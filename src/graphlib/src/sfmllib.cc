@@ -149,6 +149,41 @@ void MLRect::draw(MLTexture& texture) const {
     texture.renderTexture.draw(rect);
 } 
 
+
+//*************************************************************
+//*************************************************************
+
+MLSegment::MLSegment(const Vector2i& start, const Vector2i& end, const Color& color) {
+    setStart(start);
+    setEnd(end);
+
+    setColor(color);    
+}
+
+void MLSegment::setStart(const Vector2i& start) {
+    segment[0].position = ConvertVectorToSFMLVector(start);
+}
+
+void MLSegment::setEnd(const Vector2i& end) {
+    segment[1].position = ConvertVectorToSFMLVector(end);
+}
+
+void MLSegment::setColor(const Color& color) {
+    segment[0].color = ConvertColorToSFMLColor(color);
+    segment[1].color = ConvertColorToSFMLColor(color);
+}
+
+Color MLSegment::getColor() const {
+    return ConvertSFMLColorToColor(segment[0].color);
+}
+
+void MLSegment::draw(MLWindow& window) const {
+    window.windowSFML.draw(segment.data(), 2, sf::Lines);
+}
+void MLSegment::draw(MLTexture& texture) const {
+    texture.renderTexture.draw(segment.data(), 2, sf::Lines);
+}
+
 //*************************************************************
 //*************************************************************
 

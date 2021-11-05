@@ -320,7 +320,7 @@ Splines::Splines(const Vector2i& size,
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
     texture(size, Colors::LIGHT_BLUE) {
     
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 8; i++) {
         sliders.push_back(new SplineSlider(size, Vector2i(20*(i  + 1), 20*(i  + 1))));
         subWidgets.push_back(sliders[i]);
     }
@@ -329,6 +329,12 @@ Splines::Splines(const Vector2i& size,
 void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     this->texture.clear();
 
+    std::sort(sliders.begin(), sliders.end(),
+        [](const SplineSlider* a, const SplineSlider* b) -> bool {
+            return (a->pos.x) < (b->pos.x);
+        });
+
+
     std::vector<Vector2i> vectors(sliders.size() + 2);
     for (size_t idx = 0; idx < sliders.size(); ++idx) {
         vectors[idx + 1] = sliders[idx]->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
@@ -336,16 +342,21 @@ void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     vectors[0] = vectors[1] + Vector2i(-1, -1);
     vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(1, 1);
 
-    MLCircle dot(Vector2i(0, 0), 1, Colors::BLACK);
+    MLSegment segment(Vector2i(0, 0), Vector2i(0, 0), Colors::BLACK);
+    Vector2i pos = vectors[0];
+
     for (size_t idx = 1; idx < vectors.size() - 2; ++idx) {
+
+        segment.setStart(vectors[idx]);    
         
-        for (int i = 0; i < vectors[idx + 1].x - vectors[idx].x; i++) {
+        for (int i = 0; i <= vectors[idx + 1].x - vectors[idx].x; i++) {
             
             float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
-            auto pos = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
+            pos = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
+            segment.setEnd(pos);
 
-            dot.setPosition(pos);
-            dot.draw(this->texture);
+            segment.draw(this->texture);
+            segment.setStart(pos);
         }
         
     }
