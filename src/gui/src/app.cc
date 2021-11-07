@@ -42,7 +42,7 @@ void StartWidget::init() {
         [this]() {
             auto layoutWindow = new DefaultWindow(Vector2i(700, 500), Vector2i(300, 300), this);
             layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2i(690, 490), Vector2i(5, 5)));
-            this->subWidgets.push_back(layoutWindow);
+            this->subWidgets.push_front(layoutWindow);
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Easel),
         Colors::LIGHT_RED,
@@ -56,7 +56,7 @@ void StartWidget::init() {
         [this]() {
             auto pickerWindow = new DefaultWindow(Vector2i(700, 300), Vector2i(100, 100), this);
             pickerWindow->workManager->subWidgets.push_back(new ColorPickerGradient(Vector2i(700, 300), Vector2i(0, 0)));
-            this->subWidgets.push_back(pickerWindow);
+            this->subWidgets.push_front(pickerWindow);
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Palette),
         Colors::LIGHT_RED,
@@ -70,7 +70,7 @@ void StartWidget::init() {
         [this]() {
             auto pickerWindow = new DefaultWindow(Vector2i(100, 300), Vector2i(300, 300), this);
             pickerWindow->workManager->subWidgets.push_back(new BrushSizePicker(Vector2i(100, 300), Vector2i(0, 0)));
-            this->subWidgets.push_back(pickerWindow);
+            this->subWidgets.push_front(pickerWindow);
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Brush),
         Colors::LIGHT_RED,
@@ -85,7 +85,7 @@ void StartWidget::init() {
         [this]() {
             auto pickerWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300), this);
             pickerWindow->workManager->subWidgets.push_back(new Splines(Vector2i(500 - 10, 500 - 10), Vector2i(5, 5)));
-            this->subWidgets.push_back(pickerWindow);
+            this->subWidgets.push_front(pickerWindow);
         },
         *PictureManager::getInstance()->getPicture(DefaultPictures::Spline),
         Colors::LIGHT_RED,
@@ -96,42 +96,6 @@ void StartWidget::init() {
     subWidgets.push_back(spliner);
 }
 
-//*************************************************************
-
-/*AnnoyingWidget::AnnoyingWidget(const Vector2i& pos, MLWindow* window, MLFont* font) :
-    MainWidget(Vector2i(400, 200), pos, window, Colors::DARK_GREY), count(0), font(font)
-{}
-
-void AnnoyingWidget::init() {
-
-    auto window = new DefaultWindow(
-        this, Vector2i(400, 200), Vector2i(0, 0)
-    );
-
-    subWidgets.push_back(window);
-
-    window->getWorkManager()->subWidgets.push_back(
-        new Text(
-        "Are really want to exit?",
-        Vector2i(80, 40),
-        25, Colors::WHITE, *font
-    ));
-
-    window->getWorkManager()->subWidgets.push_back(
-        new ButtonPictureRectangle(
-        [this]() {
-            this->count++;
-            if (count >= 5) {
-                this->stop();
-            }
-        },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Exit3D),
-        Vector2i(200, 100),
-        Vector2i(100, 80),
-        Color(0, 0, 0, 0)
-    ));
-}
-*/
 //*************************************************************
 
 App* App::app = nullptr;

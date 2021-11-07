@@ -286,6 +286,14 @@ bool SplineSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i
     return true;
 }
 
+bool SplineSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+    if (mouseClick.button == Mouse::Button::Right) {
+       this->toClose = true;
+    }
+
+    return true;
+}
+
 
 float GetT(float t, float alpha, const Vector2i& p0, const Vector2i& p1 )
 {
@@ -302,8 +310,6 @@ Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, 
     float t2 = GetT( t1, alpha, p1, p2 );
     float t3 = GetT( t2, alpha, p2, p3 );
 
-    //printf("t0 = %f, t1 = %f, t2 = %f, t3 = %f\n", t0, t1, t2, t3);
-
     t = std::lerp( t1, t2, t );
     Vector2f A1 = ( t1-t )/( t1-t0 )*ConvertVector2iToVecto2f(p0) + ( t-t0 )/( t1-t0 )*ConvertVector2iToVecto2f(p1);
     Vector2f A2 = ( t2-t )/( t2-t1 )*ConvertVector2iToVecto2f(p1) + ( t-t1 )/( t2-t1 )*ConvertVector2iToVecto2f(p2);
@@ -318,29 +324,33 @@ Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, 
 Splines::Splines(const Vector2i& size,
             const Vector2i& pos) :
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
-    texture(size, Colors::LIGHT_BLUE) {
-    
-    for (int i = 0; i < 8; i++) {
-        sliders.push_back(new SplineSlider(size, Vector2i(20*(i  + 1), 20*(i  + 1))));
-        subWidgets.push_back(sliders[i]);
-    }
+    texture(size, Colors::LIGHT_BLUE) 
+{
+    addSlider(Vector2i(50, 50));
 }    
+
+void Splines::addSlider(const Vector2i& pos) {
+    subWidgets.push_front(new SplineSlider(size, pos));
+}
 
 void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     this->texture.clear();
 
-    std::sort(sliders.begin(), sliders.end(),
-        [](const SplineSlider* a, const SplineSlider* b) -> bool {
+    subWidgets.sort([](const Widget* a, const Widget* b) -> bool {
             return (a->pos.x) < (b->pos.x);
         });
 
 
-    std::vector<Vector2i> vectors(sliders.size() + 2);
-    for (size_t idx = 0; idx < sliders.size(); ++idx) {
-        vectors[idx + 1] = sliders[idx]->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
+    std::vector<Vector2i> vectors(subWidgets.size() + 4);
+
+    size_t idx = 2;
+    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it, ++idx) {
+        vectors[idx] = (*it)->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
     }
-    vectors[0] = vectors[1] + Vector2i(-1, -1);
-    vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(1, 1);
+    vectors[0] = Vector2i(0, size.y);
+    vectors[1] = vectors[0] + Vector2i(1, -1);
+    vectors[vectors.size() - 2] = Vector2i(size.x, 0);
+    vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(-1, 1);
 
     MLSegment segment(Vector2i(0, 0), Vector2i(0, 0), Colors::BLACK);
     Vector2i pos = vectors[0];
@@ -350,12 +360,13 @@ void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
         segment.setStart(vectors[idx]);    
         
         for (int i = 0; i <= vectors[idx + 1].x - vectors[idx].x; i++) {
-            
+
             float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
             pos = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
             segment.setEnd(pos);
 
             segment.draw(this->texture);
+
             segment.setStart(pos);
         }
         
@@ -366,5 +377,48 @@ void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     WidgetManager::draw(texture, absPosWidget);
 
 }
+
+bool Splines::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+    if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
+        return true;
+    }
+    
+    if (mouseClick.button != Mouse::Button::Left) {
+        return false;
+    }  
+
+    auto mouseRelPos = mouseClick.mousePos - absPosWidget;  
+
+    std::vector<Vector2i> vectors(subWidgets.size() + 4);
+
+    size_t idx = 2;
+    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it, ++idx) {
+        vectors[idx] = (*it)->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
+    }
+    vectors[0] = Vector2i(0, size.y);
+    vectors[1] = vectors[0] + Vector2i(1, -1);
+    vectors[vectors.size() - 2] = Vector2i(size.x, 0);
+    vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(-1, 1);
+
+    for (size_t idx = 1; idx < vectors.size() - 2; ++idx) {
+
+        
+        for (int i = 0; i <= vectors[idx + 1].x - vectors[idx].x; i++) {
+
+            float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
+            auto posCatmull = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
+        
+            if ((posCatmull - mouseRelPos).getLen() < 4) {
+                addSlider(mouseRelPos - Vector2i(SLIDER_RADIUS, SLIDER_RADIUS));
+                return true;
+            }
+        }
+        
+    }
+    
+    return false;
+
+} 
+
 
 //*************************************************************
