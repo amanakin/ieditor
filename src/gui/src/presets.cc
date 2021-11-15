@@ -294,40 +294,11 @@ bool SplineSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vecto
     return true;
 }
 
-
-float GetT(float t, float alpha, const Vector2i& p0, const Vector2i& p1 )
-{
-    auto d  = p1 - p0;
-    float a = DotProduct(d, d); 
-    float b = std::pow( a, alpha*.5f );
-    return (b + t);
-}
-
-Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, const Vector2i& p3, float t /* between 0 and 1 */, float alpha=.5f /* between 0 and 1 */ )
-{
-    float t0 = 0.0f;
-    float t1 = GetT( t0, alpha, p0, p1 );
-    float t2 = GetT( t1, alpha, p1, p2 );
-    float t3 = GetT( t2, alpha, p2, p3 );
-
-    t = std::lerp( t1, t2, t );
-    Vector2f A1 = ( t1-t )/( t1-t0 )*ConvertVector2iToVecto2f(p0) + ( t-t0 )/( t1-t0 )*ConvertVector2iToVecto2f(p1);
-    Vector2f A2 = ( t2-t )/( t2-t1 )*ConvertVector2iToVecto2f(p1) + ( t-t1 )/( t2-t1 )*ConvertVector2iToVecto2f(p2);
-    Vector2f A3 = ( t3-t )/( t3-t2 )*ConvertVector2iToVecto2f(p2) + ( t-t2 )/( t3-t2 )*ConvertVector2iToVecto2f(p3);
-    Vector2f B1 = ( t2-t )/( t2-t0 )*A1 + ( t-t0 )/( t2-t0 )*A2;
-    Vector2f B2 = ( t3-t )/( t3-t1 )*A2 + ( t-t1 )/( t3-t1 )*A3;
-    Vector2i C  = ConvertVector2fToVecto2i(( t2-t )/( t2-t1 )*B1 + ( t-t1 )/( t2-t1 )*B2);
-    
-    return C;
-}
-
 Splines::Splines(const Vector2i& size,
             const Vector2i& pos) :
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
     texture(size, Colors::LIGHT_BLUE) 
-{
-    addSlider(Vector2i(50, 50));
-}    
+{}    
 
 void Splines::addSlider(const Vector2i& pos) {
     subWidgets.push_front(new SplineSlider(size, pos));

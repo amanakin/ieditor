@@ -41,7 +41,7 @@ struct ButtonAnimColor: virtual public Widget, public IClickable<Handler>,
         IClickable<Handler>(handler),
         ITestableCircle(radius),
         sideColor(sideColor),
-        mainPicture(mainPicture, Vector2i(sqrt(2) * radius, sqrt(2) * radius), Vector2i(0, 0)),
+        mainPicture(mainPicture, Vector2i(sqrt(2) * radius, sqrt(2) * radius) - Vector2i(6, 6), Vector2i(3, 3)),
         isAnimated(false)
     {
         isHover = false;
@@ -91,7 +91,7 @@ struct ButtonAnimColor: virtual public Widget, public IClickable<Handler>,
             }
         }
 
-        mainPicture.setPosition(absPos + Vector2i(int(radius * (1 - 1/sqrt(2))),int(radius * (1 - 1/sqrt(2))) ) );
+        mainPicture.setPosition(absPos + Vector2i(3, 3) + Vector2i(int(radius * (1 - 1/sqrt(2))),int(radius * (1 - 1/sqrt(2))) ) );
         mainPicture.draw(texture);
     }
 

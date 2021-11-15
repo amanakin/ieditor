@@ -19,6 +19,8 @@ float GetRotateAngle(const Vector2f& vector1);
 
 bool IsInsideRect(const Vector2i& hit, const Vector2i& pos, const Vector2i& size);
 
+Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, const Vector2i& p3, float t /* between 0 and 1 */, float alpha=.5f);
+
 // Crossing two segments, segment == pos + dir
 bool AreCrossing(const Vector2f& pos1, const Vector2f& dir1,
                  const Vector2f& pos2, const Vector2f& dir2);
