@@ -51,11 +51,32 @@ static sf::Keyboard::Key ConvertKeyToSFMLKey(Keyboard::Key key) {
     CONVERT_KEY(X)
     CONVERT_KEY(Y)
     CONVERT_KEY(Z)
+    CONVERT_KEY(Space)
+    CONVERT_KEY(Slash)
+    CONVERT_KEY(Comma)
+    case Keyboard::Key::Dot: return sf::Keyboard::Key::Period;
+    CONVERT_KEY(Semicolon)
+    CONVERT_KEY(Tilde)
+    CONVERT_KEY(Num0)
+    CONVERT_KEY(Num1)
+    CONVERT_KEY(Num2)
+    CONVERT_KEY(Num3)
+    CONVERT_KEY(Num4)
+    CONVERT_KEY(Num5)
+    CONVERT_KEY(Num6)
+    CONVERT_KEY(Num7)
+    CONVERT_KEY(Num8)
+    CONVERT_KEY(Num9)
     CONVERT_KEY(Left)
     CONVERT_KEY(Right)
-    CONVERT_KEY(Space)
+    CONVERT_KEY(Up)
+    CONVERT_KEY(Down)
     CONVERT_KEY(Enter)
-    CONVERT_KEY(BackSpace)
+    CONVERT_KEY(Backspace)
+    CONVERT_KEY(LControl)
+    CONVERT_KEY(LShift)
+    CONVERT_KEY(LAlt)
+    CONVERT_KEY(LSystem)
     default: 
         assert("Wrong convert Key to SFMLKey");
         return sf::Keyboard::Key::A;
@@ -224,7 +245,7 @@ MLFont::MLFont(const std::string& filename) {
 
 MLText::MLText(const std::string& str,
                const Vector2i& pos,
-               int height,
+               unsigned height,
                const Color& color,
                const MLFont& font) :
     font(font)
@@ -240,7 +261,7 @@ void MLText::setString(const std::string& str) {
     text.setString(str);
 }
 
-void MLText::setHeight(int height) {
+void MLText::setHeight(unsigned height) {
     text.setCharacterSize(height);
 }
 
@@ -266,6 +287,10 @@ int MLText::getHeight() const {
 
 Vector2i MLText::getPosition() const {
     return ConvertSFMLVectorToVector(text.getPosition());
+}
+
+Vector2i MLText::getCharPos(unsigned pos) const {
+    return ConvertSFMLVectorToVector(text.findCharacterPos(pos));
 }
 
 void MLText::draw(MLWindow& window) const {

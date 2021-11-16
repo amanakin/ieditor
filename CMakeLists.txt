@@ -23,6 +23,7 @@ set(SOURCES
     ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/src/utils.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/util/src/color.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/util/src/timer.cc
 )
 
 set(SOURCES

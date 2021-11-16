@@ -93,10 +93,10 @@ private:
 
 struct MLText {
     // size - height of symbol in pixels 
-    MLText(const std::string& str, const Vector2i& pos, int height, const Color& color, const MLFont& font);
+    MLText(const std::string& str, const Vector2i& pos, unsigned height, const Color& color, const MLFont& font);
 
     void setString(const std::string& str);
-    void setHeight(int height);
+    void setHeight(unsigned height);
     void setColor(const Color& color);
     void setPosition(const Vector2i& pos);
 
@@ -104,7 +104,9 @@ struct MLText {
     Color     getColor()    const;
     Vector2i  getSize()     const;
     int       getHeight()   const; 
-    Vector2i  getPosition() const; 
+    Vector2i  getPosition() const;
+
+    Vector2i getCharPos(unsigned pos) const;
 
     void draw(MLWindow&  window) const;
     void draw(MLTexture& layout) const;

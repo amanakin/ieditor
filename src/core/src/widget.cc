@@ -97,6 +97,7 @@ bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick, const Vect
 }
 
 bool WidgetManager::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {    
+    
     for (auto& subWidget: subWidgets) {
         if (subWidget->isActive &&
             subWidget->testMouse(mouseDrag.prevPos - subWidget->pos - absPosWidget) &&
@@ -148,6 +149,8 @@ RootWidget::RootWidget(const Vector2i& size, const Vector2i& pos,
 
 void RootWidget::start() {
     init();
+
+    
 
     while (window->isOpen() && !isStopped) {
         eventManager.pollEvent();

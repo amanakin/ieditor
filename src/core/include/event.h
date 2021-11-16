@@ -19,44 +19,63 @@ namespace Mouse {
 
 namespace Keyboard {
     enum Key {
-        A,
-        B,
-        C,
-        D,
-        E,
-        F,
-        G,
-        H,
-        I,
-        J,
-        K,
-        L,
-        M,
-        N,
-        O,
-        P,
-        Q,
-        R,
-        S,
-        T,
-        U,
-        V,
-        W,
-        X,
-        Y,
-        Z,
+        A = 'A',
+        B = 'B',
+        C = 'C',
+        D = 'D',
+        E = 'E',
+        F = 'F',
+        G = 'G',
+        H = 'H',
+        I = 'I',
+        J = 'J',
+        K = 'K',
+        L = 'L',
+        M = 'M',
+        N = 'N',
+        O = 'O',
+        P = 'P',
+        Q = 'Q',
+        R = 'R',
+        S = 'S',
+        T = 'T',
+        U = 'U',
+        V = 'V',
+        W = 'W',
+        X = 'X',
+        Y = 'Y',
+        Z = 'Z',
+        Space =     ' ',
+        Slash =     '/',     
+        Comma =     ',',     
+        Dot =       '.',       
+        Semicolon = ';',
+        Tilde =     '~',
+        Num0, 
+        Num1,
+        Num2,
+        Num3,
+        Num4,
+        Num5,
+        Num6,
+        Num7,
+        Num8,
+        Num9,
         Left,
         Right,
-        Space,
+        Up,
+        Down,
         Enter,
-        BackSpace,
-        SIZE,
+        Backspace,
+        LControl,
+        LShift,
+        LAlt,
+        LSystem,
+        SIZE = 52,
     };
 
-    bool IsChar(enum Key key);
-
-    char GetChar(enum Key key);
-
+    bool IsLetter(enum Key key);
+    bool IsSpecChar(enum Key key);
 };
 
 //*************************************************************
@@ -121,6 +140,8 @@ struct EventManager {
 
 private:
     std::array<bool, Mouse::Button::SIZE> isButtonPressed;
+
+    std::array<int, Keyboard::Key::SIZE> keyboardMap;
     std::array<bool, Keyboard::Key::SIZE> isKeyPressed;
 
     Vector2i mousePos;
