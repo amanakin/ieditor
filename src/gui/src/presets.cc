@@ -298,7 +298,9 @@ Splines::Splines(const Vector2i& size,
             const Vector2i& pos) :
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
     texture(size, Colors::LIGHT_BLUE) 
-{}    
+{
+    updateDots();
+}    
 
 void Splines::addSlider(const Vector2i& pos) {
     subWidgets.push_front(new SplineSlider(size, pos));
@@ -307,50 +309,41 @@ void Splines::addSlider(const Vector2i& pos) {
 void Splines::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     this->texture.clear();
 
-    subWidgets.sort([](const Widget* a, const Widget* b) -> bool {
-            return (a->pos.x) < (b->pos.x);
-        });
-
-
-    std::vector<Vector2i> vectors(subWidgets.size() + 4);
-
-    size_t idx = 2;
-    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it, ++idx) {
-        vectors[idx] = (*it)->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
-    }
-    vectors[0] = Vector2i(0, size.y);
-    vectors[1] = vectors[0] + Vector2i(1, -1);
-    vectors[vectors.size() - 2] = Vector2i(size.x, 0);
-    vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(-1, 1);
-
     MLSegment segment(Vector2i(0, 0), Vector2i(0, 0), Colors::BLACK);
-    Vector2i pos = vectors[0];
+    Vector2i pos = dots[0];
 
-    for (size_t idx = 1; idx < vectors.size() - 2; ++idx) {
+    for (size_t idx = 1; idx < dots.size() - 2; ++idx) {
 
-        segment.setStart(vectors[idx]);    
+        segment.setStart(dots[idx]);    
         
-        for (int i = 0; i <= vectors[idx + 1].x - vectors[idx].x; i++) {
+        for (int i = 0; i <= dots[idx + 1].x - dots[idx].x; i++) {
 
-            float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
-            pos = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
+            float t = float(i) / (dots[idx + 1].x - dots[idx].x);
+            pos = CatmullRom(
+                ConvertVector2iToVecto2f(dots[idx - 1]),
+                ConvertVector2iToVecto2f(dots[idx]),
+                ConvertVector2iToVecto2f(dots[idx + 1]),
+                ConvertVector2iToVecto2f(dots[idx + 2]),
+                t);
             segment.setEnd(pos);
 
             segment.draw(this->texture);
 
             segment.setStart(pos);
         }
-        
     }
 
     this->texture.draw(texture, absPosWidget);
 
     WidgetManager::draw(texture, absPosWidget);
-
 }
 
 bool Splines::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+
     if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
+        WidgetManager::update();
+        updateDots();
+        
         return true;
     }
     
@@ -360,27 +353,21 @@ bool Splines::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& 
 
     auto mouseRelPos = mouseClick.mousePos - absPosWidget;  
 
-    std::vector<Vector2i> vectors(subWidgets.size() + 4);
+    for (size_t idx = 1; idx < dots.size() - 2; ++idx) {
 
-    size_t idx = 2;
-    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it, ++idx) {
-        vectors[idx] = (*it)->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
-    }
-    vectors[0] = Vector2i(0, size.y);
-    vectors[1] = vectors[0] + Vector2i(1, -1);
-    vectors[vectors.size() - 2] = Vector2i(size.x, 0);
-    vectors[vectors.size() - 1] = vectors[vectors.size() - 2] + Vector2i(-1, 1);
+        for (int i = 0; i <= dots[idx + 1].x - dots[idx].x; i++) {
 
-    for (size_t idx = 1; idx < vectors.size() - 2; ++idx) {
-
-        
-        for (int i = 0; i <= vectors[idx + 1].x - vectors[idx].x; i++) {
-
-            float t = float(i) / (vectors[idx + 1].x - vectors[idx].x);
-            auto posCatmull = CatmullRom(vectors[idx - 1], vectors[idx], vectors[idx + 1], vectors[idx + 2], t);
+            float t = float(i) / (dots[idx + 1].x - dots[idx].x);
+            auto posCatmull = CatmullRom(
+                ConvertVector2iToVecto2f(dots[idx - 1]),
+                ConvertVector2iToVecto2f(dots[idx]),
+                ConvertVector2iToVecto2f(dots[idx + 1]),
+                ConvertVector2iToVecto2f(dots[idx + 2]),
+                t);
         
             if ((posCatmull - mouseRelPos).getLen() < 4) {
                 addSlider(mouseRelPos - Vector2i(SLIDER_RADIUS, SLIDER_RADIUS));
+                updateDots();
                 return true;
             }
         }
@@ -390,6 +377,33 @@ bool Splines::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& 
     return false;
 
 } 
+
+bool Splines::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+    bool isDragged = WidgetManager::onMouseDrag(mouseDrag, absPosWidget);
+    if (isDragged) {
+        updateDots();
+    }
+
+    return isDragged;
+}
+
+void Splines::updateDots() {
+    subWidgets.sort([](const Widget* a, const Widget* b) -> bool {
+        return (a->pos.x) < (b->pos.x);
+    });
+    
+    dots.resize(subWidgets.size() + 4);
+
+    dots[0] = Vector2i(0, size.y);
+    dots[1] = dots[0] + Vector2i(1, -1);
+    dots[dots.size() - 2] = Vector2i(size.x, 0);
+    dots[dots.size() - 1] = dots[dots.size() - 2] + Vector2i(-1, 1);
+
+    size_t idx = 2;
+    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it, ++idx) {
+        dots[idx] = (*it)->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
+    }
+}
 
 
 //*************************************************************

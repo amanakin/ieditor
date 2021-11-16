@@ -7,15 +7,11 @@
 #include <presets.h>
 #include <pickers.h>
 #include <pictures.h>
-#include <text.h>
 #include <slider.h>
+#include <textbar.h>
 
-//static const char* const STUFF_FOLDER = "/home/anton/Projects/ieditor/stuff/";
-//static const char* const FONT_FILENAME = "arial.ttf";
-
-#define STUFF_FOLDER "stuff/"
-#define FONT_FILENAME "arial.ttf"
-
+const char* const STUFF_FOLDER = "stuff/";
+static const char* const FONT_FILENAME  = "arial.ttf";
 static const char* const APP_NAME = "iEditor"; 
 
 //*************************************************************
@@ -94,6 +90,8 @@ void StartWidget::init() {
     );
 
     subWidgets.push_back(spliner);
+
+    subWidgets.push_front(new TextBar(Vector2i(100, 100), Vector2i(200, 200), "hello"));
 }
 
 //*************************************************************
@@ -102,7 +100,7 @@ App* App::app = nullptr;
 
 App::App(const Vector2i& size) :
     window(size, Vector2i(0, 0), APP_NAME),
-    font(STUFF_FOLDER FONT_FILENAME)
+    font(std::string(STUFF_FOLDER) + FONT_FILENAME)
 {}
 
 App* App::getApp() {

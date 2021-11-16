@@ -19,16 +19,44 @@ namespace Mouse {
 
 namespace Keyboard {
     enum Key {
-        W,
         A,
-        S,
+        B,
+        C,
         D,
-        Up,
-        Down,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L,
+        M,
+        N,
+        O,
+        P,
+        Q,
+        R,
+        S,
+        T,
+        U,
+        V,
+        W,
+        X,
+        Y,
+        Z,
         Left,
         Right,
+        Space,
+        Enter,
+        BackSpace,
         SIZE,
     };
+
+    bool IsChar(enum Key key);
+
+    char GetChar(enum Key key);
+
 };
 
 //*************************************************************

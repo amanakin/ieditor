@@ -121,11 +121,11 @@ bool WidgetManager::onMouseHover(const Event::MouseHover& mouseHover, const Vect
 }
 
 bool WidgetManager::onKeyboard(const Event::KeyClick& key) {
-    for (auto& subWidget: subWidgets) {
-        if (subWidget->isActive &&
-            subWidget->onKeyboard(key)) {
-            return true;
-        }
+    
+    if (subWidgets.size() > 0 &&
+        (*subWidgets.begin())->isActive &&
+        (*subWidgets.begin())->onKeyboard(key)) {
+        return true;
     }
 
     return false;

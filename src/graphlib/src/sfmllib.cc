@@ -20,21 +20,49 @@ static sf::Mouse::Button ConvertButtonToSFMLButton(Mouse::Button button) {
 }
 
 
+#define CONVERT_KEY(key) \
+    case Keyboard::Key::key: return sf::Keyboard::Key::key;
+
 static sf::Keyboard::Key ConvertKeyToSFMLKey(Keyboard::Key key) {
     switch (key) {
-    case Keyboard::Key::W:      return sf::Keyboard::Key::W;
-    case Keyboard::Key::A:      return sf::Keyboard::Key::A;
-    case Keyboard::Key::S:      return sf::Keyboard::Key::S;
-    case Keyboard::Key::D:      return sf::Keyboard::Key::D;
-    case Keyboard::Key::Up:     return sf::Keyboard::Key::Up;
-    case Keyboard::Key::Down:   return sf::Keyboard::Key::Down;
-    case Keyboard::Key::Left:   return sf::Keyboard::Key::Left;
-    case Keyboard::Key::Right:  return sf::Keyboard::Key::Right;
+    CONVERT_KEY(A)
+    CONVERT_KEY(B)
+    CONVERT_KEY(C)
+    CONVERT_KEY(D)
+    CONVERT_KEY(E)
+    CONVERT_KEY(F)
+    CONVERT_KEY(G)
+    CONVERT_KEY(H)
+    CONVERT_KEY(I)
+    CONVERT_KEY(J)
+    CONVERT_KEY(K)
+    CONVERT_KEY(L)
+    CONVERT_KEY(M)
+    CONVERT_KEY(N)
+    CONVERT_KEY(O)
+    CONVERT_KEY(P)
+    CONVERT_KEY(Q)
+    CONVERT_KEY(R)
+    CONVERT_KEY(S)
+    CONVERT_KEY(T)
+    CONVERT_KEY(U)
+    CONVERT_KEY(V)
+    CONVERT_KEY(W)
+    CONVERT_KEY(X)
+    CONVERT_KEY(Y)
+    CONVERT_KEY(Z)
+    CONVERT_KEY(Left)
+    CONVERT_KEY(Right)
+    CONVERT_KEY(Space)
+    CONVERT_KEY(Enter)
+    CONVERT_KEY(BackSpace)
     default: 
         assert("Wrong convert Key to SFMLKey");
         return sf::Keyboard::Key::A;
     }
 }
+
+#undef CONVERT_KEY
 
 //*************************************************************
 //*************************************************************
@@ -187,31 +215,28 @@ void MLSegment::draw(MLTexture& texture) const {
 //*************************************************************
 //*************************************************************
 
-MLFont::MLFont(const char* filename) {
-    assert(filename != nullptr);
+MLFont::MLFont(const std::string& filename) {
     assert(fontSFML.loadFromFile(filename));
 }
 
 //*************************************************************
 //*************************************************************
 
-MLText::MLText(const char* str,
+MLText::MLText(const std::string& str,
                const Vector2i& pos,
                int height,
                const Color& color,
                const MLFont& font) :
     font(font)
     {
-    assert(str != nullptr);
 
     setString(str);
     setHeight(height);
-    setColor(color);    
+    setColor(color); 
     text.setFont(font.fontSFML);
 }
 
-void MLText::setString(const char* str) {
-    assert(str != nullptr);
+void MLText::setString(const std::string& str) {
     text.setString(str);
 }
 
@@ -254,7 +279,7 @@ void MLText::draw(MLTexture& texture) const {
 //*************************************************************
 //*************************************************************
 
-MLPicture::MLPicture(const char* filename) {
+MLPicture::MLPicture(const std::string& filename) {
     assert(texture.loadFromFile(filename));
 }
 

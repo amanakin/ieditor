@@ -4,6 +4,8 @@
 #include <widget.h>
 #include <graphlib.h>
 
+extern const char* const STUFF_FOLDER;
+
 //*************************************************************
 
 struct Settings {

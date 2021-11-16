@@ -3,10 +3,8 @@
 #include <cassert>
 #include <cstring>
 
-#define STUFF_FOLDER "stuff/"
-#define PATH_MAX 4096
-
 #include <pictures.h>
+#include <app.h>
 
 const char* GetPictureName(DefaultPictures::Picture picture) {
     switch (picture) {
@@ -30,17 +28,15 @@ const char* GetPictureName(DefaultPictures::Picture picture) {
 PictureManager* PictureManager::pictureManager = nullptr;
 
 PictureManager::PictureManager() {
-    char buffer[PATH_MAX] = "";
+    std::string filename;
 
     for (size_t idx = 0; idx != DefaultPictures::SIZE; ++idx) {
         auto currTexture = static_cast<DefaultPictures::Picture>(idx);
 
-        strcpy(buffer, STUFF_FOLDER);
-        strcat(buffer, GetPictureName(currTexture));
+        filename = STUFF_FOLDER;
+        filename += GetPictureName(currTexture);
 
-        const char* str = buffer;
-
-        pictures.emplace_back(str);
+        pictures.emplace_back(filename);
     }
 }
 

@@ -8,6 +8,16 @@
 
 //*************************************************************
 
+bool Keyboard::IsChar(enum Key key) {
+    return key >= 0 && key <= Z;
+}
+
+char Keyboard::GetChar(enum Key key) {
+    return key + 'a';
+}
+
+//*************************************************************
+
 Event::MouseClick::MouseClick(const Type type, const Vector2i& mousePos, const Mouse::Button button) :
     mousePos(mousePos), button(button), type(type)
 {}

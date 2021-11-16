@@ -3,6 +3,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include <string>
+
 #include "vector2.h"
 #include "color.h"
 #include "event.h"
@@ -79,7 +81,7 @@ private:
 struct MLText;
 
 struct MLFont {
-    MLFont(const char* filename);
+    MLFont(const std::string& filename);
 
     friend MLText;
 
@@ -91,9 +93,9 @@ private:
 
 struct MLText {
     // size - height of symbol in pixels 
-    MLText(const char* str, const Vector2i& pos, int height, const Color& color, const MLFont& font);
+    MLText(const std::string& str, const Vector2i& pos, int height, const Color& color, const MLFont& font);
 
-    void setString(const char* str);
+    void setString(const std::string& str);
     void setHeight(int height);
     void setColor(const Color& color);
     void setPosition(const Vector2i& pos);
@@ -117,7 +119,7 @@ private:
 struct MLSprite;
 
 struct MLPicture {
-    MLPicture(const char* filename);
+    MLPicture(const std::string& filename);
 
     Vector2i getSize() const;
 

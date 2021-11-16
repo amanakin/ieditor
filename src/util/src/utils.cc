@@ -77,7 +77,7 @@ Vector2f ConvertVector2iToVecto2f(const Vector2i& vector) {
     return Vector2f(vector.x, vector.y);
 }  
 
-float GetT(float t, float alpha, const Vector2i& p0, const Vector2i& p1 )
+float GetT(float t, float alpha, const Vector2f& p0, const Vector2f& p1 )
 {
     auto d  = p1 - p0;
     float a = DotProduct(d, d); 
@@ -85,7 +85,7 @@ float GetT(float t, float alpha, const Vector2i& p0, const Vector2i& p1 )
     return (b + t);
 }
 
-Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, const Vector2i& p3, float t, float alpha )
+Vector2i CatmullRom(const Vector2f& p0, const Vector2f& p1, const Vector2f& p2, const Vector2f& p3, float t, float alpha )
 {
     float t0 = 0.0f;
     float t1 = GetT( t0, alpha, p0, p1 );
@@ -93,11 +93,12 @@ Vector2i CatmullRom(const Vector2i& p0, const Vector2i& p1, const Vector2i& p2, 
     float t3 = GetT( t2, alpha, p2, p3 );
 
     t = std::lerp( t1, t2, t );
-    Vector2f A1 = ( t1-t )/( t1-t0 )*ConvertVector2iToVecto2f(p0) + ( t-t0 )/( t1-t0 )*ConvertVector2iToVecto2f(p1);
-    Vector2f A2 = ( t2-t )/( t2-t1 )*ConvertVector2iToVecto2f(p1) + ( t-t1 )/( t2-t1 )*ConvertVector2iToVecto2f(p2);
-    Vector2f A3 = ( t3-t )/( t3-t2 )*ConvertVector2iToVecto2f(p2) + ( t-t2 )/( t3-t2 )*ConvertVector2iToVecto2f(p3);
+    Vector2f A1 = ( t1-t )/( t1-t0 )*p0 + ( t-t0 )/( t1-t0 )*p1;
+    Vector2f A2 = ( t2-t )/( t2-t1 )*p1 + ( t-t1 )/( t2-t1 )*p2;
+    Vector2f A3 = ( t3-t )/( t3-t2 )*p2 + ( t-t2 )/( t3-t2 )*p3;
     Vector2f B1 = ( t2-t )/( t2-t0 )*A1 + ( t-t0 )/( t2-t0 )*A2;
     Vector2f B2 = ( t3-t )/( t3-t1 )*A2 + ( t-t1 )/( t3-t1 )*A3;
+
     Vector2i C  = ConvertVector2fToVecto2i(( t2-t )/( t2-t1 )*B1 + ( t-t1 )/( t2-t1 )*B2);
     
     return C;

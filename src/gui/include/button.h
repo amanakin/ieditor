@@ -4,7 +4,6 @@
 #include <utils.h>
 #include <widget.h>
 #include <graphlib.h>
-#include <text.h>
 #include <interfaces.h>
 #include <math.h>
 #include <pictures.h>

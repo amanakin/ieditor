@@ -65,9 +65,13 @@ struct Splines: public WidgetManager {
 
     void draw(MLTexture& texture, const Vector2i& absPosWidget)    override;
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) override;
 
 private:
+    void updateDots();
+
     MLTexture texture;
+    std::vector<Vector2i> dots;
 };
 
 //*************************************************************
