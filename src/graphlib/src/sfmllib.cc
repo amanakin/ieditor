@@ -398,7 +398,8 @@ void MLTexture::clear() {
 //*************************************************************
 
 MLWindow::MLWindow(const Vector2i& size, const Vector2i& pos, const char* name) :
-    windowSFML(sf::VideoMode(size.x, size.y), name, sf::Style::Fullscreen)
+    windowSFML(sf::VideoMode(size.x, size.y), name, sf::Style::Fullscreen),
+    isActive_(true)
 {
     windowSFML.setVerticalSyncEnabled(true);
 }
@@ -431,6 +432,10 @@ bool MLWindow::isOpen() const {
     return windowSFML.isOpen();
 }
 
+bool MLWindow::isActive() const {
+    return isActive_;
+}
+
 void MLWindow::close() {
     windowSFML.close();
 }
@@ -446,6 +451,36 @@ bool MLWindow::isButtonPressed(Mouse::Button button) const {
 
 bool MLWindow::isKeyPressed(Keyboard::Key key) const {
     return sf::Keyboard::isKeyPressed(ConvertKeyToSFMLKey(key));
+}
+
+uint32_t MLWindow::isTextEntered() {    
+    sf::Event event;
+
+    while (windowSFML.pollEvent(event)) {
+        
+        switch (event.type) {
+        case sf::Event::GainedFocus:
+            isActive_ = true;
+            break;
+        case sf::Event::LostFocus:
+            isActive_ = false;
+            break;
+        case sf::Event::TextEntered:
+            return event.text.unicode;
+        default:
+            break;
+        }
+    }
+
+    return 0;
+}
+
+std::string MLWindow::getClipBuffer() {
+    return sf::Clipboard::getString();
+}
+
+void MLWindow::setClipBuffer(const std::string& str) {
+    sf::Clipboard::setString(str);
 }
 
 //*************************************************************

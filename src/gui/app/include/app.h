@@ -3,6 +3,7 @@
 
 #include <widget.h>
 #include <graphlib.h>
+#include <pictures.h>
 
 extern const char* const STUFF_FOLDER;
 
@@ -12,7 +13,7 @@ struct Settings {
     Color drawColor;
     float brushSize;
 
-    static constexpr float MaxBrushSize = 10;
+    static constexpr float MaxBrushSize = 20;
 };
 
 //*************************************************************
@@ -23,16 +24,6 @@ struct StartWidget: public RootWidget {
     void init() override;
 
 };
-
-//*************************************************************
-
-/*struct AnnoyingWidget: public  RootWidget {
-    AnnoyingWidget(const Vector2i& pos);
-
-    void init() override;
-
-    int count;
-};*/
 
 //*************************************************************
 
@@ -49,6 +40,7 @@ struct App {
     Settings settings;
     MLFont font;
     MLWindow window;
+    PictureManager pictManager;
 private:
     App(const Vector2i& size);
     static App* app;

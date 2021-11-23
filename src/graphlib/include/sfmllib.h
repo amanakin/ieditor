@@ -197,11 +197,16 @@ struct MLWindow {
     void clear();
 
     bool isOpen() const;
+    bool isActive() const;
     void close();
 
     Vector2i getMousePosition()                const;
     bool isButtonPressed(Mouse::Button button) const;
     bool isKeyPressed(Keyboard::Key key)       const;
+    uint32_t isTextEntered();
+
+    std::string getClipBuffer();
+    void setClipBuffer(const std::string& str);
 
     friend MLCircle;
     friend MLRect;
@@ -212,6 +217,8 @@ struct MLWindow {
 
 private:
     sf::RenderWindow windowSFML;
+
+    bool isActive_;
 
     Color bg;
 };

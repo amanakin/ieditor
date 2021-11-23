@@ -120,6 +120,12 @@ inline Vector2<T> operator*(const T num, const Vector2<T>& vector) {
     return (vector * num);
 }
 
+template <typename T>
+inline Vector2<T> operator/(const Vector2<T>& vector, const T num) {
+    return Vector2<T>(vector.x / num,
+                      vector.y / num);
+}
+
 //*************************************************************
 
 template <typename T>

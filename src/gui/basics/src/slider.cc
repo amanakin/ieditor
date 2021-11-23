@@ -3,6 +3,7 @@
 #include <slider.h>
 #include <pictures.h>
 #include <utils.h>
+#include <app.h>
 
 const int SLIDER_RADIUS = 10;
 const int SLIDER_WIDTH  = 14;
@@ -12,7 +13,7 @@ Slider::Slider(int widgetHeight, const Vector2i& pos, const Color& color) :
     height(widgetHeight - 2 * SLIDER_RADIUS),
     currPos(height / 2),
     bg(color),
-    sprite(*PictureManager::getInstance()->getPicture(DefaultPictures::Slider),
+    sprite(*App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
             Vector2i(SLIDER_RADIUS * 2, SLIDER_RADIUS * 2), pos)
 {}
 
@@ -64,7 +65,7 @@ PlaneSlider::PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color&
     currPos(pos),
     bgSize(Vector2i(size.x - 2 * SLIDER_RADIUS, size.y - 2 * SLIDER_RADIUS)),
     bg(color),
-    sprite(*PictureManager::getInstance()->getPicture(DefaultPictures::Slider),
+    sprite(*App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
             Vector2i(SLIDER_RADIUS * 2, SLIDER_RADIUS * 2), pos)
 {}
 

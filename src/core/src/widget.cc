@@ -24,6 +24,7 @@ bool Widget::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 bool Widget::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) {return false;}
 bool Widget::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {return false;}
 bool Widget::onKeyboard(  const Event::KeyClick&   key) {return false;}
+bool Widget::onTextEntered(const Event::Text& text) {return false;} 
 
 bool Widget::testMouse(const Vector2i& relPosEvent) {return false;}
 
@@ -65,9 +66,9 @@ void WidgetManager::draw(MLTexture& texture, const Vector2i& absPosWidget) {
         }
     }
 
-    if (subWidgets.size() > 0) {
-        (*subWidgets.begin())->draw(texture, (*subWidgets.begin())->pos + absPosWidget);
-    }
+    // if (subWidgets.size() > 0) {
+    //     (*subWidgets.begin())->draw(texture, (*subWidgets.begin())->pos + absPosWidget);
+    // }
 }
 
 bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
@@ -110,6 +111,7 @@ bool WidgetManager::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2
 }
 
 bool WidgetManager::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {
+    
     for (auto& subWidget: subWidgets) {
         if (subWidget->isActive &&
             subWidget->testMouse(mouseHover.prevPos - subWidget->pos - absPosWidget) &&
@@ -126,6 +128,17 @@ bool WidgetManager::onKeyboard(const Event::KeyClick& key) {
     if (subWidgets.size() > 0 &&
         (*subWidgets.begin())->isActive &&
         (*subWidgets.begin())->onKeyboard(key)) {
+        return true;
+    }
+
+    return false;
+}
+
+bool WidgetManager::onTextEntered(const Event::Text& text) {
+    
+    if (subWidgets.size() > 0 &&
+        (*subWidgets.begin())->isActive &&
+        (*subWidgets.begin())->onTextEntered(text)) {
         return true;
     }
 

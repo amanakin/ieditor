@@ -13,7 +13,7 @@
 struct MoveKey {
     MoveKey();
 
-    Keyboard::Key key;
+    Event::KeyClick keyClick;
     bool isMove;
     bool isPressed;
     
@@ -24,10 +24,10 @@ struct IKeyHandler {
     void update();
     
     virtual void onRelease(Keyboard::Key key) final;
-    virtual void onPress(Keyboard::Key key) final;
+    virtual void onPress(const Event::KeyClick& keyClick) final;
     
     virtual void customRelease(Keyboard::Key key);
-    virtual void customPress(Keyboard::Key key);
+    virtual void customPress(const Event::KeyClick& keyClick);
     
     MoveKey moveKey;
 };
@@ -46,18 +46,17 @@ struct Cursor: public Widget, public IKeyHandler {
     void setPos(unsigned pos);
     void setBorder(unsigned border);
 
-    bool onKeyboard(const Event::KeyClick& key);
-    void customPress(Keyboard::Key key) override;
+    bool onKeyboard(const Event::KeyClick& keyClick) override;
+    void customPress(const Event::KeyClick& keyClick) override;
 
-    void update();
-    void draw(MLTexture& texture, const Vector2i& pos);
+    void update() override;
+    void drawCustom(MLTexture& texture, const Vector2i& pos);
 
     bool isDraw;
     Timer timer;
-
+    unsigned border;
 private:
     unsigned pos;
-    unsigned border;
 
     unsigned height;
 };
@@ -69,20 +68,26 @@ struct TextBar : public WidgetManager, public IKeyHandler {
 
     void update();
 
-    bool onKeyboard(const Event::KeyClick& key);
-    void customPress(Keyboard::Key key) override;
+    bool onKeyboard(const Event::KeyClick& key) override;
+    bool onTextEntered(const Event::Text& text) override;
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget);
+    void customPress(const Event::KeyClick& key) override;
+
+    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
+
+    const std::string& getStr() const;
 
 private:
     void deleteChar();
-
-    // Insert letter after in this pos
-    void addChar(char ch);
     
+    void addChar(char ch);
+    void addStr(const std::string& str);
+
     Cursor* cursor;
     std::string str;
     MLText text;
+
+    unsigned char lastSym;
 
     MLTexture texture;
 };

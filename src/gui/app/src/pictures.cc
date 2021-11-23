@@ -19,13 +19,12 @@ const char* GetPictureName(DefaultPictures::Picture picture) {
     case DefaultPictures::Picture::Button:        return "button.png";
     case DefaultPictures::Picture::Spline:        return "spline.png";
     case DefaultPictures::Picture::SplineSlider:  return "spline_slider.png";
+    case DefaultPictures::Picture::Floppy:        return "floppy.png";
     default:
         assert("No such default picture");
         return "error";
     }
 };
-
-PictureManager* PictureManager::pictureManager = nullptr;
 
 PictureManager::PictureManager() {
     std::string filename;
@@ -42,15 +41,6 @@ PictureManager::PictureManager() {
 
 const MLPicture* PictureManager::getPicture(DefaultPictures::Picture picture) {
     return &pictures[picture];
-}
-
-PictureManager* PictureManager::getInstance() {
-    
-    if (pictureManager == nullptr) {
-        pictureManager = new PictureManager();
-    }
-
-    return pictureManager;
 }
 
 #undef PATH_MAX

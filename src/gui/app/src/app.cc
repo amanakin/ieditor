@@ -9,6 +9,8 @@
 #include <pictures.h>
 #include <slider.h>
 #include <textbar.h>
+#include <spline.h>
+#include <layout.h>
 
 const char* const STUFF_FOLDER = "stuff/";
 static const char* const FONT_FILENAME  = "arial.ttf";
@@ -26,7 +28,7 @@ void StartWidget::init() {
         [this](){
             this->stop();
         },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Exit),
+        *App::getApp()->pictManager.getPicture(DefaultPictures::Exit),
         Colors::LIGHT_RED,
         50,
         Vector2i(0, 0)
@@ -40,7 +42,7 @@ void StartWidget::init() {
             layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2i(690, 490), Vector2i(5, 5)));
             this->subWidgets.push_front(layoutWindow);
         },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Easel),
+        *App::getApp()->pictManager.getPicture(DefaultPictures::Easel),
         Colors::LIGHT_RED,
         50,
         Vector2i(0, 100)
@@ -54,7 +56,7 @@ void StartWidget::init() {
             pickerWindow->workManager->subWidgets.push_back(new ColorPickerGradient(Vector2i(700, 300), Vector2i(0, 0)));
             this->subWidgets.push_front(pickerWindow);
         },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Palette),
+        *App::getApp()->pictManager.getPicture(DefaultPictures::Palette),
         Colors::LIGHT_RED,
         50,
         Vector2i(0, 200)
@@ -68,7 +70,7 @@ void StartWidget::init() {
             pickerWindow->workManager->subWidgets.push_back(new BrushSizePicker(Vector2i(100, 300), Vector2i(0, 0)));
             this->subWidgets.push_front(pickerWindow);
         },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Brush),
+        *App::getApp()->pictManager.getPicture(DefaultPictures::Brush),
         Colors::LIGHT_RED,
         50,
         Vector2i(0, 300)
@@ -83,7 +85,7 @@ void StartWidget::init() {
             pickerWindow->workManager->subWidgets.push_back(new Splines(Vector2i(500 - 10, 500 - 10), Vector2i(5, 5)));
             this->subWidgets.push_front(pickerWindow);
         },
-        *PictureManager::getInstance()->getPicture(DefaultPictures::Spline),
+        *App::getApp()->pictManager.getPicture(DefaultPictures::Spline),
         Colors::LIGHT_RED,
         50,
         Vector2i(0, 400)
@@ -91,7 +93,19 @@ void StartWidget::init() {
 
     subWidgets.push_back(spliner);
 
-    subWidgets.push_front(new TextBar(Vector2i(100, 100), Vector2i(200, 200), "hello"));
+    auto saveFileButton = new ButtonAnimColor(
+        [this]() {
+            auto openWindow = new DefaultWindow(Vector2i(810, 260), Vector2i(500, 350), this);
+            openWindow->workManager->subWidgets.push_back(new OpenFile(Vector2i(5, 5), this, openWindow));
+            this->subWidgets.push_front(openWindow);
+        },
+        *App::getApp()->pictManager.getPicture(DefaultPictures::Floppy),
+        Colors::LIGHT_RED,
+        50,
+        Vector2i(0, 500)
+    );
+
+    subWidgets.push_front(saveFileButton);
 }
 
 //*************************************************************
@@ -100,7 +114,8 @@ App* App::app = nullptr;
 
 App::App(const Vector2i& size) :
     window(size, Vector2i(0, 0), APP_NAME),
-    font(std::string(STUFF_FOLDER) + FONT_FILENAME)
+    font(std::string(STUFF_FOLDER) + FONT_FILENAME),
+    pictManager()
 {}
 
 App* App::getApp() {

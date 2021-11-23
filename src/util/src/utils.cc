@@ -103,3 +103,15 @@ Vector2i CatmullRom(const Vector2f& p0, const Vector2f& p1, const Vector2f& p2, 
     
     return C;
 }
+
+Vector2i FitRectInCenter(const Vector2i& rectSize, const Vector2i& availableArea) {
+    if (rectSize.x >= availableArea.x || rectSize.y >= availableArea.y) {
+        return Vector2i(0, 0);
+    }
+
+    return (availableArea  - rectSize) / 2;
+}
+
+bool IsCharacter(uint32_t unicode) {
+    return (unicode >= 32 && unicode <= 126);
+}

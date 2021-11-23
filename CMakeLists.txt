@@ -9,7 +9,9 @@ set(SFML_BUILD_GRAPHICS true)
 include_directories(src/core/include)
 include_directories(src/util/include)
 include_directories(src/graphlib/include)
-include_directories(src/gui/include)
+include_directories(src/gui/app/include)
+include_directories(src/gui/presets/include)
+include_directories(src/gui/basics/include)
 
 set(SOURCES main.cc)
 
@@ -33,14 +35,24 @@ set(SOURCES
 
 set(SOURCES
     ${SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/app.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/button.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/pictures.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/presets.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/pickers.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/interfaces.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/slider.cc
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/src/textbar.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/app.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/pictures.cc
+)
+
+set(SOURCES
+    ${SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/basics/src/button.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/basics/src/interfaces.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/basics/src/slider.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/basics/src/textbar.cc
+)
+
+set(SOURCES
+    ${SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/presets/src/presets.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/presets/src/pickers.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/presets/src/layout.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/presets/src/spline.cc
 )
 
 find_package(SFML 2 COMPONENTS system window graphics network audio REQUIRED)

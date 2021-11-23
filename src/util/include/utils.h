@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cctype>
+#include <cstdint>
 
 #include <vector2.h>
 
@@ -28,5 +29,9 @@ bool AreCrossing(const Vector2f& pos1, const Vector2f& dir1,
 Vector2i ConvertVector2fToVecto2i(const Vector2f& vector);
 
 Vector2f ConvertVector2iToVecto2f(const Vector2i& vector);
+
+Vector2i FitRectInCenter(const Vector2i& rectSize, const Vector2i& availableArea);
+
+bool IsCharacter(uint32_t unicode);
 
 #endif // UTILS_HEADER

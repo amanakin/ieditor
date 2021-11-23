@@ -17,24 +17,17 @@ enum Picture {
     Button,
     Spline,
     SplineSlider,
+    Floppy,
     SIZE
 };
 
 }
 
 struct PictureManager {
-    PictureManager(const PictureManager& other) = delete;
-    const PictureManager& operator=(const PictureManager& other) = delete; 
-
-    static PictureManager* getInstance();
-
+    PictureManager();
     const MLPicture* getPicture(DefaultPictures::Picture picture);
 
 private:
-    PictureManager();
-
-    static PictureManager* pictureManager;
-
     std::vector<MLPicture> pictures;
 };
 

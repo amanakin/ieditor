@@ -1,6 +1,7 @@
 #ifndef BUTTON_HEADER
 #define BUTTON_HEADER
 
+#include <app.h>
 #include <utils.h>
 #include <widget.h>
 #include <graphlib.h>
@@ -16,7 +17,7 @@ constexpr auto AnimationTime = std::chrono::nanoseconds(std::chrono::seconds(1))
 
 //*************************************************************
 
-template <typename Handler>
+/*template <typename Handler>
 struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>,
                                public ITestableRectangle, public IDrawablePicture {
     ButtonPictureRectangle(Handler handler, const MLPicture& picture, const Vector2i& size, const Vector2i& pos, const Color& bg) :
@@ -27,8 +28,21 @@ struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>
     {}
 
     Color bg;
+};*/
+
+//*************************************************************
+
+template <typename Handler>
+struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>,
+                               public ITestableRectangle, public IDrawableRectangle {
+    ButtonPictureRectangle(Handler handler, const Color& color, const Vector2i& size, const Vector2i& pos) :
+        Widget(size, pos, nullptr),
+        IClickable<Handler>(handler),
+        IDrawableRectangle(color), 
+        ITestableRectangle()
+    {}
 };
-                    
+
 //*************************************************************
 
 template <typename Handler>
@@ -47,7 +61,7 @@ struct ButtonAnimColor: virtual public Widget, public IClickable<Handler>,
     }
 
     void draw(MLTexture& texture, const Vector2i& absPos) override {
-        MLSprite button(*PictureManager::getInstance()->getPicture(DefaultPictures::Picture::Button), size, absPos);
+        MLSprite button(*App::getApp()->pictManager.getPicture(DefaultPictures::Picture::Button), size, absPos);
         button.draw(texture);
 
         if (isHover) {
@@ -105,12 +119,12 @@ struct ButtonAnimColor: virtual public Widget, public IClickable<Handler>,
 template <typename Handler>
 struct ButtonAnimPicture: virtual public Widget, public IClickable<Handler>,
                           public ITestableRectangle, public IHoverable {
-    ButtonAnimPicture(Handler handler, const MLPicture& mainPicture, DefaultPictures::Picture sidePicture,
+    ButtonAnimPicture(Handler handler, DefaultPictures::Picture mainPicture, DefaultPictures::Picture sidePicture,
                      const Vector2i& size, const Vector2i& pos) :
         Widget(size, pos, nullptr),
         IClickable<Handler>(handler),
         ITestableRectangle(),
-        mainPicture(mainPicture, size, Vector2i(0, 0)),
+        mainPicture(mainPicture),
         sidePicture(sidePicture),
         isAnimated(false)
     {
@@ -118,8 +132,8 @@ struct ButtonAnimPicture: virtual public Widget, public IClickable<Handler>,
     }
 
     void draw(MLTexture& texture, const Vector2i& absPos) override {
-        mainPicture.setPosition(absPos);
-        mainPicture.draw(texture);
+        MLSprite mainSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
+        mainSprite.draw(texture);
 
         if (isHover) {
             if (!isAnimated) {
@@ -127,15 +141,15 @@ struct ButtonAnimPicture: virtual public Widget, public IClickable<Handler>,
                 timeAnimated = clockmy::now();
             }
             else {
-                MLSprite sprite(*PictureManager::getInstance()->getPicture(sidePicture), size, absPos);
+                MLSprite sideSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
 
                 double delta = (clockmy::now() - timeAnimated).count();
                 if (delta > AnimationTime) {
-                    sprite.draw(texture);
+                    sideSprite.draw(texture);
                 } else {
                     auto currOpacity = delta / AnimationTime;
-                    sprite.setColor(Color(255, 255, 255, 255 * currOpacity));
-                    sprite.draw(texture);
+                    sideSprite.setColor(Color(255, 255, 255, 255 * currOpacity));
+                    sideSprite.draw(texture);
                 }
             }
         }
@@ -143,22 +157,22 @@ struct ButtonAnimPicture: virtual public Widget, public IClickable<Handler>,
             if (isAnimated) {
                 isAnimated = false;
                 timeAnimated = clockmy::now();
-                MLSprite sprite(*PictureManager::getInstance()->getPicture(sidePicture), size, absPos);
-                sprite.draw(texture);
+                MLSprite sideSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
+                sideSprite.draw(texture);
             } else {
                 double delta = (clockmy::now() - timeAnimated).count();
                 if (delta < AnimationTime) {
                     auto currOpacity = delta / AnimationTime;
                     currOpacity = 1 - currOpacity;
-                    MLSprite sprite(*PictureManager::getInstance()->getPicture(sidePicture), size, absPos);
-                    sprite.setColor(Color(255, 255, 255, 255 * currOpacity));
-                    sprite.draw(texture);
+                    MLSprite sideSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
+                    sideSprite.setColor(Color(255, 255, 255, 255 * currOpacity));
+                    sideSprite.draw(texture);
                 }
             }
         }
     }
 
-    MLSprite mainPicture;
+    DefaultPictures::Picture mainPicture;
     DefaultPictures::Picture sidePicture;
     bool isAnimated;
     clockmy::time_point timeAnimated;

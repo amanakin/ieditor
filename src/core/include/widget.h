@@ -28,6 +28,7 @@ struct Widget {
     virtual bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget);
     virtual bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget);
     virtual bool onKeyboard(  const Event::KeyClick&   key);
+    virtual bool onTextEntered(const Event::Text& text);
     
     // Relative pos of mouse event
     virtual bool testMouse(const Vector2i& relPosEvent);
@@ -56,6 +57,7 @@ struct WidgetManager: public Widget {
     bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) override;
     bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
     bool onKeyboard(  const Event::KeyClick&   key) override;
+    bool onTextEntered(const Event::Text& text) override;
 
     bool testMouse(const Vector2i& relPosEvent) override;
 

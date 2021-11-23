@@ -1,22 +1,25 @@
 // textbar.cc
 
+#include <iostream>
 #include <cassert>
 
 #include <textbar.h>
 #include <color.h>
+#include <utils.h>
 
 //*************************************************************
 
 MoveKey::MoveKey() :
     isPressed(false),
-    isMove(false)
+    isMove(false),
+    keyClick(Event::Type::KeyboardKeyPressed, Keyboard::Key::A)
 {}
 
 void IKeyHandler::update() {
     auto now = moveKey.timer.elapsed();
     if (now > 25) {
         if (moveKey.isMove) {
-            customPress(moveKey.key);
+            customPress(moveKey.keyClick);
 
             moveKey.timer.start();
             return;
@@ -31,17 +34,17 @@ void IKeyHandler::update() {
     }
 }
 
-void IKeyHandler::onPress(Keyboard::Key key) {
-    customPress(key);
+void IKeyHandler::onPress(const Event::KeyClick& keyClick) {
+    customPress(keyClick);
 
-    moveKey.key = key;
+    moveKey.keyClick = keyClick;
     moveKey.isPressed = true;
     moveKey.isMove    = false;
     moveKey.timer.start();
 }
 
 void IKeyHandler::onRelease(Keyboard::Key key) {
-    if (key == moveKey.key) {
+    if (key == moveKey.keyClick.key) {
         moveKey.timer.stop();
         moveKey.isPressed = false;
         moveKey.isMove    = false;
@@ -50,7 +53,7 @@ void IKeyHandler::onRelease(Keyboard::Key key) {
 
 void IKeyHandler::customRelease(Keyboard::Key key)
 {}
-void IKeyHandler::customPress(Keyboard::Key key)
+void IKeyHandler::customPress(const Event::KeyClick& keyClick)
 {}
 
 //*************************************************************
@@ -95,22 +98,22 @@ void Cursor::update() {
     IKeyHandler::update();
 }
 
-bool Cursor::onKeyboard(const Event::KeyClick& key) {
-    if (key.key != Keyboard::Key::Left && key.key != Keyboard::Key::Right) {
+bool Cursor::onKeyboard(const Event::KeyClick& keyClick) {
+    if (keyClick.key != Keyboard::Key::Left && keyClick.key != Keyboard::Key::Right) {
         return false;
     }
 
-    if (key.type == Event::Type::KeyboardKeyReleased) {
-        onRelease(key.key);
+    if (keyClick.type == Event::Type::KeyboardKeyReleased) {
+        onRelease(keyClick.key);
     } else {
-        onPress(key.key);
+        onPress(keyClick);
     }
 
     return true;
 }
 
-void Cursor::customPress(Keyboard::Key key) {
-    if (key == Keyboard::Key::Left) {
+void Cursor::customPress(const Event::KeyClick& keyClick) {
+    if (keyClick.key == Keyboard::Key::Left) {
         moveLeft();
     } else {
         moveRight();
@@ -120,7 +123,7 @@ void Cursor::customPress(Keyboard::Key key) {
     timer.start();
 }
 
-void Cursor::draw(MLTexture& texture, const Vector2i& pos) {
+void Cursor::drawCustom(MLTexture& texture, const Vector2i& pos) {
     auto currTime = timer.elapsed();
     
     if (isDraw) {
@@ -146,12 +149,15 @@ void Cursor::draw(MLTexture& texture, const Vector2i& pos) {
 
 //*************************************************************
 
+constexpr int TEXT_BAR_EDGE = 3;
+
 TextBar::TextBar(const Vector2i& size, const Vector2i& pos, const std::string& str) :
     WidgetManager(size, pos, Colors::SEA_GREEN, nullptr),
-    text(str, Vector2i(0, 0), 30, Colors::BLACK, App::getApp()->font),
+    text(str, Vector2i(0, 0), size.y - 2 * TEXT_BAR_EDGE, Colors::BLACK, App::getApp()->font),
     str(str),
-    cursor(new Cursor(30, str.size())),
-    texture(size, Colors::SEA_GREEN)
+    cursor(new Cursor(size.y - 2 * TEXT_BAR_EDGE, str.size())),
+    texture(size - Vector2i(TEXT_BAR_EDGE, TEXT_BAR_EDGE), Colors::SEA_GREEN),
+    lastSym(0)
 {
     subWidgets.push_back(cursor);
 }
@@ -162,44 +168,58 @@ void TextBar::update() {
     WidgetManager::update();
 }
 
-bool TextBar::onKeyboard(const Event::KeyClick& key) {
-    if (WidgetManager::onKeyboard(key)) {
+bool TextBar::onKeyboard(const Event::KeyClick& keyClick) {
+    if (WidgetManager::onKeyboard(keyClick)) {
         return true;
     }                       
-    
-    if (key.type == Event::Type::KeyboardKeyReleased) {
-        onRelease(key.key);
+
+    std::cout << "key event: "<<keyClick.key << '\n';    
+    if (keyClick.type == Event::Type::KeyboardKeyReleased) {
+        onRelease(keyClick.key);
     } else {
-        onPress(key.key);
+        onPress(keyClick);
     }
 
     return true;
 }
 
-void TextBar::customPress(Keyboard::Key key) {
+bool TextBar::onTextEntered(const Event::Text& text) {
+    std::cout << "entered: " << text.unicode << '\n';
+    lastSym = IsCharacter(text.unicode) ? text.unicode : 0;
+
+    return true;
+}
+
+void TextBar::customPress(const Event::KeyClick& keyClick) {
     cursor->isDraw = true;
     cursor->timer.start();
-    
-    if (Keyboard::IsLetter(key)) {
-        addChar(key  + 'a' - 'A');
-        return;
-    }
 
-    if (Keyboard::IsSpecChar(key)) {
-        addChar(key);
-        return;
-    } 
-
-    switch (key) {
+    switch (keyClick.key) {
         case Keyboard::Key::Backspace:
             deleteChar();
             return;
+        case Keyboard::Key::V: 
+            if (keyClick.control) {  
+                addStr(App::getApp()->window.getClipBuffer());
+            return;
+            }
     }
+
+    if (lastSym != 0) {
+        if (Keyboard::IsCharacter(keyClick.key)) {
+            addChar(lastSym);
+        }
+    } 
+}
+
+const std::string& TextBar::getStr() const {
+    return str;
 }
 
 void TextBar::deleteChar() {
     if (cursor->getPos() != 0) {
         str.erase(cursor->getPos() - 1, 1);
+        cursor->border--;
         cursor->moveLeft();
     }
 }
@@ -207,30 +227,28 @@ void TextBar::deleteChar() {
 void TextBar::addChar(char ch) {
     if (cursor->getPos() <= str.size()) {
         str.insert(cursor->getPos(), 1, ch);
-        cursor->setBorder(str.size());
+        cursor->border++;
         cursor->moveRight();
     }
 }
 
+void TextBar::addStr(const std::string& str) {
+    for (auto ch: str) {
+        addChar(ch);
+    }
+}
+
 void TextBar::draw(MLTexture& texture, const Vector2i& absPosWidget) {
-    text.setPosition(absPosWidget);
+    WidgetManager::draw(texture, absPosWidget);
+    
+    text.setPosition(Vector2i(0, -4));
     text.setString(str);
 
     auto pos = text.getCharPos(cursor->getPos());
-    
-    cursor->draw(texture, pos);
 
-    text.draw(texture);
+    this->texture.clear();
+    cursor->drawCustom(this->texture, pos);
+    text.draw(this->texture);
+
+    this->texture.draw(texture, absPosWidget + Vector2i(TEXT_BAR_EDGE, TEXT_BAR_EDGE));
 }
-
-//*************************************************************
-
-/*
-
-    *--------
-    | 
-    | 
-    | 
-    *--------
-
-*/

@@ -19,38 +19,38 @@ namespace Mouse {
 
 namespace Keyboard {
     enum Key {
-        A = 'A',
-        B = 'B',
-        C = 'C',
-        D = 'D',
-        E = 'E',
-        F = 'F',
-        G = 'G',
-        H = 'H',
-        I = 'I',
-        J = 'J',
-        K = 'K',
-        L = 'L',
-        M = 'M',
-        N = 'N',
-        O = 'O',
-        P = 'P',
-        Q = 'Q',
-        R = 'R',
-        S = 'S',
-        T = 'T',
-        U = 'U',
-        V = 'V',
-        W = 'W',
-        X = 'X',
-        Y = 'Y',
-        Z = 'Z',
-        Space =     ' ',
-        Slash =     '/',     
-        Comma =     ',',     
-        Dot =       '.',       
-        Semicolon = ';',
-        Tilde =     '~',
+        A,
+        B,
+        C,
+        D,
+        E,
+        F,
+        G,
+        H,
+        I,
+        J,
+        K,
+        L,
+        M,
+        N,
+        O,
+        P,
+        Q,
+        R,
+        S,
+        T,
+        U,
+        V,
+        W,
+        X,
+        Y,
+        Z,
+        Space,
+        Slash,     
+        Comma,     
+        Dot,       
+        Semicolon,
+        Tilde,
         Num0, 
         Num1,
         Num2,
@@ -71,11 +71,10 @@ namespace Keyboard {
         LShift,
         LAlt,
         LSystem,
-        SIZE = 52,
+        SIZE,
     };
 
-    bool IsLetter(enum Key key);
-    bool IsSpecChar(enum Key key);
+    bool IsCharacter(enum Key key);
 };
 
 //*************************************************************
@@ -93,6 +92,8 @@ namespace Event {
         // KeyClick
         KeyboardKeyPressed,
         KeyboardKeyReleased,
+        // 
+        TextEntered,
     };
 
     struct MouseClick {
@@ -123,6 +124,16 @@ namespace Event {
         
         Type type;
         Keyboard::Key key;
+        bool control;
+        bool alt;
+        bool shift;
+        bool system;
+    };
+
+    struct Text {
+        Text(uint32_t unicode);
+        
+        uint32_t unicode;
     };
 
 };
@@ -140,8 +151,6 @@ struct EventManager {
 
 private:
     std::array<bool, Mouse::Button::SIZE> isButtonPressed;
-
-    std::array<int, Keyboard::Key::SIZE> keyboardMap;
     std::array<bool, Keyboard::Key::SIZE> isKeyPressed;
 
     Vector2i mousePos;

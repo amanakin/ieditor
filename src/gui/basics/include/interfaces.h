@@ -90,4 +90,23 @@ struct IMovable: virtual public Widget {
 
 //*************************************************************
 
+/*
+template <typename Handler>
+struct IAnimated: virtual public Widget, virtual public IHoverable, virtual public IClickable<Handler> {
+    Animation(Handler handler, 
+        DefaultPictures::Picture defaultPicture, DefaultPictures::Picture actionPicture, const Color& clickColor);
+    
+    void draw(MLTexture& texture, const Vector2i& absPos) override;
+
+private:
+    DefaultPictures::Picture defaultPicture;
+    DefaultPictures::Picture actionPicture;
+    
+    Color clickColor;
+
+    Timer timer;
+};*/
+
+//*************************************************************
+
 #endif // INTERFACES_HEADER
