@@ -1,34 +1,15 @@
 #ifndef BUTTON_HEADER
 #define BUTTON_HEADER
 
+#include <cmath>
+
 #include <app.h>
 #include <utils.h>
 #include <widget.h>
 #include <graphlib.h>
 #include <interfaces.h>
-#include <math.h>
 #include <pictures.h>
-
-#include <chrono>
-using clockmy = std::chrono::high_resolution_clock;
-using duration = std::chrono::duration<float, std::milli>;
-
-constexpr auto AnimationTime = std::chrono::nanoseconds(std::chrono::seconds(1)).count() * 0.3;
-
-//*************************************************************
-
-/*template <typename Handler>
-struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>,
-                               public ITestableRectangle, public IDrawablePicture {
-    ButtonPictureRectangle(Handler handler, const MLPicture& picture, const Vector2i& size, const Vector2i& pos, const Color& bg) :
-        Widget(size, pos, nullptr),
-        IClickable<Handler>(handler),
-        IDrawablePicture(picture), ITestableRectangle(),
-        bg(bg)
-    {}
-
-    Color bg;
-};*/
+#include <timer.h>
 
 //*************************************************************
 
@@ -46,136 +27,33 @@ struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>
 //*************************************************************
 
 template <typename Handler>
-struct ButtonAnimColor: virtual public Widget, public IClickable<Handler>,
-                        public ITestableCircle, public IHoverable {
-    ButtonAnimColor(Handler handler, const MLPicture& mainPicture, const Color& sideColor,
-                     int radius, const Vector2i& pos) :
+struct AnimatedButton: virtual public Widget, public ITestableCircle, public IAnimated {
+
+    AnimatedButton(Handler handler,
+                    DefaultPictures::Picture mainPicture,
+                    DefaultPictures::Picture hoverPicture,
+                    DefaultPictures::Picture pressPicture,
+                    int radius, const Vector2i& pos) :
         Widget(Vector2i(2 * radius, 2 * radius), pos, nullptr),
-        IClickable<Handler>(handler),
         ITestableCircle(radius),
-        sideColor(sideColor),
-        mainPicture(mainPicture, Vector2i(sqrt(2) * radius, sqrt(2) * radius) - Vector2i(6, 6), Vector2i(3, 3)),
-        isAnimated(false)
+        IAnimated(Vector2i(sqrt(2) * radius, sqrt(2) * radius) - Vector2i(6, 6),
+                           pos + Vector2i(3, 3),
+                           mainPicture,
+                           hoverPicture,
+                           pressPicture),
+        handler(handler)
     {
-        isHover = false;
+        IHoverable::isHover = false;
     }
 
-    void draw(MLTexture& texture, const Vector2i& absPos) override {
-        MLSprite button(*App::getApp()->pictManager.getPicture(DefaultPictures::Picture::Button), size, absPos);
-        button.draw(texture);
-
-        if (isHover) {
-            if (!isAnimated) {
-                isAnimated = true;
-                timeAnimated = clockmy::now();
-            }
-            else {
-                MLCircle circle(absPos, radius, sideColor);
-
-                double delta = (clockmy::now() - timeAnimated).count();
-                if (delta > AnimationTime * 0.7) {
-                    circle.setColor(Color(sideColor.x * 255, sideColor.y * 255, sideColor.z * 255, 0.7 * 255));
-                    circle.draw(texture);
-                } else {
-                    auto currOpacity = delta / AnimationTime;
-                    auto currColor = circle.getColor();
-                    currColor.t = currOpacity;
-                    circle.setColor(currColor);
-                    circle.draw(texture);
-                }
-            }
-        } else {
-            if (isAnimated) {
-                isAnimated = false;
-                timeAnimated = clockmy::now();
-                MLCircle circle(absPos, radius, Color(sideColor.x * 255, sideColor.y * 255, sideColor.z * 255, 0.7 * 255));
-                circle.draw(texture);
-            } else {
-                double delta = (clockmy::now() - timeAnimated).count();
-                if (delta < AnimationTime) {
-                    auto currOpacity = delta / AnimationTime;
-                    currOpacity = 0.7 - currOpacity;
-                    if (currOpacity < 0) {
-                        currOpacity = 0;
-                    }
-                    MLCircle circle(absPos, radius, Color(sideColor.x * 255, sideColor.y * 255, sideColor.z * 255, currOpacity * 255));
-                    circle.draw(texture);
-                }
-            }
-        }
-
-        mainPicture.setPosition(absPos + Vector2i(3, 3) + Vector2i(int(radius * (1 - 1/sqrt(2))),int(radius * (1 - 1/sqrt(2))) ) );
-        mainPicture.draw(texture);
-    }
-
-    MLSprite mainPicture;
-    Color sideColor;
-    bool isAnimated;
-    clockmy::time_point timeAnimated;
-};
-
-//*************************************************************
-
-template <typename Handler>
-struct ButtonAnimPicture: virtual public Widget, public IClickable<Handler>,
-                          public ITestableRectangle, public IHoverable {
-    ButtonAnimPicture(Handler handler, DefaultPictures::Picture mainPicture, DefaultPictures::Picture sidePicture,
-                     const Vector2i& size, const Vector2i& pos) :
-        Widget(size, pos, nullptr),
-        IClickable<Handler>(handler),
-        ITestableRectangle(),
-        mainPicture(mainPicture),
-        sidePicture(sidePicture),
-        isAnimated(false)
-    {
-        isHover = false;
-    }
-
-    void draw(MLTexture& texture, const Vector2i& absPos) override {
-        MLSprite mainSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
-        mainSprite.draw(texture);
-
-        if (isHover) {
-            if (!isAnimated) {
-                isAnimated = true;
-                timeAnimated = clockmy::now();
-            }
-            else {
-                MLSprite sideSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
-
-                double delta = (clockmy::now() - timeAnimated).count();
-                if (delta > AnimationTime) {
-                    sideSprite.draw(texture);
-                } else {
-                    auto currOpacity = delta / AnimationTime;
-                    sideSprite.setColor(Color(255, 255, 255, 255 * currOpacity));
-                    sideSprite.draw(texture);
-                }
-            }
-        }
-         else {
-            if (isAnimated) {
-                isAnimated = false;
-                timeAnimated = clockmy::now();
-                MLSprite sideSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
-                sideSprite.draw(texture);
-            } else {
-                double delta = (clockmy::now() - timeAnimated).count();
-                if (delta < AnimationTime) {
-                    auto currOpacity = delta / AnimationTime;
-                    currOpacity = 1 - currOpacity;
-                    MLSprite sideSprite(*App::getApp()->pictManager.getPicture(sidePicture), size, absPos);
-                    sideSprite.setColor(Color(255, 255, 255, 255 * currOpacity));
-                    sideSprite.draw(texture);
-                }
-            }
+    void update() override {
+        if (isClicked) {
+            isClicked = false;
+            handler();
         }
     }
 
-    DefaultPictures::Picture mainPicture;
-    DefaultPictures::Picture sidePicture;
-    bool isAnimated;
-    clockmy::time_point timeAnimated;
+    Handler handler;
 };
 
 //*************************************************************

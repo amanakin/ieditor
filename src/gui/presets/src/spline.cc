@@ -9,7 +9,7 @@
 SplineSlider::SplineSlider(const Vector2i& size, const Vector2i& pos) :
     Widget(Vector2i(2 * SLIDER_RADIUS, 2 * SLIDER_RADIUS), pos, nullptr),
     bgSize(Vector2i(size.x - 2 * SLIDER_RADIUS, size.y - 2 * SLIDER_RADIUS)),
-    sprite(*App::getApp()->pictManager.getPicture(DefaultPictures::SplineSlider),
+    sprite(*App::getApp()->pictManager.getPicture(DefaultPictures::CurveSlider),
             Vector2i(SLIDER_RADIUS * 2, SLIDER_RADIUS * 2), pos)
 {}
 

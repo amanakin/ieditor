@@ -2,6 +2,7 @@
 
 #include <interfaces.h>
 #include <utils.h>
+#include <app.h>
 
 //*************************************************************
 
@@ -95,6 +96,96 @@ bool IMovable::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i&
     }
 
     return false;
+}
+
+//*************************************************************
+
+IAnimated::IAnimated(
+    const Vector2i& size, const Vector2i& pos,
+    DefaultPictures::Picture mainPicture,
+    DefaultPictures::Picture hoverPicture,
+    DefaultPictures::Picture pressPicture) :
+    Widget(size, pos, nullptr),
+    mainPicture(mainPicture),
+    hoverPicture(hoverPicture),
+    pressPicture(pressPicture),
+    isAnimated(false),
+    isClicked(false),
+    isPressed(false)
+{}
+
+bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+    if (mouseClick.type == Event::Type::MouseButtonReleased) {
+        if (isPressed) {
+            isClicked = true;
+            isPressed = false;
+            return true;
+        }
+    } else {
+        isPressed = true;
+        return true;
+    }
+
+    return false;
+}
+
+void IAnimated::draw(MLTexture& texture, const Vector2i& absPos) {
+    if (isPressed) {
+        MLSprite pressSprite(*App::getApp()->pictManager.getPicture(pressPicture), size, absPos);
+        pressSprite.draw(texture);
+        return;
+    }
+    
+    MLSprite mainSprite(*App::getApp()->pictManager.getPicture(mainPicture), size, absPos);
+    mainSprite.draw(texture);
+    
+    if (isHover) {
+        if (!isAnimated) {
+            isAnimated = true;
+            timer.start();
+        }
+        else {
+            MLSprite hoverSprite(*App::getApp()->pictManager.getPicture(hoverPicture), size, absPos);
+
+            double delta = timer.elapsed();
+            if (delta > AnimationTime) {
+                hoverSprite.draw(texture);
+            } else {
+                auto currOpacity = delta / AnimationTime;
+                
+                hoverSprite.setColor(Color(255, 255, 255, 255 * currOpacity));
+                hoverSprite.draw(texture);
+            }
+        }
+    }
+    else {
+        if (isAnimated) {
+            MLSprite hoverSprite(*App::getApp()->pictManager.getPicture(hoverPicture), size, absPos);
+
+            double delta = timer.elapsed();
+            if (delta > AnimationTime) {
+                hoverSprite.draw(texture);
+            } else {
+                auto currOpacity = delta / AnimationTime;
+                
+                hoverSprite.setColor(Color(255, 255, 255, 255 * currOpacity));
+                hoverSprite.draw(texture);
+            }
+
+            isAnimated = false;
+            timer.start();
+        } else {
+            MLSprite hoverSprite(*App::getApp()->pictManager.getPicture(hoverPicture), size, absPos);
+
+            double delta = timer.elapsed();
+            if (delta > 0 && delta < AnimationTime) {
+                auto currOpacity = delta / AnimationTime;
+                
+                hoverSprite.setColor(Color(255, 255, 255, 255 * (1 - currOpacity)));
+                hoverSprite.draw(texture);
+            }
+        }
+    }
 }
 
 //*************************************************************

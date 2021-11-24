@@ -2,6 +2,8 @@
 #define INTERFACES_HEADER
 
 #include <widget.h>
+#include <pictures.h>
+#include <timer.h>
 
 //*************************************************************
 
@@ -90,22 +92,30 @@ struct IMovable: virtual public Widget {
 
 //*************************************************************
 
-/*
-template <typename Handler>
-struct IAnimated: virtual public Widget, virtual public IHoverable, virtual public IClickable<Handler> {
-    Animation(Handler handler, 
-        DefaultPictures::Picture defaultPicture, DefaultPictures::Picture actionPicture, const Color& clickColor);
+struct IAnimated: virtual public Widget, public IHoverable {
+    static constexpr uint32_t AnimationTime = 300;
     
+    IAnimated(
+        const Vector2i& size, const Vector2i& pos,
+        DefaultPictures::Picture mainPicture,
+        DefaultPictures::Picture hoverPicture,
+        DefaultPictures::Picture pressPicture);
+
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
     void draw(MLTexture& texture, const Vector2i& absPos) override;
 
-private:
-    DefaultPictures::Picture defaultPicture;
-    DefaultPictures::Picture actionPicture;
-    
-    Color clickColor;
+    bool isClicked;
 
+private:
+    DefaultPictures::Picture mainPicture;
+    DefaultPictures::Picture hoverPicture;
+    DefaultPictures::Picture pressPicture;
+    
     Timer timer;
-};*/
+
+    bool isAnimated;
+    bool isPressed;
+};
 
 //*************************************************************
 

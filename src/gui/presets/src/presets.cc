@@ -142,7 +142,7 @@ DefaultWindow::DefaultWindow(const Vector2i& size, const Vector2i& pos, WidgetMa
     workManager = new WidgetManager(size, Vector2i(0, TITLE_BAR_SIZE), Color(0, 0, 0, 0), this);
     subWidgets.push_back(workManager);
 
-    subWidgets.push_back(new ButtonAnimPicture(
+    subWidgets.push_back(new AnimatedButton(
         [parent, this]() {
             for (auto& subWidget: parent->subWidgets) {
                 if ((void*)subWidget == (void*)this) {
@@ -152,8 +152,9 @@ DefaultWindow::DefaultWindow(const Vector2i& size, const Vector2i& pos, WidgetMa
             }
         },
         DefaultPictures::Close,
-        DefaultPictures::CloseAnimated,
-        Vector2i(20, 20),
+        DefaultPictures::CloseHover,
+        DefaultPictures::ClosePressed,
+        10,
         Vector2i(5, 5)
     ));
 

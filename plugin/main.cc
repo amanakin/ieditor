@@ -20,4 +20,3 @@ int main() {
 
     App::getApp()->run();*/
 }
-ё
