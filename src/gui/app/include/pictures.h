@@ -45,7 +45,7 @@ enum Picture {
 
 struct PictureManager {
     PictureManager();
-    const MLPicture* getPicture(DefaultPictures::Picture picture);
+    const MLPicture& getPicture(DefaultPictures::Picture picture);
 
 private:
     std::vector<MLPicture> pictures;

@@ -4,16 +4,29 @@
 #include <widget.h>
 #include <graphlib.h>
 #include <pictures.h>
+#include <layout.h>
 
 extern const char* const STUFF_FOLDER;
 
 //*************************************************************
 
-struct Settings {
-    Color drawColor;
-    float brushSize;
+struct Tool;
+struct Effect;
 
-    static constexpr float MaxBrushSize = 20;
+struct WorkSpace {
+    WorkSpace();
+    ~WorkSpace();
+
+    void changeTool(const Tool* tool);
+    void changeEffect(const Effect* effect);
+
+    Color color;
+    float size;
+
+    Tool* tool;
+    Effect* effect;
+
+    static constexpr float MaxBrushSize = 25;
 };
 
 //*************************************************************
@@ -37,10 +50,13 @@ struct App {
     void run();
     void init();
 
-    Settings settings;
+    WorkSpace workSpace;
+    
     MLFont font;
     MLWindow window;
+
     PictureManager pictManager;
+    LayoutManager layoutManager;
 private:
     App(const Vector2i& size);
     static App* app;

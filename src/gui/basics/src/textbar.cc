@@ -173,7 +173,6 @@ bool TextBar::onKeyboard(const Event::KeyClick& keyClick) {
         return true;
     }                       
 
-    std::cout << "key event: "<<keyClick.key << '\n';    
     if (keyClick.type == Event::Type::KeyboardKeyReleased) {
         onRelease(keyClick.key);
     } else {
@@ -184,7 +183,6 @@ bool TextBar::onKeyboard(const Event::KeyClick& keyClick) {
 }
 
 bool TextBar::onTextEntered(const Event::Text& text) {
-    std::cout << "entered: " << text.unicode << '\n';
     lastSym = IsCharacter(text.unicode) ? text.unicode : 0;
 
     return true;
@@ -201,7 +199,7 @@ void TextBar::customPress(const Event::KeyClick& keyClick) {
         case Keyboard::Key::V: 
             if (keyClick.control) {  
                 addStr(App::getApp()->window.getClipBuffer());
-            return;
+                return;
             }
     }
 
@@ -247,7 +245,9 @@ void TextBar::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     auto pos = text.getCharPos(cursor->getPos());
 
     this->texture.clear();
-    cursor->drawCustom(this->texture, pos);
+    if (isFocus) {
+        cursor->drawCustom(this->texture, pos);
+    }
     text.draw(this->texture);
 
     this->texture.draw(texture, absPosWidget + Vector2i(TEXT_BAR_EDGE, TEXT_BAR_EDGE));

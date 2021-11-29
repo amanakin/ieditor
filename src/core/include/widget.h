@@ -27,17 +27,23 @@ struct Widget {
     virtual bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget);
     virtual bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget);
     virtual bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget);
+    
     virtual bool onKeyboard(  const Event::KeyClick&   key);
     virtual bool onTextEntered(const Event::Text& text);
     
+    virtual void onUnFocus();
+
     // Relative pos of mouse event
     virtual bool testMouse(const Vector2i& relPosEvent);
 
     // Relative position
     Vector2i pos;
     Vector2i size;
+
     bool isActive;
+    bool isFocus;
     bool toClose;
+    
     WidgetManager* parent;
 };
 
@@ -54,13 +60,16 @@ struct WidgetManager: public Widget {
     void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
     
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
-    bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) override;
+    bool onMouseDrag(const Event::MouseDrag&   mouseDrag,  const Vector2i& absPosWidget) override;
     bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
-    bool onKeyboard(  const Event::KeyClick&   key) override;
+    
+    bool onKeyboard(const Event::KeyClick& key) override;
     bool onTextEntered(const Event::Text& text) override;
 
-    bool testMouse(const Vector2i& relPosEvent) override;
+    void onUnFocus() override;
 
+    bool testMouse(const Vector2i& relPosEvent) override;
+    
     std::list<Widget*> subWidgets;
     Color bg;
 };

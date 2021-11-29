@@ -8,16 +8,18 @@ struct Layout: public Widget {
     Layout(const Vector2i& size,
            const Vector2i& pos);
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget)    override;
+    void dropPreview();
+
+    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
     bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) override;
-    bool testMouse(const Vector2i& relPosEvent)                    override;
 
+    MLTexture preview;
     MLTexture texture;
 };
 
-/*
-struct LayoutManager;
+
+/*struct LayoutManager;
 
 struct LayoutButton: public Widget {
     LayoutButton(const Vector2i& size, const Vector2i& pos, LayoutManager& layoutManager);
@@ -28,15 +30,16 @@ struct LayoutButton: public Widget {
 private:
     Layout* layout;
     MLText layoutName;
-};
+};*/
 
 struct LayoutManager: public WidgetManager {
     LayoutManager(const Vector2i&size, const Vector2i& pos);
-    void update() override;
 
-    size_t count;
-    WidgetManager* workSpace;
-    WidgetManager* controlSpace;
+    void addLayout(const Vector2i& size);
+    Layout* geCurrtLayout();
+
+private:
+    Layout* currLayout;
 };
-*/
+
 #endif // LAYOUT_HEADER

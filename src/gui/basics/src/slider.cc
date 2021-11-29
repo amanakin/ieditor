@@ -5,23 +5,20 @@
 #include <utils.h>
 #include <app.h>
 
-const int SLIDER_RADIUS = 10;
-const int SLIDER_WIDTH  = 14;
-
-Slider::Slider(int widgetHeight, const Vector2i& pos, const Color& color) :
-    Widget(Vector2i(SLIDER_RADIUS * 2, widgetHeight), pos, nullptr),
-    height(widgetHeight - 2 * SLIDER_RADIUS),
-    currPos(height / 2),
+Slider::Slider(int widgetLength, const Vector2i& pos, const Color& color) :
+    Widget(Vector2i(widgetLength, SliderRadius * 2), pos, nullptr),
+    width(widgetLength - 2 * SliderRadius),
+    currPos(width / 2),
     bg(color),
-    sprite(*App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
-            Vector2i(SLIDER_RADIUS * 2, SLIDER_RADIUS * 2), pos)
+    sprite(App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
+            Vector2i(SliderRadius * 2, SliderRadius * 2), pos)
 {}
 
 void Slider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
-    MLRect back(Vector2i(SLIDER_WIDTH, height), absPosWidget + Vector2i(SLIDER_RADIUS - SLIDER_WIDTH / 2, SLIDER_RADIUS), bg);
+    MLRect back(Vector2i(width, SliderHeight), absPosWidget + Vector2i(SliderRadius, SliderRadius - SliderHeight / 2), bg);
     back.draw(texture);
 
-    sprite.setPosition(absPosWidget + Vector2i(0, currPos));
+    sprite.setPosition(absPosWidget + Vector2i(currPos, 0));
     sprite.draw(texture);
 }
 
@@ -30,13 +27,12 @@ bool Slider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absP
         return false;
     }
 
-    int delta = mouseDrag.currPos.y - mouseDrag.prevPos.y;
-    currPos += delta;
+    currPos = mouseDrag.currPos.x - absPosWidget.x;;
 
     if (currPos < 0) {
         currPos = 0;
-    } else if (currPos > height) {
-        currPos = height;
+    } else if (currPos > width) {
+        currPos = width;
     } 
 
     return true;
@@ -47,15 +43,27 @@ bool Slider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
         return false;
     }
 
-    currPos = mouseClick.mousePos.y - absPosWidget.y - SLIDER_RADIUS;
+    currPos = mouseClick.mousePos.x - absPosWidget.x - SliderRadius;
 
     if (currPos < 0) {
         currPos = 0;
-    } else if (currPos > height) {
-        currPos = height;
+    } else if (currPos > width) {
+        currPos = width;
     }
 
     return true;
+}
+
+int Slider::getCurrPos() const {
+    return currPos;
+}
+
+void Slider::setCurrPos(const int currPos) {
+    this->currPos = currPos;
+}
+
+int Slider::getWidth() const {
+    return width;
 }
 
 //*************************************************************
@@ -63,14 +71,14 @@ bool Slider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 PlaneSlider::PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color& color) :
     Widget(size, pos, nullptr),
     currPos(pos),
-    bgSize(Vector2i(size.x - 2 * SLIDER_RADIUS, size.y - 2 * SLIDER_RADIUS)),
+    bgSize(Vector2i(size.x - 2 * SliderRadius, size.y - 2 * SliderRadius)),
     bg(color),
-    sprite(*App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
-            Vector2i(SLIDER_RADIUS * 2, SLIDER_RADIUS * 2), pos)
+    sprite(App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
+            Vector2i(SliderRadius * 2, SliderRadius * 2), pos)
 {}
 
 void PlaneSlider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
-    MLRect back(bgSize, absPosWidget + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS), bg);
+    MLRect back(bgSize, absPosWidget + Vector2i(SliderRadius, SliderRadius), bg);
     back.draw(texture);
 
     sprite.setPosition(absPosWidget + currPos);
@@ -82,8 +90,7 @@ bool PlaneSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i&
         return false;
     }
     
-    auto delta = mouseDrag.currPos - mouseDrag.prevPos;
-    currPos += delta;
+    currPos = (mouseDrag.currPos - absPosWidget) - Vector2i(SliderRadius, SliderRadius);
 
     if (currPos.x < 0) {
         currPos.x = 0;
@@ -105,7 +112,7 @@ bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector
         return false;
     }
 
-    currPos = mouseClick.mousePos - absPosWidget - Vector2i(SLIDER_RADIUS, SLIDER_RADIUS);
+    currPos = mouseClick.mousePos - absPosWidget - Vector2i(SliderRadius, SliderRadius);
 
     if (currPos.x < 0) {
         currPos.x = 0;
@@ -120,6 +127,18 @@ bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector
     }
 
     return true;
+}
+
+Vector2i PlaneSlider::getCurrPos() const {
+    return currPos;
+}
+
+void PlaneSlider::setCurrPos(const Vector2i& currPos) {
+    this->currPos = currPos;
+}
+
+Vector2i PlaneSlider::getBgSize() const {
+    return bgSize;
 }
 
 //*************************************************************

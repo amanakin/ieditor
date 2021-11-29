@@ -1,20 +1,35 @@
 // app.cc
 
-#include <cassert>
-
 #include <app.h>
 #include <button.h>
-#include <presets.h>
+#include <filter.h>
+#include <layout.h>
 #include <pickers.h>
 #include <pictures.h>
+#include <presets.h>
 #include <slider.h>
+#include <curve.h>
 #include <textbar.h>
-#include <spline.h>
-#include <layout.h>
+#include <tool.h>
+
+#include <cassert>
 
 const char* const STUFF_FOLDER = "stuff/";
-static const char* const FONT_FILENAME  = "arial.ttf";
-static const char* const APP_NAME = "iEditor"; 
+const char* const FONT_FILENAME  = "arial.ttf";
+const char* const APP_NAME = "iEditor"; 
+
+//*************************************************************
+
+WorkSpace::WorkSpace() :
+    size(5), color(Colors::BLACK),
+    tool(new Tool), effect(new Effect)
+{}
+
+WorkSpace::~WorkSpace() {
+    delete tool;
+    delete effect;
+}
+
 
 //*************************************************************
 
@@ -23,14 +38,12 @@ StartWidget::StartWidget(const Vector2i& size, const Vector2i& pos, const Color&
 {}
 
 void StartWidget::init() {
-    
+
     auto exitButton = new AnimatedButton(
         [this](){
             this->stop();
         },
-        DefaultPictures::Exit,
-        DefaultPictures::Exit,
-        DefaultPictures::Exit,
+        new Frames1(DefaultPictures::Exit),
         50,
         Vector2i(0, 0)
     );
@@ -39,13 +52,11 @@ void StartWidget::init() {
 
     auto layoutButton = new AnimatedButton(
         [this]() {
-            auto layoutWindow = new DefaultWindow(Vector2i(700, 500), Vector2i(300, 300), this);
+            auto layoutWindow = new DefaultWindow(Vector2i(700, 500), Vector2i(300, 300));
             layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2i(690, 490), Vector2i(5, 5)));
             this->subWidgets.push_front(layoutWindow);
         },
-        DefaultPictures::Easel,
-        DefaultPictures::EaselHover,
-        DefaultPictures::EaselPressed,
+        new Frames1(DefaultPictures::Easel),
         50,
         Vector2i(0, 100)
     );
@@ -54,13 +65,11 @@ void StartWidget::init() {
 
     auto colorPickerButton = new AnimatedButton(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(700, 300), Vector2i(100, 100), this);
-            pickerWindow->workManager->subWidgets.push_back(new ColorPickerGradient(Vector2i(700, 300), Vector2i(0, 0)));
+            auto pickerWindow = new DefaultWindow(Vector2i(700, 300), Vector2i(100, 100));
+            pickerWindow->workManager->subWidgets.push_back(new ColorPicker(Vector2i(700, 300), Vector2i(0, 0)));
             this->subWidgets.push_front(pickerWindow);
         },
-        DefaultPictures::Palette,
-        DefaultPictures::PaletteHover,
-        DefaultPictures::PalettePressed,
+        new Frames1(DefaultPictures::Palette),
         50,
         Vector2i(0, 200)
     );
@@ -69,13 +78,11 @@ void StartWidget::init() {
 
     auto brushSizePicker = new AnimatedButton(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(100, 300), Vector2i(300, 300), this);
+            auto pickerWindow = new DefaultWindow(Vector2i(100, 300), Vector2i(300, 300));
             pickerWindow->workManager->subWidgets.push_back(new BrushSizePicker(Vector2i(100, 300), Vector2i(0, 0)));
             this->subWidgets.push_front(pickerWindow);
         },
-        DefaultPictures::Brush,
-        DefaultPictures::BrushHover,
-        DefaultPictures::BrushPressed,
+        new Frames1(DefaultPictures::Brush),
         50,
         Vector2i(0, 300)
     );
@@ -85,13 +92,11 @@ void StartWidget::init() {
 
     auto spliner = new AnimatedButton(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300), this);
-            pickerWindow->workManager->subWidgets.push_back(new Splines(Vector2i(500 - 10, 500 - 10), Vector2i(5, 5)));
+            auto pickerWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300));
+            pickerWindow->workManager->subWidgets.push_back(new Curves(Vector2i(500 - 10, 500 - 10), Vector2i(5, 5)));
             this->subWidgets.push_front(pickerWindow);
         },
-        DefaultPictures::Curve,
-        DefaultPictures::CurveHover,
-        DefaultPictures::CurverPressed,
+        new Frames1(DefaultPictures::Curve),
         50,
         Vector2i(0, 400)
     );
@@ -100,13 +105,11 @@ void StartWidget::init() {
 
     auto saveFileButton = new AnimatedButton(
         [this]() {
-            auto openWindow = new DefaultWindow(Vector2i(810, 260), Vector2i(500, 350), this);
+            auto openWindow = new DefaultWindow(Vector2i(810, 260), Vector2i(500, 350));
             openWindow->workManager->subWidgets.push_back(new OpenFile(Vector2i(5, 5), this, openWindow));
             this->subWidgets.push_front(openWindow);
         },
-        DefaultPictures::Floppy,
-        DefaultPictures::FloppyHover,
-        DefaultPictures::FloppyPressed,
+        new Frames1(DefaultPictures::Floppy),
         50,
         Vector2i(0, 500)
     );
@@ -121,6 +124,7 @@ App* App::app = nullptr;
 App::App(const Vector2i& size) :
     window(size, Vector2i(0, 0), APP_NAME),
     font(std::string(STUFF_FOLDER) + FONT_FILENAME),
+    layoutManager(Vector2i(1920 - 110, 1080), Vector2i(110, 0)),
     pictManager()
 {}
 
@@ -143,9 +147,11 @@ void App::run() {
 }
 
 void App::init() {
-    settings.drawColor = Colors::BLUE;
-    settings.brushSize = 5;
+    workSpace.color = Colors::BLUE;
+    workSpace.size = 5;
+    
     startWidget = new StartWidget(Vector2i(1920, 1080), Vector2i(0, 0));
-    }
+    startWidget->subWidgets.push_back(&layoutManager);
+}
 
 //*************************************************************

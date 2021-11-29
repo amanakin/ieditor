@@ -57,6 +57,9 @@ static sf::Keyboard::Key ConvertKeyToSFMLKey(Keyboard::Key key) {
     case Keyboard::Key::Dot: return sf::Keyboard::Key::Period;
     CONVERT_KEY(Semicolon)
     CONVERT_KEY(Tilde)
+    CONVERT_KEY(LBracket)
+    CONVERT_KEY(RBracket)
+    CONVERT_KEY(Quote)
     CONVERT_KEY(Num0)
     CONVERT_KEY(Num1)
     CONVERT_KEY(Num2)
@@ -202,6 +205,73 @@ void MLRect::draw(MLTexture& texture) const {
 //*************************************************************
 //*************************************************************
 
+MLRoundedRect::MLRoundedRect(const Vector2i& size, float radius, const Color& color) :
+    points(PointCount * 4)
+{
+    rect.setPointCount(4 * PointCount);
+
+	float X = 0,
+          Y = 0;
+	for(int i= 0; i < PointCount; i++)
+	{
+		X += radius / PointCount;
+		Y = sqrt(radius * radius - X * X);
+		points[10 * 0 + i] = sf::Vector2f(X - radius + size.x, radius - Y);
+	}
+
+	Y=0;
+    for(int i = 0; i < PointCount; i++)
+	{
+		Y += radius / PointCount;
+		X = sqrt(radius * radius - Y * Y);
+		points[10 * 1 + i] = sf::Vector2f(size.x + X - radius,size.y - radius + Y);
+	}
+
+	X=0;
+    for(int i = 0; i < PointCount; i++)
+	{
+		X += radius / PointCount;
+		Y = sqrt(radius * radius - X * X);
+		points[10 * 2 + i] = sf::Vector2f(radius-X, size.y - radius + Y);
+	}
+
+	Y=0;
+    for(int i=0; i < PointCount; i++)
+	{
+		Y += radius / PointCount;
+		X = sqrt(radius * radius - Y * Y);
+		points[10 * 3 + i] = sf::Vector2f(radius - X, radius - Y);
+	}
+
+    for (int idx = 0; idx < PointCount * 4; idx++) {
+        rect.setPoint(idx, points[idx]);
+    }
+
+    setColor(color);
+}
+
+void MLRoundedRect::setColor(const Color& color) {
+    rect.setFillColor(ConvertColorToSFMLColor(color));
+}
+
+Color MLRoundedRect::getColor() const {
+    return ConvertSFMLColorToColor(rect.getFillColor());
+}
+
+void MLRoundedRect::setPosition(const Vector2i& pos) {
+    rect.setPosition(ConvertVectorToSFMLVector(pos));
+}
+
+void MLRoundedRect::draw(MLWindow& window) const {
+    window.windowSFML.draw(rect);
+}
+void MLRoundedRect::draw(MLTexture& texture) const {
+    texture.renderTexture.draw(rect);
+}
+
+//*************************************************************
+//*************************************************************
+
 MLSegment::MLSegment(const Vector2i& start, const Vector2i& end, const Color& color) {
     setStart(start);
     setEnd(end);
@@ -305,11 +375,15 @@ void MLText::draw(MLTexture& texture) const {
 //*************************************************************
 
 MLPicture::MLPicture(const std::string& filename) {
-    assert(texture.loadFromFile(filename));
+    isOk = texture.loadFromFile(filename);
 }
 
 Vector2i MLPicture::getSize() const {
     return Vector2i(texture.getSize().x, texture.getSize().y);
+}
+
+bool MLPicture::operator!() const {
+    return !isOk;
 }
 
 //*************************************************************
@@ -332,6 +406,13 @@ MLSprite::MLSprite(const MLPicture& picture, const Vector2i& picPos,
                    const Vector2i& size, const Vector2i& pos) {
     sprite.setTexture(picture.texture);
     sprite.setTextureRect(sf::IntRect(sf::Vector2i(picPos.x, picPos.y), sf::Vector2i(size.x, size.y)));
+    setPosition(pos);
+}
+
+MLSprite::MLSprite(const MLTexture& texture, const Vector2i& size, const Vector2i& pos) {
+    sprite.setTexture(texture.renderTexture.getTexture());
+    float scale = float(size.x) / texture.renderTexture.getSize().x;
+    sprite.setScale(sf::Vector2f(scale, scale));
     setPosition(pos);
 }
 
@@ -372,6 +453,14 @@ MLTexture::MLTexture(const Vector2i& size, const Color& bg) :
     clear();
 }
 
+MLTexture::MLTexture()
+{}
+
+bool MLTexture::create(const Vector2i& size, const Color& bg) {
+    this->bg = bg; 
+    return renderTexture.create(size.x, size.y);
+}
+
 void MLTexture::draw(MLWindow& window, const Vector2i& pos) {
     renderTexture.display();
 
@@ -379,6 +468,10 @@ void MLTexture::draw(MLWindow& window, const Vector2i& pos) {
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
 
     window.windowSFML.draw(sprite);
+}
+
+void MLTexture::display() {
+    renderTexture.display();
 }
 
 void MLTexture::draw(MLTexture& texture, const Vector2i& pos) {
@@ -402,6 +495,7 @@ MLWindow::MLWindow(const Vector2i& size, const Vector2i& pos, const char* name) 
     isActive_(true)
 {
     windowSFML.setVerticalSyncEnabled(true);
+    windowSFML.setKeyRepeatEnabled(false);
 }
 
 void MLWindow::setPosition(const Vector2i& pos) {
@@ -454,6 +548,7 @@ bool MLWindow::isKeyPressed(Keyboard::Key key) const {
 }
 
 uint32_t MLWindow::isTextEntered() {    
+    
     sf::Event event;
 
     while (windowSFML.pollEvent(event)) {

@@ -20,7 +20,7 @@ static void DrawPalette(MLTexture& texture, const Vector2i& size, const Vector2i
     }
 }
 
-static void DrawHSV(MLTexture& texture, const Vector2i& size, const Vector2i& absPos){
+static void DrawHSVLine(MLTexture& texture, const Vector2i& size, const Vector2i& absPos){
     float width = size.y / 360.f;
     MLRect rect(Vector2i(size.x, ceil(width)), absPos, Colors::BLACK);
 
@@ -33,64 +33,63 @@ static void DrawHSV(MLTexture& texture, const Vector2i& size, const Vector2i& ab
 
 //*************************************************************
 
-ColorPickerGradient::ColorPickerGradient(const Vector2i& size, const Vector2i& pos) :
+ColorPicker::ColorPicker(const Vector2i& size, const Vector2i& pos) :
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
     texture(size, Color(0, 0, 0, 0))
 {
-    planeSlider = new PlaneSlider(Vector2i(size.x - 5 * 3 - SLIDER_RADIUS * 2, size.y - 5 * 2), Vector2i(5, 5), Color(0, 0, 0, 0));
+    planeSlider = new PlaneSlider(Vector2i(size.x - 5 * 3 - Slider::SliderRadius * 2, size.y - 5 * 2), Vector2i(5, 5), Color(0, 0, 0, 0));
     slider      = new Slider(size.y - 5 * 2, Vector2i(planeSlider->size.x + 5 * 2, 5), Color(0, 0, 0, 0));
 
     subWidgets.push_back(slider);
     subWidgets.push_back(planeSlider);
 
-    setColor(App::getApp()->settings.drawColor);
-    drawHSVA();
+    setColor(App::getApp()->workSpace.color);
+    redrawTexture();
 }
 
-Color ColorPickerGradient::getColor() const {
+Color ColorPicker::getColor() const {
     return Color(ConvertHSVAToRGBA(ColorHSVA(
-        float(slider->currPos) / slider->height * 360,
-        float(planeSlider->currPos.x) / planeSlider->bgSize.x * 100,
-        float(planeSlider->currPos.y) / planeSlider->bgSize.y * 100,
+        float(slider->getCurrPos()) / slider->getWidth() * 360,
+        float(planeSlider->getCurrPos().x) / (planeSlider->getBgSize()).x * 100,
+        float(planeSlider->getCurrPos().y) / (planeSlider->getBgSize()).y * 100,
         1)));
 }
 
-void ColorPickerGradient::setColor(const Color& color) {
+void ColorPicker::setColor(const Color& color) {
     ColorHSVA hsva = ConvertRGBAToHSVA(color);
 
-    slider->currPos = hsva.x / 360 * slider->height;
-    planeSlider->currPos.x = hsva.y / 100 * planeSlider->bgSize.x;
-    planeSlider->currPos.y = hsva.z / 100 * planeSlider->bgSize.y;
+    slider->setCurrPos(hsva.x / 360 * slider->getWidth());
+    planeSlider->setCurrPos(Vector2i(hsva.y / 100 * (planeSlider->getBgSize()).x, hsva.z / 100 * (planeSlider->getBgSize()).y));
 }
 
-void ColorPickerGradient::drawHSVA() {
+void ColorPicker::redrawTexture() {
     DrawPalette(this->texture,
-                planeSlider->size - Vector2i(2 * SLIDER_RADIUS, 2 * SLIDER_RADIUS),
-                planeSlider->pos + Vector2i(SLIDER_RADIUS, SLIDER_RADIUS),
-                (float(slider->currPos) / slider->height) * 360);
+                planeSlider->size - Vector2i(2 * Slider::SliderRadius, 2 * Slider::SliderRadius),
+                planeSlider->pos + Vector2i(Slider::SliderRadius, Slider::SliderRadius),
+                (float(slider->getCurrPos()) / slider->getWidth()) * 360);
 
-    DrawHSV(this->texture,
-            Vector2i(SLIDER_WIDTH, slider->height),
-            slider->pos + Vector2i(SLIDER_RADIUS - SLIDER_WIDTH / 2, SLIDER_RADIUS));
+    DrawHSVLine(this->texture,
+            Vector2i(Slider::SliderHeight, slider->getWidth()),
+            slider->pos + Vector2i(Slider::SliderRadius - Slider::SliderHeight / 2, Slider::SliderRadius));
 }
 
-void ColorPickerGradient::update() {
-    if (App::getApp()->settings.drawColor != getColor()) {
-        setColor(App::getApp()->settings.drawColor);
-        drawHSVA();
+void ColorPicker::update() {
+    if (App::getApp()->workSpace.color != getColor()) {
+        setColor(App::getApp()->workSpace.color);
+        redrawTexture();
     }
 }
 
-void ColorPickerGradient::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+void ColorPicker::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     this->texture.draw(texture, absPosWidget);
 
     WidgetManager::draw(texture, absPosWidget);
 }
 
-bool ColorPickerGradient::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+bool ColorPicker::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
     if (WidgetManager::onMouseDrag(mouseDrag, absPosWidget)) {
-        App::getApp()->settings.drawColor = getColor();
-        drawHSVA();
+        App::getApp()->workSpace.color = getColor();
+        redrawTexture();
 
         return true;
     }
@@ -98,10 +97,10 @@ bool ColorPickerGradient::onMouseDrag(const Event::MouseDrag& mouseDrag, const V
     return false;
 }
 
-bool ColorPickerGradient::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool ColorPicker::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
     if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
-        App::getApp()->settings.drawColor = getColor();
-        drawHSVA();
+        App::getApp()->workSpace.color = getColor();
+        redrawTexture();
                 
         return true;
     }
@@ -114,29 +113,29 @@ bool ColorPickerGradient::onMouseClick(const Event::MouseClick& mouseClick, cons
 BrushSizePicker::BrushSizePicker(const Vector2i& size, const Vector2i& pos) :
     WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr) {
 
-    slider = new Slider(size.y - 5 * 2, Vector2i((size.x - 10) / 2 - SLIDER_RADIUS + 5, 5), Colors::CRIMSON);
+    slider = new Slider(size.y - 5 * 2, Vector2i((size.x - 10) / 2 - Slider::SliderRadius + 5, 5), Colors::CRIMSON);
     subWidgets.push_back(slider);
 
-    setBrushSize(App::getApp()->settings.brushSize);
+    setBrushSize(App::getApp()->workSpace.size);
 }
     
 float BrushSizePicker::getBrushSize() const {
-    return (float(slider->currPos) / slider->height) * Settings::MaxBrushSize;
+    return (float(slider->getCurrPos()) / slider->getWidth()) * WorkSpace::MaxBrushSize;
 }
 
 void BrushSizePicker::setBrushSize(float brushSize) {
-    slider->currPos = (brushSize / Settings::MaxBrushSize) * slider->height;
+    slider->setCurrPos((brushSize / WorkSpace::MaxBrushSize) * slider->getWidth());
 }
 
 void BrushSizePicker::update() {
-    if (getBrushSize() != App::getApp()->settings.brushSize) {
-        setBrushSize(App::getApp()->settings.brushSize);
+    if (getBrushSize() != App::getApp()->workSpace.size) {
+        setBrushSize(App::getApp()->workSpace.size);
     }
 }
 
 bool BrushSizePicker::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
     if (WidgetManager::onMouseDrag(mouseDrag, absPosWidget)) {
-        App::getApp()->settings.brushSize = getBrushSize();
+        App::getApp()->workSpace.size = getBrushSize();
         return true;
     }
 
@@ -145,7 +144,7 @@ bool BrushSizePicker::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vecto
 
 bool BrushSizePicker::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
     if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
-        App::getApp()->settings.brushSize = getBrushSize();
+        App::getApp()->workSpace.size = getBrushSize();
         return true;
     }
 

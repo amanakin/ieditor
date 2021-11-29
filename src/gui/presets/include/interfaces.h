@@ -47,7 +47,7 @@ struct IHoverable: virtual public Widget {
 
     bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
     bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
-    
+
     bool isHover;
 };
 
@@ -92,14 +92,54 @@ struct IMovable: virtual public Widget {
 
 //*************************************************************
 
+struct FrameManager {
+    virtual ~FrameManager();
+
+    virtual MLSprite getMainPict(const Vector2i& size)  = 0;
+    virtual MLSprite getHoverPict(const Vector2i& size) = 0;
+    virtual MLSprite getPressPict(const Vector2i& size) = 0;
+};
+
+
+//*************************************************************
+
+struct Frames3: public FrameManager {
+    Frames3(DefaultPictures::Picture mainPicture,
+            DefaultPictures::Picture hoverPicture,
+            DefaultPictures::Picture pressPicture);
+
+    MLSprite getMainPict(const Vector2i& size)  override;
+    MLSprite getHoverPict(const Vector2i& size) override;
+    MLSprite getPressPict(const Vector2i& size) override;
+
+private:
+    DefaultPictures::Picture mainPicture;
+    DefaultPictures::Picture hoverPicture;
+    DefaultPictures::Picture pressPicture;
+};
+
+//*************************************************************
+
+struct Frames1: public FrameManager {
+    Frames1(DefaultPictures::Picture picture);
+
+    MLSprite getMainPict(const Vector2i& size)  override;
+    MLSprite getHoverPict(const Vector2i& size) override;
+    MLSprite getPressPict(const Vector2i& size) override;
+
+private:
+    DefaultPictures::Picture picture;
+    MLTexture hoverTexture;
+    MLTexture pressTexture;
+};
+
+//*************************************************************
+
 struct IAnimated: virtual public Widget, public IHoverable {
     static constexpr uint32_t AnimationTime = 300;
     
-    IAnimated(
-        const Vector2i& size, const Vector2i& pos,
-        DefaultPictures::Picture mainPicture,
-        DefaultPictures::Picture hoverPicture,
-        DefaultPictures::Picture pressPicture);
+    IAnimated(const Vector2i& size, const Vector2i& pos, FrameManager* frameManager);
+    ~IAnimated();
 
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
     void draw(MLTexture& texture, const Vector2i& absPos) override;
@@ -107,10 +147,8 @@ struct IAnimated: virtual public Widget, public IHoverable {
     bool isClicked;
 
 private:
-    DefaultPictures::Picture mainPicture;
-    DefaultPictures::Picture hoverPicture;
-    DefaultPictures::Picture pressPicture;
-    
+    FrameManager* frameManager;
+
     Timer timer;
 
     bool isAnimated;

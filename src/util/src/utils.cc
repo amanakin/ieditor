@@ -99,9 +99,9 @@ Vector2i CatmullRom(const Vector2f& p0, const Vector2f& p1, const Vector2f& p2, 
     Vector2f B1 = ( t2-t )/( t2-t0 )*A1 + ( t-t0 )/( t2-t0 )*A2;
     Vector2f B2 = ( t3-t )/( t3-t1 )*A2 + ( t-t1 )/( t3-t1 )*A3;
 
-    Vector2i C  = ConvertVector2fToVecto2i(( t2-t )/( t2-t1 )*B1 + ( t-t1 )/( t2-t1 )*B2);
+    Vector2f C  = ( t2-t )/( t2-t1 )*B1 + ( t-t1 )/( t2-t1 )*B2;
     
-    return C;
+    return Vector2i(roundf(C.x), roundf(C.y));
 }
 
 Vector2i FitRectInCenter(const Vector2i& rectSize, const Vector2i& availableArea) {

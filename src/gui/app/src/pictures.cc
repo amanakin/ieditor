@@ -58,8 +58,8 @@ PictureManager::PictureManager() {
     }
 }
 
-const MLPicture* PictureManager::getPicture(DefaultPictures::Picture picture) {
-    return &pictures[picture];
+const MLPicture& PictureManager::getPicture(DefaultPictures::Picture picture) {
+    return pictures[picture];
 }
 
 #undef PATH_MAX

@@ -60,6 +60,25 @@ private:
 
 //*************************************************************
 
+struct MLRoundedRect {
+    MLRoundedRect(const Vector2i& size, float radius, const Color& color);
+
+    void setColor(const Color& color);
+    Color getColor() const;
+
+    void setPosition(const Vector2i& pos);
+
+    void draw(MLWindow& window) const;
+    void draw(MLTexture& texture) const;
+private:
+    sf::ConvexShape rect;
+    std::vector<sf::Vector2f> points;
+
+    static constexpr int PointCount = 10;
+};
+
+//*************************************************************
+
 struct MLSegment {
     MLSegment(const Vector2i& start, const Vector2i& end, const Color& color);
 
@@ -125,10 +144,13 @@ struct MLPicture {
 
     Vector2i getSize() const;
 
+    bool operator!() const;
+
     friend MLSprite;
 
 private:
     sf::Texture texture;
+    bool isOk;
 };
 
 //*************************************************************
@@ -142,6 +164,9 @@ struct MLSprite {
 
     MLSprite(const MLPicture& picture, const Vector2i& picPos,
              const Vector2i& size, const Vector2i& pos);
+   
+    MLSprite(const MLTexture& texture, const Vector2i& size,
+             const Vector2i& pos);
     
     void setPosition(const Vector2i& pos);
     
@@ -164,17 +189,23 @@ private:
 
 struct MLTexture {
     MLTexture(const Vector2i& size, const Color& bg = Colors::WHITE);
+    MLTexture();
+
+    bool create(const Vector2i& size, const Color& bg = Colors::WHITE);
 
     void draw(MLWindow& window, const Vector2i& pos);
     void draw(MLTexture& texture, const Vector2i& pos);
 
     void clear();
 
+    void display();
+
     friend MLCircle;
     friend MLRect;
     friend MLText;
     friend MLSprite;
     friend MLSegment;
+    friend MLRoundedRect;
 
 private:
     sf::RenderTexture renderTexture;
@@ -214,6 +245,7 @@ struct MLWindow {
     friend MLSprite;
     friend MLTexture;
     friend MLSegment;
+    friend MLRoundedRect;
 
 private:
     sf::RenderWindow windowSFML;

@@ -63,16 +63,6 @@ bool EventManager::pollEvent() {
 
     bool isEvented = false;
 
-    uint32_t unicode = window->isTextEntered();
-    if (!window->isActive()) {
-        return false;
-    }
-
-    if (unicode != 0) {
-        rootWidget->onTextEntered(Event::Text(unicode));
-        isEvented = true;
-    }
-
     Vector2i newMousePos = window->getMousePosition();
 
     bool isMousePosChanged = newMousePos != mousePos;
@@ -85,12 +75,14 @@ bool EventManager::pollEvent() {
             if (!isButtonPressed[idx]) {
                 isButtonPressed[idx] = true;
 
+                if (button == Mouse::Button::Left) {
+                    rootWidget->onUnFocus();
+                }
+
                 rootWidget->onMouseClick(
                     Event::MouseClick(Event::Type::MouseButtonPressed, newMousePos, button),
                     rootWidget->pos
                 );
-
-                mousePos = newMousePos;
 
                 isEvented = true;
             } else {
@@ -101,8 +93,6 @@ bool EventManager::pollEvent() {
                         Event::MouseDrag(mousePos, newMousePos, button),
                         rootWidget->pos
                     );
-
-                    mousePos = newMousePos;
 
                     isEvented = true;
                 }
@@ -117,8 +107,6 @@ bool EventManager::pollEvent() {
                     rootWidget->pos
                 );
 
-                mousePos = newMousePos;
-
                 isEvented = true;
             }
         }
@@ -131,6 +119,16 @@ bool EventManager::pollEvent() {
 
             if (!isKeyPressed[idx]) {
                 isKeyPressed[idx] = true;
+
+                uint32_t unicode = window->isTextEntered();
+                if (!window->isActive()) {
+                    return false;
+                }
+                if (unicode != 0) {
+                    rootWidget->onTextEntered(Event::Text(unicode));
+                }
+
+                printf("%i\n", unicode);
 
                 auto event = Event::KeyClick(Event::Type::KeyboardKeyPressed, key);
                 event.control = window->isKeyPressed(Keyboard::Key::LControl);

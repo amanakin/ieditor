@@ -16,15 +16,22 @@ struct WidgetPicture: virtual public Widget, public IDrawablePicture {
 
 //*************************************************************
 
+// By Y axe
 extern const int TITLE_BAR_SIZE;
 
 struct DefaultWindow: public WidgetManager {
-    DefaultWindow(const Vector2i& size, const Vector2i& pos, WidgetManager* parent);
+    DefaultWindow(const Vector2i& size, const Vector2i& pos);
 
-    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
+    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
+    WidgetManager* workManager;
+};
+
+struct WindowPanel: public WidgetManager {
+    WindowPanel(const int len, const Vector2i& pos, WidgetManager* parent);
+
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) override;
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
 
-    WidgetManager* workManager;
     bool isPressed;
 };
 

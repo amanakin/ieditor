@@ -1,5 +1,7 @@
 // interfaces.cc
 
+#include <cassert>
+
 #include <interfaces.h>
 #include <utils.h>
 #include <app.h>
@@ -46,7 +48,7 @@ bool ITestableCircle::testMouse(const Vector2i& relPosEvent) {
 
 //*************************************************************
 
-bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    {
+bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
     if (!testMouse(mouseDrag.currPos - absPosWidget)) {
         isHover = false;
         return false;
@@ -56,7 +58,7 @@ bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& 
     return true;
 }
 
-bool IHoverable::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {
+bool IHoverable::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {        
     if (!testMouse(mouseHover.currPos - absPosWidget)) {
         isHover = false;
         return false;
@@ -100,26 +102,98 @@ bool IMovable::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i&
 
 //*************************************************************
 
-IAnimated::IAnimated(
-    const Vector2i& size, const Vector2i& pos,
-    DefaultPictures::Picture mainPicture,
-    DefaultPictures::Picture hoverPicture,
-    DefaultPictures::Picture pressPicture) :
-    Widget(size, pos, nullptr),
+FrameManager::~FrameManager() 
+{}
+
+//*************************************************************
+
+Frames3::Frames3(DefaultPictures::Picture mainPicture,
+            DefaultPictures::Picture hoverPicture,
+            DefaultPictures::Picture pressPicture) :
     mainPicture(mainPicture),
     hoverPicture(hoverPicture),
-    pressPicture(pressPicture),
+    pressPicture(pressPicture)
+{}
+
+MLSprite Frames3::getMainPict(const Vector2i& size) {
+    return MLSprite(App::getApp()->pictManager.getPicture(mainPicture), size, Vector2i(0, 0));
+}
+
+MLSprite Frames3::getHoverPict(const Vector2i& size) {
+    return MLSprite(App::getApp()->pictManager.getPicture(hoverPicture), size, Vector2i(0, 0));
+}
+MLSprite Frames3::getPressPict(const Vector2i& size) {
+    return MLSprite(App::getApp()->pictManager.getPicture(pressPicture), size, Vector2i(0, 0));
+}
+
+//*************************************************************
+
+Frames1::Frames1(DefaultPictures::Picture picture) :
+    picture(picture)
+{
+    MLSprite pict(App::getApp()->pictManager.getPicture(picture), Vector2i(0, 0));
+    auto size = App::getApp()->pictManager.getPicture(picture).getSize();
+
+    //Vector2i size(800, 800);
+
+    assert(hoverTexture.create(size, Color(0, 0, 0, 0)));
+    assert(pressTexture.create(size, Color(0, 0, 0, 0)));
+
+    MLRoundedRect roundRect(size, size.x / 5, Colors::GREY);
+    roundRect.setPosition(Vector2i(0, 0));
+    roundRect.draw(hoverTexture);
+
+    roundRect.setColor(Colors::DARK_GREY);
+    roundRect.draw(pressTexture);
+
+    pict.draw(hoverTexture);
+    pict.draw(pressTexture);
+
+    hoverTexture.display();
+    pressTexture.display();
+}
+
+MLSprite Frames1::getMainPict(const Vector2i& size)  {
+    return MLSprite(App::getApp()->pictManager.getPicture(picture), size, Vector2i(0, 0));
+}
+
+MLSprite Frames1::getHoverPict(const Vector2i& size) {
+    return MLSprite(hoverTexture, size, Vector2i(0, 0));
+}
+
+MLSprite Frames1::getPressPict(const Vector2i& size) {
+    return MLSprite(pressTexture, size, Vector2i(0, 0));
+}
+
+//*************************************************************
+
+IAnimated::IAnimated(
+    const Vector2i& size, const Vector2i& pos,
+    FrameManager* frameManager) :
+    Widget(size, pos, nullptr),
+    frameManager(frameManager),
     isAnimated(false),
     isClicked(false),
     isPressed(false)
-{}
+{
+    assert(frameManager != nullptr);
+}
+
+IAnimated::~IAnimated() {
+    delete frameManager;
+}
 
 bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
     if (mouseClick.type == Event::Type::MouseButtonReleased) {
         if (isPressed) {
-            isClicked = true;
-            isPressed = false;
-            return true;
+            if (testMouse(mouseClick.mousePos - absPosWidget)) {
+                isClicked = true;
+                isPressed = false;
+                return true;
+            } else {
+                isPressed = false;
+                return true;
+            }
         }
     } else {
         isPressed = true;
@@ -131,22 +205,26 @@ bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i
 
 void IAnimated::draw(MLTexture& texture, const Vector2i& absPos) {
     if (isPressed) {
-        MLSprite pressSprite(*App::getApp()->pictManager.getPicture(pressPicture), size, absPos);
+        auto pressSprite = frameManager->getPressPict(size);
+        pressSprite.setPosition(absPos);
         pressSprite.draw(texture);
+
         return;
     }
     
-    MLSprite mainSprite(*App::getApp()->pictManager.getPicture(mainPicture), size, absPos);
+    auto mainSprite = frameManager->getMainPict(size);
+    mainSprite.setPosition(absPos);
     mainSprite.draw(texture);
     
+    auto hoverSprite = frameManager->getHoverPict(size);
+    hoverSprite.setPosition(absPos);
+
     if (isHover) {
         if (!isAnimated) {
             isAnimated = true;
             timer.start();
         }
         else {
-            MLSprite hoverSprite(*App::getApp()->pictManager.getPicture(hoverPicture), size, absPos);
-
             double delta = timer.elapsed();
             if (delta > AnimationTime) {
                 hoverSprite.draw(texture);
@@ -160,8 +238,6 @@ void IAnimated::draw(MLTexture& texture, const Vector2i& absPos) {
     }
     else {
         if (isAnimated) {
-            MLSprite hoverSprite(*App::getApp()->pictManager.getPicture(hoverPicture), size, absPos);
-
             double delta = timer.elapsed();
             if (delta > AnimationTime) {
                 hoverSprite.draw(texture);
@@ -175,8 +251,6 @@ void IAnimated::draw(MLTexture& texture, const Vector2i& absPos) {
             isAnimated = false;
             timer.start();
         } else {
-            MLSprite hoverSprite(*App::getApp()->pictManager.getPicture(hoverPicture), size, absPos);
-
             double delta = timer.elapsed();
             if (delta > 0 && delta < AnimationTime) {
                 auto currOpacity = delta / AnimationTime;
