@@ -4,9 +4,8 @@
 #include <widget.h>
 #include <graphlib.h>
 #include <pictures.h>
-#include <layout.h>
-
-extern const char* const STUFF_FOLDER;
+#include <layout_manager.h>
+#include <loader.h>
 
 //*************************************************************
 
@@ -31,10 +30,41 @@ struct WorkSpace {
 
 //*************************************************************
 
-struct StartWidget: public RootWidget {
-    StartWidget(const Vector2i& size, const Vector2i& pos, const Color& color = Colors::LIGHT_GREY);
+struct App;
+
+struct AppWidget: public RootWidget {
+    AppWidget(const Vector2i& size, const Vector2i& pos, const Color& color, MLWindow* window);
+
+    void update() override;
+    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
+    
+    void onUnFocus() override;
+
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+    bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) override;
+    bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
 
     void init() override;
+
+    friend App;
+    
+private:
+    std::vector<Widget*> staticWidgets;
+};
+
+//*************************************************************
+
+// GO TO MENU MANAGER
+struct MenuManager {
+
+};
+
+// GO TO TOOLS MANAGER
+struct ToolManager {
+
+};
+
+struct ToolSettingsManager {
 
 };
 
@@ -46,9 +76,13 @@ struct App {
 
     static App* getApp();
     static void createApp(const Vector2i& size);
+    static void destructApp();
 
     void run();
-    void init();
+    
+    static constexpr const char* StuffFolder   = "stuff/";
+    static constexpr const char* FontFilename  = "arial.ttf";
+    static constexpr const char* AppName       = "iEditor"; 
 
     WorkSpace workSpace;
     
@@ -57,11 +91,15 @@ struct App {
 
     PictureManager pictManager;
     LayoutManager layoutManager;
+
+    Loader loader;
 private:
     App(const Vector2i& size);
+    ~App();
+
     static App* app;
     
-    StartWidget* startWidget;
+    AppWidget* appWidget;
 };
 
 //*************************************************************

@@ -108,10 +108,17 @@ namespace Event {
     };
 
     struct MouseHover {
-        MouseHover(const Vector2i& prevPos, const Vector2i& currPos);
+        enum class HoverSpecific {
+            In,
+            Out
+        };
+
+        MouseHover(const Vector2i& prevPos, const Vector2i& currPos, HoverSpecific type);
 
         Vector2i prevPos;
         Vector2i currPos;
+
+        HoverSpecific type;
     };
 
     struct MouseDrag {

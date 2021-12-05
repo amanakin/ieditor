@@ -45,10 +45,12 @@ enum Picture {
 
 struct PictureManager {
     PictureManager();
+    ~PictureManager();
+
     const MLPicture& getPicture(DefaultPictures::Picture picture);
 
 private:
-    std::vector<MLPicture> pictures;
+    std::vector<MLPicture*> pictures;
 };
 
 #endif // TEXTURE_HEADER

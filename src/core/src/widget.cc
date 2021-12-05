@@ -1,5 +1,7 @@
 // widget.cc
 
+#include <cassert>
+
 #include <utils.h>
 #include <widget.h>
 
@@ -40,7 +42,7 @@ bool Widget::onTextEntered(const Event::Text& text) { return false; }
 
 void Widget::onUnFocus() { isFocus = false; }
 
-bool Widget::testMouse(const Vector2i& relPosEvent) { return false; }
+bool Widget::testMouse(const Vector2i& relPosEvent) { return IsInsideRect(relPosEvent, Vector2i(0, 0), size); }
 
 //*************************************************************
 
@@ -79,6 +81,8 @@ void WidgetManager::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     }
 }
 
+#include <iostream>
+
 bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick,
                                  const Vector2i& absPosWidget) {
     if (mouseClick.type == Event::Type::MouseButtonReleased &&
@@ -95,6 +99,7 @@ bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick,
             subWidget->testMouse(mouseClick.mousePos - subWidget->pos -
                                  absPosWidget)) {
             // If focus changed
+
             if (mouseClick.button == Mouse::Button::Left) {
                 subWidgets.erase(it);
                 subWidgets.push_front(subWidget);
@@ -128,14 +133,21 @@ bool WidgetManager::onMouseDrag(const Event::MouseDrag& mouseDrag,
 }
 
 bool WidgetManager::onMouseHover(const Event::MouseHover& mouseHover,
-                                 const Vector2i& absPosWidget) {
-    for (auto& subWidget : subWidgets) {
-        if (subWidget->isActive &&
-            subWidget->testMouse(mouseHover.prevPos - subWidget->pos -
-                                 absPosWidget) &&
-            subWidget->onMouseHover(mouseHover,
-                                    subWidget->pos + absPosWidget)) {
-            return true;
+                                 const Vector2i& absPosWidget) {      
+    if (mouseHover.type == Event::MouseHover::HoverSpecific::In) {
+        for (auto& subWidget : subWidgets) {
+            if (subWidget->isActive &&
+                subWidget->testMouse(mouseHover.currPos - subWidget->pos - absPosWidget)) {
+                    subWidget->onMouseHover(mouseHover, subWidget->pos + absPosWidget);
+                    return true;
+            }
+        }
+    } else {
+        for (auto& subWidget : subWidgets) {
+            if (subWidget->isActive &&
+                subWidget->testMouse(mouseHover.prevPos - subWidget->pos - absPosWidget)) {
+                    subWidget->onMouseHover(mouseHover, subWidget->pos + absPosWidget);
+            }
         }
     }
 
@@ -175,13 +187,15 @@ bool WidgetManager::testMouse(const Vector2i& relPosEvent) {
 
 RootWidget::RootWidget(const Vector2i& size, const Vector2i& pos,
                        MLWindow* window, const Color& color)
-    : WidgetManager(size, pos, color, nullptr),
+    : WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
       texture(size),
       window(window),
       isStopped(false),
-      eventManager(window, this) {}
-
-#include <interfaces.h>
+      eventManager(window, this),
+      color(color)
+{
+    assert(window != nullptr);
+}
 
 void RootWidget::start() {
     init();
@@ -191,15 +205,10 @@ void RootWidget::start() {
 
         update();
 
-        //Frames1 frames1(DefaultPictures::Brush);
-
-        texture.clear();
+        texture.clear(color);
         draw(texture, Vector2i(0, 0));
 
-        //frames1.getHoverPict(Vector2i(400, 400)).draw(texture);
-
         texture.draw(*window, pos);
-        window->display();
     }
 }
 

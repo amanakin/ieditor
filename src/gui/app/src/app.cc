@@ -2,7 +2,7 @@
 
 #include <app.h>
 #include <button.h>
-#include <filter.h>
+#include <effect.h>
 #include <layout.h>
 #include <pickers.h>
 #include <pictures.h>
@@ -11,12 +11,12 @@
 #include <curve.h>
 #include <textbar.h>
 #include <tool.h>
+#include <brush.h>
+
+#include <loader.h>
+#include <app_interface.h>
 
 #include <cassert>
-
-const char* const STUFF_FOLDER = "stuff/";
-const char* const FONT_FILENAME  = "arial.ttf";
-const char* const APP_NAME = "iEditor"; 
 
 //*************************************************************
 
@@ -26,18 +26,126 @@ WorkSpace::WorkSpace() :
 {}
 
 WorkSpace::~WorkSpace() {
-    delete tool;
-    delete effect;
+    // delete tool;
+    // delete effect;
 }
-
 
 //*************************************************************
 
-StartWidget::StartWidget(const Vector2i& size, const Vector2i& pos, const Color& color) :
-    RootWidget(size, pos, &(App::getApp()->window), color)
-{}
+AppWidget::AppWidget(const Vector2i& size, const Vector2i& pos,
+                     const Color& color, MLWindow* window) :
+    RootWidget(size, pos, window, color)
+{
+    assert(window != nullptr);
+}
 
-void StartWidget::init() {
+void AppWidget::update() {
+    WidgetManager::update();
+    for (auto widget: staticWidgets) {
+        widget->update();
+    }
+}
+
+void AppWidget::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+    for (auto widget: staticWidgets) {
+        widget->draw(texture, absPosWidget + widget->pos);
+    }
+
+    WidgetManager::draw(texture, absPosWidget);
+}
+
+void AppWidget::onUnFocus() {
+    WidgetManager::onUnFocus();
+
+    for (auto widget: staticWidgets) {
+        widget->onUnFocus();
+    }
+}
+
+bool AppWidget::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+    
+    if (mouseClick.type == Event::Type::MouseButtonReleased) {
+        for (auto widget: staticWidgets) {
+            if (widget->isFocus) {
+                return widget->onMouseClick(mouseClick, widget->pos + absPosWidget);
+            }
+        }
+
+        if (subWidgets.size() > 0) {
+            auto widget = *subWidgets.begin();
+            if (widget->isFocus) {
+                return widget->onMouseClick(mouseClick, widget->pos + absPosWidget);
+            }
+        }
+
+        return false;
+    }
+    
+    for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it) {
+        Widget* subWidget = *it;
+
+        if (subWidget->isActive &&
+            subWidget->testMouse(mouseClick.mousePos - subWidget->pos -
+                                 absPosWidget)) {
+            
+            // If focus changed
+            if (mouseClick.button == Mouse::Button::Left) {
+                subWidgets.erase(it);
+                subWidgets.push_front(subWidget);
+                subWidget->isFocus = true;
+            }
+
+            if (subWidget->onMouseClick(mouseClick,
+                                        subWidget->pos + absPosWidget)) {
+                return true;
+            }
+
+            return false;
+        }
+    }
+
+    for (auto widget: staticWidgets) {
+        if (widget->testMouse(mouseClick.mousePos - widget->pos - absPosWidget)) {
+            widget->isFocus = true;
+            return widget->onMouseClick(mouseClick, widget->pos + absPosWidget);
+        }
+    }
+
+    return false;
+}
+
+bool AppWidget::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) {
+    
+    for (auto widget: staticWidgets) {
+        if (widget->isFocus) {
+            return widget->onMouseDrag(mouseDrag, widget->pos + absPosWidget);
+        }
+    }
+    
+    if (subWidgets.size() > 0) {
+        auto widget = *subWidgets.begin();
+
+        if (widget->isFocus) {            
+            return widget->onMouseDrag(mouseDrag, widget->pos + absPosWidget);
+        }
+    }
+
+    return false;
+}
+
+bool AppWidget::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {
+    if (!WidgetManager::onMouseHover(mouseHover, absPosWidget)) {
+        for (auto widget: staticWidgets) {
+            if (widget->onMouseHover(mouseHover, absPosWidget + widget->pos)) {
+                return true;
+            }
+        }
+    }
+
+    return true;
+}
+
+void AppWidget::init() {
 
     auto exitButton = new AnimatedButton(
         [this](){
@@ -115,6 +223,20 @@ void StartWidget::init() {
     );
 
     subWidgets.push_front(saveFileButton);
+
+    size_t idx = 0;
+
+    for (auto plugin: App::getApp()->loader.plugins) {
+        auto brush = new AnimatedButton(
+            [plugin]() {
+                // delete App::getApp()->workSpace.tool;
+                App::getApp()->workSpace.tool = plugin;
+            },
+            new Frames1(DefaultPictures::Brush), 50, Vector2i(0, 600 + 100 * idx));
+
+        subWidgets.push_front(brush);
+        idx++;
+    }
 }
 
 //*************************************************************
@@ -122,11 +244,19 @@ void StartWidget::init() {
 App* App::app = nullptr;
 
 App::App(const Vector2i& size) :
-    window(size, Vector2i(0, 0), APP_NAME),
-    font(std::string(STUFF_FOLDER) + FONT_FILENAME),
-    layoutManager(Vector2i(1920 - 110, 1080), Vector2i(110, 0)),
-    pictManager()
-{}
+    window(size, Vector2i(0, 0), AppName),
+    font(std::string(StuffFolder) + FontFilename),
+    layoutManager(Vector2i(1670, 888), Vector2i(225, 65)),
+    pictManager(),
+    loader("./plugins/")
+{
+    appWidget = new AppWidget(Vector2i(1920, 1080), Vector2i(0, 0), Color(210, 204, 215), &window);
+    appWidget->staticWidgets.push_back(&layoutManager);
+}
+
+App::~App() {
+    delete appWidget;
+}
 
 App* App::getApp() {
     if (app == nullptr) {
@@ -140,18 +270,14 @@ void App::createApp(const Vector2i& size) {
     app = new App(size);
 }
 
-void App::run() {
-    startWidget->start();
-
-    window.close();
+void App::destructApp() {    
+    delete app;
 }
 
-void App::init() {
-    workSpace.color = Colors::BLUE;
-    workSpace.size = 5;
-    
-    startWidget = new StartWidget(Vector2i(1920, 1080), Vector2i(0, 0));
-    startWidget->subWidgets.push_back(&layoutManager);
+void App::run() {
+    appWidget->start();
+
+    window.close();
 }
 
 //*************************************************************

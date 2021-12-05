@@ -66,7 +66,7 @@ private:
 struct TextBar : public WidgetManager, public IKeyHandler {
     TextBar(const Vector2i& size, const Vector2i& pos, const std::string& str = "");
 
-    void update();
+    void update() override;
 
     bool onKeyboard(const Event::KeyClick& key) override;
     bool onTextEntered(const Event::Text& text) override;

@@ -1,6 +1,7 @@
 #ifndef VECTOR2_HEADER
 #define VECTOR2_HEADER
 
+#include <iostream>
 #include <cmath>
 
 template <typename T>
@@ -11,18 +12,21 @@ struct Vector2 {
     Vector2& operator=(const Vector2&) = default;
     ~Vector2()                         = default;
 
-    T getLen() const;
+    friend std::ostream& operator<<(std::ostream& out, const Vector2<T>& vector);
+    friend std::istream& operator>>(std::istream& in, Vector2<T>& vector);
+
+    double getLen() const;
     Vector2 unit() const;
-    Vector2& rotate(float angle);
 
     T x;
     T y;
 };
 
-using Vector2f = Vector2<float>   ;
-using Vector2u = Vector2<unsigned>;
-using Vector2d = Vector2<double>  ;
-using Vector2i = Vector2<int>     ;
+using Vector2f = Vector2<float>     ;
+using Vector2u = Vector2<unsigned>  ;
+using Vector2d = Vector2<double>    ;
+using Vector2i = Vector2<int>       ;
+using Vector2ll = Vector2<long long>;
 
 //*************************************************************
 
@@ -39,13 +43,25 @@ inline Vector2<T>::Vector2(T x, T y) :
 //*************************************************************
 
 template <typename T>
-inline T Vector2<T>::getLen() const {
+inline std::ostream& operator<<(std::ostream& out, const Vector2<T>& vector) {
+    out << '(' << vector.x << ' ' << vector.y << ')';
+    return out;
+}
+
+template <typename T>
+inline std::istream& operator>>(std::istream& in, Vector2<T>& vector) {
+    in >> vector.x >> vector.y;
+    return in;
+}
+
+template <typename T>
+inline double Vector2<T>::getLen() const {
     return sqrt(x*x + y*y);
 }
 
 template <typename T>
 inline Vector2<T> Vector2<T>::unit() const {
-    T len = getLen();
+    double len = getLen();
     
     return (len == 0 ? Vector2<T>() : Vector2<T>(x / len, y / len));
 }
@@ -85,6 +101,14 @@ template <typename T>
 inline Vector2<T>& operator*=(Vector2<T>& vector, T num) {
     vector.x *= num;
     vector.y *= num;
+
+    return vector;
+}
+
+template <typename T>
+inline Vector2<T>& operator/=(Vector2<T>& vector, T num) {
+    vector.x /= num;
+    vector.y /= num;
 
     return vector;
 }
@@ -146,6 +170,12 @@ inline T DotProduct(const Vector2<T>& vector1, const Vector2<T>& vector2) {
     return (vector1.x * vector2.x + 
             vector1.y * vector2.y);
 }
+
+template <typename T>
+inline T CrossProduct(const Vector2<T>& vector1, const Vector2<T>& vector2) {
+    return (vector1.x * vector2.y - vector2.x * vector1.y);
+}
+
 
 #endif // VECTOR2_HEADER
 

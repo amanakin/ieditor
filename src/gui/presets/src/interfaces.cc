@@ -59,13 +59,18 @@ bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& 
 }
 
 bool IHoverable::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {        
-    if (!testMouse(mouseHover.currPos - absPosWidget)) {
+    if (mouseHover.type == Event::MouseHover::HoverSpecific::Out) {
         isHover = false;
-        return false;
-    }
+        return true;
+    } else {
+        if (!testMouse(mouseHover.currPos - absPosWidget)) {
+            isHover = false;
+            return false;
+        }
 
-    isHover = true;
-    return true;
+        isHover = true;
+        return true;
+    }
 }
 
 //*************************************************************
@@ -132,9 +137,7 @@ Frames1::Frames1(DefaultPictures::Picture picture) :
     picture(picture)
 {
     MLSprite pict(App::getApp()->pictManager.getPicture(picture), Vector2i(0, 0));
-    auto size = App::getApp()->pictManager.getPicture(picture).getSize();
-
-    //Vector2i size(800, 800);
+    auto size = pict.getSize();
 
     assert(hoverTexture.create(size, Color(0, 0, 0, 0)));
     assert(pressTexture.create(size, Color(0, 0, 0, 0)));
@@ -148,9 +151,6 @@ Frames1::Frames1(DefaultPictures::Picture picture) :
 
     pict.draw(hoverTexture);
     pict.draw(pressTexture);
-
-    hoverTexture.display();
-    pressTexture.display();
 }
 
 MLSprite Frames1::getMainPict(const Vector2i& size)  {
@@ -215,7 +215,7 @@ void IAnimated::draw(MLTexture& texture, const Vector2i& absPos) {
     auto mainSprite = frameManager->getMainPict(size);
     mainSprite.setPosition(absPos);
     mainSprite.draw(texture);
-    
+
     auto hoverSprite = frameManager->getHoverPict(size);
     hoverSprite.setPosition(absPos);
 

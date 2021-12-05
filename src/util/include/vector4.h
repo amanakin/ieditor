@@ -163,18 +163,5 @@ inline T DotProduct(const Vector4<T>& vector1, const Vector4<T>& vector2) {
             vector1.t * vector2.t);
 }
 
-//template<typename T>
-//inline Vector4<T> CrossProduct(const Vector4<T>& vector1, const Vector4<T>& vector2) {
-//    return Vector4<T>(vector1.y* vector2.z- vector1.z* vector2.y,
-//                      vector1.z* vector2.x- vector1.x* vector2.z,
-//                      vector1.x* vector2.y- vector1.y* vector2.x);
-//}
-
-//template<typename T>
-//inline T GetCos(const Vector4<T>& vector1, const Vector4<T>& vector2) {
-//    return DotProduct(vector1, vector2) / (vector1.getLen() * vector2.getLen());
-//}
-
-
 #endif // VECTOR4_HEADER
 

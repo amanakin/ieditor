@@ -78,7 +78,7 @@ struct WidgetManager: public Widget {
 
 struct RootWidget: public WidgetManager {
     RootWidget(const Vector2i& size, const Vector2i& pos,
-               MLWindow* window, const Color& color = Colors::LIGHT_GREY);
+               MLWindow* window, const Color& color);
 
     virtual void start();
     virtual void stop();
@@ -88,6 +88,8 @@ struct RootWidget: public WidgetManager {
     MLWindow* window;
     EventManager eventManager;
     bool isStopped;
+
+    Color color;
 };
 
 //*************************************************************

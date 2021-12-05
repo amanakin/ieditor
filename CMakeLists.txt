@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 
 set(SFML_BUILD_GRAPHICS true)
 
-set (CMAKE_CXX_FLAGS "-O3 -march=native ${CMAKE_CXX_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
-set (CMAKE_LINKER_FLAGS "-O3 -march=native ${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined")
+set (CMAKE_CXX_FLAGS "-O3 -march=native ${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined") 
+set (CMAKE_LINKER_FLAGS "-O3 -march=native ${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined") 
 
 include_directories(src/core/include)
 include_directories(src/util/include)
@@ -17,7 +17,9 @@ include_directories(src/gui/app/include)
 include_directories(src/gui/presets/include)
 include_directories(src/gui/basics/include)
 include_directories(src/gui/tools/include)
-include_directories(src/gui/filters/include)
+include_directories(src/gui/effects/include)
+
+include_directories(src/plugin)
 
 set(SOURCES main.cc)
 
@@ -43,6 +45,7 @@ set(SOURCES
     ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/app.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/pictures.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/layout_manager.cc
 )
 
 set(SOURCES
@@ -69,7 +72,15 @@ set(SOURCES
 
 set(SOURCES
     ${SOURCES}
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/filters/src/filter.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/effects/src/effect.cc
+)
+
+set(SOURCES
+    ${SOURCES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/loader.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/app_interface.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/plugin_utils.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/plugin.cc
 )
 
 
@@ -77,9 +88,10 @@ find_package(SFML 2 COMPONENTS system window graphics network audio REQUIRED)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system)
+target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system ${CMAKE_DL_LIBS})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
 file(COPY stuff DESTINATION .)
+file(COPY plugins DESTINATION .)

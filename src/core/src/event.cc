@@ -12,8 +12,8 @@ Event::MouseClick::MouseClick(const Type type, const Vector2i& mousePos, const M
     mousePos(mousePos), button(button), type(type)
 {}
 
-Event::MouseHover::MouseHover(const Vector2i& prevPos, const Vector2i& currPos) :
-    prevPos(prevPos), currPos(currPos)
+Event::MouseHover::MouseHover(const Vector2i& prevPos, const Vector2i& currPos, HoverSpecific type) :
+    prevPos(prevPos), currPos(currPos), type(type)
 {}
 
 Event::MouseDrag::MouseDrag(const Vector2i& prevPos, const Vector2i& currPos, const Mouse::Button button) :
@@ -128,8 +128,6 @@ bool EventManager::pollEvent() {
                     rootWidget->onTextEntered(Event::Text(unicode));
                 }
 
-                printf("%i\n", unicode);
-
                 auto event = Event::KeyClick(Event::Type::KeyboardKeyPressed, key);
                 event.control = window->isKeyPressed(Keyboard::Key::LControl);
                 event.shift = window->isKeyPressed(Keyboard::Key::LShift);
@@ -157,7 +155,12 @@ bool EventManager::pollEvent() {
     if (isMousePosChanged) {
 
         rootWidget->onMouseHover(
-            Event::MouseHover(mousePos, newMousePos),
+            Event::MouseHover(mousePos, newMousePos, Event::MouseHover::HoverSpecific::Out),
+            rootWidget->pos
+        );
+
+        rootWidget->onMouseHover(
+            Event::MouseHover(mousePos, newMousePos, Event::MouseHover::HoverSpecific::In),
             rootWidget->pos
         );
 

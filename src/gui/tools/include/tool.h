@@ -5,6 +5,8 @@
 #include <layout.h>
 
 struct Tool {
+    virtual ~Tool();
+
     // Everywhere relative position to layout
     virtual void onPress(Layout& layout, const Vector2i& pos);
     virtual void onRelease(Layout& layout, const Vector2i& pos);

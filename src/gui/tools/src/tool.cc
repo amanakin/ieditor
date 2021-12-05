@@ -2,6 +2,9 @@
 
 #include <tool.h>
 
+Tool::~Tool()
+{}
+
 void Tool::onMove(Layout& layout, const Vector2i& oldPos, const Vector2i& newPos)
 {}
 

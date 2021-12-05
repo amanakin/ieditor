@@ -205,7 +205,7 @@ OpenFile::OpenFile(const Vector2i& pos, WidgetManager* manager, WidgetManager* w
             MLSprite sprite(file, Vector2i(0, 0));
             
             App::getApp()->layoutManager.addLayout(sprite.getSize());
-            sprite.draw(App::getApp()->layoutManager.geCurrtLayout()->texture);
+            sprite.draw(App::getApp()->layoutManager.getCurrLayout()->texture);
 
             window->toClose = true;    
         },

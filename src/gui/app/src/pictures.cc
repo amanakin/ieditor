@@ -45,21 +45,29 @@ const char* GetPictureName(DefaultPictures::Picture picture) {
     }
 };
 
+#include <cassert>
+
 PictureManager::PictureManager() {
     std::string filename;
 
     for (size_t idx = 0; idx != DefaultPictures::SIZE; ++idx) {
         auto currTexture = static_cast<DefaultPictures::Picture>(idx);
 
-        filename = STUFF_FOLDER;
+        filename = App::StuffFolder;
         filename += GetPictureName(currTexture);
+        
+        pictures.push_back(new MLPicture(filename));
 
-        pictures.emplace_back(filename);
+        assert(!!pictures[pictures.size() - 1]);
+    }
+}
+
+PictureManager::~PictureManager() {
+    for (auto pict: pictures) {
+        delete pict;
     }
 }
 
 const MLPicture& PictureManager::getPicture(DefaultPictures::Picture picture) {
-    return pictures[picture];
+    return *pictures[picture];
 }
-
-#undef PATH_MAX
