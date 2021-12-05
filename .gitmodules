@@ -1,0 +1,3 @@
+[submodule "src/plugin/EditorPluginAPI"]
+	path = src/plugin/EditorPluginAPI
+	url = https://github.com/MIPTGroup/EditorPluginAPI
