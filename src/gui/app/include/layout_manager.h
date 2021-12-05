@@ -4,9 +4,9 @@
 #include <layout.h>
 
 struct LayoutManager: public WidgetManager {
-    LayoutManager(const Vector2i&size, const Vector2i& pos);
+    LayoutManager(const Vector2f&size, const Vector2f& pos);
 
-    void addLayout(const Vector2i& size);
+    void addLayout(const Vector2f& size);
     Layout* getCurrLayout();
 
 private:

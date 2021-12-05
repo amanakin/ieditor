@@ -12,20 +12,20 @@ Color ConvertColorFromPlugin(const PRGBA& color) {
     return Color(color.r, color.g, color.b, color.a);
 }
 
-MLBlendMode ConvertBlendMode(PBlendMode pBlendMode) {
+ML::BlendMode ConvertBlendMode(PBlendMode pBlendMode) {
     switch (pBlendMode) {
-    case PBlendMode::PPBM_ALPHA_BLEND: return MLBlendMode::BlendAlpha;
-    case PBlendMode::PPBM_COPY: return MLBlendMode::BlendNone;
+    case PBlendMode::PPBM_ALPHA_BLEND: return ML::BlendMode::BlendAlpha;
+    case PBlendMode::PPBM_COPY: return ML::BlendMode::BlendNone;
     default:
         assert("Plugin wrong blend mode");
-        return MLBlendMode::BlendAlpha;
+        return ML::BlendMode::BlendAlpha;
     }
 }
 
-Vector2i ConvertVectorFromPlugin(const PVec2f& pVec) {
-    return Vector2i(pVec.x, pVec.y);
+Vector2f ConvertVectorFromPlugin(const PVec2f& pVec) {
+    return Vector2f(pVec.x, pVec.y);
 }
 
-PVec2f ConvertVectorToPlugin(const Vector2i& vec) {
+PVec2f ConvertVectorToPlugin(const Vector2f& vec) {
     return PVec2f(vec.x, vec.y);
 }

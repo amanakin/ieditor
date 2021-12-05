@@ -10,24 +10,24 @@
 
 //*************************************************************
 
-Layout::Layout(const Vector2i& size,
-           const Vector2i& pos) :
+Layout::Layout(const Vector2f& size,
+           const Vector2f& pos) :
     Widget(size, pos, nullptr),
     preview(size, Color(0, 0, 0, 0)),
     texture(size, Colors::WHITE)
 {}
 
 void Layout::dropPreview() {
-    preview.draw(texture, Vector2i(0, 0));
+    preview.draw(texture, Vector2f(0, 0));
     preview.clear();
 }
 
-void Layout::draw(MLTexture& texture, const Vector2i& abs) {
+void Layout::draw(ML::Texture& texture, const Vector2f& abs) {
     this->texture.draw(texture, abs);
     this->preview.draw(texture, abs);
 }
 
-bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
 
     if (mouseClick.type == Event::Type::MouseButtonPressed) {
         App::getApp()->workSpace.tool->onPress(*this, mouseClick.mousePos - absPosWidget);    
@@ -38,7 +38,7 @@ bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 
     return true;
 }
-bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) {
+bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget) {
     App::getApp()->workSpace.tool->onMove(*this, mouseDrag.prevPos - absPosWidget, mouseDrag.currPos - absPosWidget);
     
     return true;

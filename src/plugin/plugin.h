@@ -11,9 +11,9 @@ struct Plugin: public Effect, public Tool {
     PPluginStatus init();
     PPluginStatus deinit();
 
-    void onPress(Layout& layout, const Vector2i& pos)   override;
-    void onRelease(Layout& layout, const Vector2i& pos) override;
-    void onMove(Layout& layout, const Vector2i& oldPos, const Vector2i& newPos) override;
+    void onPress(Layout& layout, const Vector2f& pos)   override;
+    void onRelease(Layout& layout, const Vector2f& pos) override;
+    void onMove(Layout& layout, const Vector2f& oldPos, const Vector2f& newPos) override;
 
     void apply(Layout& layout) override;
 

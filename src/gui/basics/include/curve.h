@@ -9,28 +9,28 @@ struct Curves;
 
 struct CurvesSlider: virtual public Widget, public ITestableRectangle {
     // size - borders of the rectangle 
-    CurvesSlider(const Vector2i& size, const Vector2i& pos);
+    CurvesSlider(const Vector2f& size, const Vector2f& pos);
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget)                          override;
-    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget)                          override;
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
 
     static constexpr int SliderRadius = 14;
 
 private:
-    Vector2i bgSize;
-    MLSprite sprite;
+    Vector2f bgSize;
+    ML::Sprite sprite;
 };
 
 //*************************************************************
 
 struct Curves: public WidgetManager { 
-    Curves(const Vector2i& size,
-            const Vector2i& pos);
+    Curves(const Vector2f& size,
+            const Vector2f& pos);
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget)                          override;
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
-    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget)                          override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    override;
 
     // return vector of size.x size
     const std::vector<float>& getSplain() const;
@@ -38,14 +38,14 @@ struct Curves: public WidgetManager {
 private:
     void redraw();
 
-    void addSlider(const Vector2i& pos);
+    void addSlider(const Vector2f& pos);
     void updateCatmullRom();
     void syncDots();
 
-    MLTexture texture;
+    ML::Texture texture;
 
     std::vector<float> catmullRom;
-    std::vector<Vector2i> dots;
+    std::vector<Vector2f> dots;
 };
 
 //*************************************************************

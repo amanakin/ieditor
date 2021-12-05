@@ -8,15 +8,15 @@
 
 //*************************************************************
 
-Event::MouseClick::MouseClick(const Type type, const Vector2i& mousePos, const Mouse::Button button) :
+Event::MouseClick::MouseClick(const Type type, const Vector2f& mousePos, const Mouse::Button button) :
     mousePos(mousePos), button(button), type(type)
 {}
 
-Event::MouseHover::MouseHover(const Vector2i& prevPos, const Vector2i& currPos, HoverSpecific type) :
+Event::MouseHover::MouseHover(const Vector2f& prevPos, const Vector2f& currPos, HoverSpecific type) :
     prevPos(prevPos), currPos(currPos), type(type)
 {}
 
-Event::MouseDrag::MouseDrag(const Vector2i& prevPos, const Vector2i& currPos, const Mouse::Button button) :
+Event::MouseDrag::MouseDrag(const Vector2f& prevPos, const Vector2f& currPos, const Mouse::Button button) :
     prevPos(prevPos), currPos(currPos), button(button)
 {}
 
@@ -41,7 +41,7 @@ bool Keyboard::IsCharacter(Keyboard::Key key) {
 
 //*************************************************************
 
-EventManager::EventManager(MLWindow* window, RootWidget* rootWidget) :
+EventManager::EventManager(ML::Window* window, RootWidget* rootWidget) :
     window(window),
     rootWidget(rootWidget) {
     
@@ -63,7 +63,12 @@ bool EventManager::pollEvent() {
 
     bool isEvented = false;
 
-    Vector2i newMousePos = window->getMousePosition();
+    uint32_t unicode = window->isTextEntered();
+    if (!window->isActive()) {
+        return false;
+    }
+
+    Vector2f newMousePos = window->getMousePosition();
 
     bool isMousePosChanged = newMousePos != mousePos;
 
@@ -120,12 +125,8 @@ bool EventManager::pollEvent() {
             if (!isKeyPressed[idx]) {
                 isKeyPressed[idx] = true;
 
-                uint32_t unicode = window->isTextEntered();
-                if (!window->isActive()) {
-                    return false;
-                }
                 if (unicode != 0) {
-                    rootWidget->onTextEntered(Event::Text(unicode));
+                    rootWidget->onTextEntered(Event::Text(unicode));    
                 }
 
                 auto event = Event::KeyClick(Event::Type::KeyboardKeyPressed, key);

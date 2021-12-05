@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(ieditor)
 
-set(CMAKE_CXX_COMPILER g++)
+set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_CXX_STANDARD 20)
 
 set(SFML_BUILD_GRAPHICS true)

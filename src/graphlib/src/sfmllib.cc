@@ -8,6 +8,8 @@
 #include "utils.h"
 #include "sfmllib.h"
 
+namespace ML {
+
 //*************************************************************
 //*************************************************************
 
@@ -21,16 +23,15 @@ static sf::Mouse::Button ConvertButtonToSFMLButton(Mouse::Button button) {
     }
 }
 
-static sf::BlendMode ConvertBlendMove(MLBlendMode blendMode) {
+static sf::BlendMode ConvertBlendMove(BlendMode blendMode) {
     switch (blendMode) {
-    case MLBlendMode::BlendAlpha: return sf::BlendAlpha;
-    case MLBlendMode::BlendNone: return sf::BlendNone;
+    case BlendMode::BlendAlpha: return sf::BlendAlpha;
+    case BlendMode::BlendNone: return sf::BlendNone;
     default:
         assert("Wring convert Blendmode to SFML::Blend");
         return sf::BlendNone;
     }
 }
-
 
 #define CONVERT_KEY(key) \
     case Keyboard::Key::key: return sf::Keyboard::Key::key;
@@ -122,7 +123,7 @@ static Vector2f ConvertSFMLVectorToVector(const sf::Vector2f& vectorSFML) {
 //*************************************************************
 //*************************************************************
 
-MLCircle::MLCircle(const Vector2f& pos, float radius,
+Circle::Circle(const Vector2f& pos, float radius,
                    const Color& color, float outline,
                    const Color& outlineColor) :
     circle(radius) {
@@ -134,56 +135,56 @@ MLCircle::MLCircle(const Vector2f& pos, float radius,
 
 //*************************************************************
 
-void MLCircle::setColor(const Color& color) {
+void Circle::setColor(const Color& color) {
     circle.setFillColor(ConvertColorToSFMLColor(color));
 }
 
-void MLCircle::setPosition(const Vector2f& pos) {
+void Circle::setPosition(const Vector2f& pos) {
     circle.setPosition(ConvertVectorToSFMLVector(pos));
 }
 
-void MLCircle::setRadius(float radius) {
+void Circle::setRadius(float radius) {
     circle.setRadius(radius);
 }
 
-void MLCircle::setOutline(float outline) {
+void Circle::setOutline(float outline) {
     circle.setOutlineThickness(outline);
 }
 
-void MLCircle::setOutlineColor(const Color& outlineColor) {
+void Circle::setOutlineColor(const Color& outlineColor) {
     circle.setFillColor(ConvertColorToSFMLColor(outlineColor));
 }
 
 //*************************************************************
 
-const Color& MLCircle::getColor() const {
+Color Circle::getColor() const {
     return ConvertSFMLColorToColor(circle.getFillColor());
 }
 
-const Vector2f& MLCircle::getPosition() const {
+Vector2f Circle::getPosition() const {
     return ConvertSFMLVectorToVector(circle.getPosition());
 }
 
-float MLCircle::getRadius() const {
+float Circle::getRadius() const {
     return circle.getRadius();
 }
 
-float MLCircle::getOutline() const {
+float Circle::getOutline() const {
     return circle.getOutlineThickness();
 }
 
-const Color& MLCircle::getOutlineColor() const {
+Color Circle::getOutlineColor() const {
     return ConvertSFMLColorToColor(circle.getOutlineColor());
 }
 
 //*************************************************************
 
-void MLCircle::draw(MLWindow& window, MLBlendMode blendMode) const {
-    window.windowSFML.draw(circle, ConvertBlendMove(blendMode));
-    window.windowSFML.display();
+void Circle::draw(Window& window, BlendMode blendMode) const {
+    window.window.draw(circle, ConvertBlendMove(blendMode));
+    window.window.display();
 } 
 
-void MLCircle::draw(MLTexture& texture, MLBlendMode blendMode) const {
+void Circle::draw(Texture& texture, BlendMode blendMode) const {
     texture.renderTexture.draw(circle, ConvertBlendMove(blendMode));
     texture.renderTexture.display();
 }
@@ -191,7 +192,7 @@ void MLCircle::draw(MLTexture& texture, MLBlendMode blendMode) const {
 //*************************************************************
 //*************************************************************
 
-MLRect::MLRect(const Vector2f& size,
+Rect::Rect(const Vector2f& size,
                const Vector2f& pos,
                const Color& color,
                float angle, float outline,
@@ -206,64 +207,64 @@ MLRect::MLRect(const Vector2f& size,
 
 //*************************************************************
 
-void MLRect::setColor(const Color& color) {
+void Rect::setColor(const Color& color) {
     rect.setFillColor(ConvertColorToSFMLColor(color));
 }
 
-void MLRect::setPosition(const Vector2f& pos) {
+void Rect::setPosition(const Vector2f& pos) {
     rect.setPosition(ConvertVectorToSFMLVector(pos));
 }
 
-void MLRect::setSize(const Vector2f& size) {
+void Rect::setSize(const Vector2f& size) {
     rect.setSize(ConvertVectorToSFMLVector(size));
 }
 
-void MLRect::setAngle(float angle) {
+void Rect::setAngle(float angle) {
     rect.setRotation(RadToDegree(angle));
 }
 
-void MLRect::setOutline(float outline) {
+void Rect::setOutline(float outline) {
     rect.setOutlineThickness(outline);
 }
 
-void MLRect::setOutlineColor(const Color& outlineColor) {
+void Rect::setOutlineColor(const Color& outlineColor) {
     rect.setFillColor(ConvertColorToSFMLColor(outlineColor));
 }
 
 //*************************************************************
 
-const Color& MLRect::getColor() const {
+Color Rect::getColor() const {
     return ConvertSFMLColorToColor(rect.getFillColor());
 }
 
-const Vector2f& MLRect::getPosition() const {
+Vector2f Rect::getPosition() const {
     return ConvertSFMLVectorToVector(rect.getPosition());
 }
 
-const Vector2f& MLRect::getSize() const {
+Vector2f Rect::getSize() const {
     return ConvertSFMLVectorToVector(rect.getSize());
 }
 
-float MLRect::getAngle() const {
+float Rect::getAngle() const {
     return DegreeToRad(rect.getRotation());
 }
 
-float MLRect::getOutline() const {
+float Rect::getOutline() const {
     return rect.getOutlineThickness();
 }
 
-const Color& MLRect::getOutlineColor() const {
+Color Rect::getOutlineColor() const {
     return ConvertSFMLColorToColor(rect.getOutlineColor());
 }
 
 //*************************************************************
 
-void MLRect::draw(MLWindow& window, MLBlendMode blendMode) const {
-    window.windowSFML.draw(rect, ConvertBlendMove(blendMode));
-    window.windowSFML.display();
+void Rect::draw(Window& window, BlendMode blendMode) const {
+    window.window.draw(rect, ConvertBlendMove(blendMode));
+    window.window.display();
 } 
 
-void MLRect::draw(MLTexture& texture, MLBlendMode blendMode) const {
+void Rect::draw(Texture& texture, BlendMode blendMode) const {
     texture.renderTexture.draw(rect, ConvertBlendMove(blendMode));
     texture.renderTexture.display();
 } 
@@ -271,7 +272,7 @@ void MLRect::draw(MLTexture& texture, MLBlendMode blendMode) const {
 //*************************************************************
 //*************************************************************
 
-MLRoundedRect::MLRoundedRect(const Vector2f& size, const Vector2f& pos, 
+RoundedRect::RoundedRect(const Vector2f& size, const Vector2f& pos, 
                             float radius, const Color& color,
                             float outline, const Color& outlineColor) :
     rect(4 * PointCount)
@@ -285,59 +286,59 @@ MLRoundedRect::MLRoundedRect(const Vector2f& size, const Vector2f& pos,
 
 //*************************************************************
 
-void MLRoundedRect::setColor(const Color& color) {
+void RoundedRect::setColor(const Color& color) {
     rect.setFillColor(ConvertColorToSFMLColor(color));
 }
 
-void MLRoundedRect::setPosition(const Vector2f& pos) {
+void RoundedRect::setPosition(const Vector2f& pos) {
     rect.setPosition(ConvertVectorToSFMLVector(pos));
 }
 
-void MLRoundedRect::setSize(const Vector2f& size) {
+void RoundedRect::setSize(const Vector2f& size) {
     updateDots(size, radius);
 }
 
-void MLRoundedRect::setRadius(float radius) {
+void RoundedRect::setRadius(float radius) {
     updateDots(size, radius);
 }
 
-void MLRoundedRect::setOutline(float outline) {
+void RoundedRect::setOutline(float outline) {
     rect.setOutlineThickness(outline);
 }
 
-void MLRoundedRect::setOutlineColor(const Color& outlineColor) {
-    rect.setFillColor(ConvertColorToSFMLColor(outlineColor));
+void RoundedRect::setOutlineColor(const Color& outlineColor) {
+    rect.setOutlineColor(ConvertColorToSFMLColor(outlineColor));
 }
 
 //*************************************************************
 
-const Color& MLRoundedRect::getColor() const {
+Color RoundedRect::getColor() const {
     return ConvertSFMLColorToColor(rect.getFillColor());
 }
 
-const Vector2f& MLRoundedRect::getPosition() const {
+Vector2f RoundedRect::getPosition() const {
     return ConvertSFMLVectorToVector(rect.getPosition());
 }
 
-const Vector2f& MLRoundedRect::getSize() const {
+Vector2f RoundedRect::getSize() const {
     return size;
 }
 
-float MLRoundedRect::getRadius() const {
+float RoundedRect::getRadius() const {
     return radius;
 }
 
-float MLRoundedRect::getOutline() const {
+float RoundedRect::getOutline() const {
     return rect.getOutlineThickness();
 }
 
-const Color& MLRoundedRect::getOutlineColor() const {
+Color RoundedRect::getOutlineColor() const {
     return ConvertSFMLColorToColor(rect.getOutlineColor());
 }
 
 //*************************************************************
 
-void MLRoundedRect::updateDots(const Vector2f& size, float radius) {
+void RoundedRect::updateDots(const Vector2f& size, float radius) {
     this->size = size;
     this->radius = radius;
 
@@ -348,7 +349,7 @@ void MLRoundedRect::updateDots(const Vector2f& size, float radius) {
     
     // Left Upper
     float angle = 0;
-    for(int i= 0; i < PointCount; i++) {	
+    for(int i = 0; i < PointCount; i++) {	
         x = radius * cos(angle);
 		y = radius * sin(angle);
         rect.setPoint(10 * 0 + i, sf::Vector2f(radius - x, radius - y));
@@ -361,18 +362,8 @@ void MLRoundedRect::updateDots(const Vector2f& size, float radius) {
     for(int i = 0; i < PointCount; i++) {
         x = radius * cos(angle);
 		y = radius * sin(angle);
-		rect.setPoint(10 * 1 + i, sf::Vector2f(size.x - (radius - x), radius - y));
+		rect.setPoint(10 * 1 + (9 - i), sf::Vector2f(size.x - (radius - x), radius - y));
         
-        angle += delta;
-    }
-
-    // Left Down
-	angle = 0;
-    for(int i = 0; i < PointCount; i++) {		
-        x = radius * cos(angle);
-		y = radius * sin(angle);
-        rect.setPoint(10 * 2 + i, sf::Vector2f(radius - x, size.y - (radius - y)));
-
         angle += delta;
     }
 
@@ -381,7 +372,17 @@ void MLRoundedRect::updateDots(const Vector2f& size, float radius) {
     for(int i = 0; i < PointCount; i++) {	
         x = radius * cos(angle);
 		y = radius * sin(angle);
-        rect.setPoint(10 * 3 + i, sf::Vector2f(size.x - (radius - x), size.y - (radius - y)));
+        rect.setPoint(10 * 2 + i, sf::Vector2f(size.x - (radius - x), size.y - (radius - y)));
+
+        angle += delta;
+    }
+
+    // Left Down
+	angle = 0;
+    for(int i = 0; i < PointCount; i++) {		
+        x = radius * cos(angle);
+		y = radius * sin(angle);
+        rect.setPoint(10 * 3 + (9 - i), sf::Vector2f(radius - x, size.y - (radius - y)));
 
         angle += delta;
     }
@@ -389,12 +390,12 @@ void MLRoundedRect::updateDots(const Vector2f& size, float radius) {
 
 //*************************************************************
 
-void MLRoundedRect::draw(MLWindow& window, MLBlendMode blendMode) const {
-    window.windowSFML.draw(rect, ConvertBlendMove(blendMode));
-    window.windowSFML.display();
+void RoundedRect::draw(Window& window, BlendMode blendMode) const {
+    window.window.draw(rect, ConvertBlendMove(blendMode));
+    window.window.display();
 }
 
-void MLRoundedRect::draw(MLTexture& texture, MLBlendMode blendMode) const {
+void RoundedRect::draw(Texture& texture, BlendMode blendMode) const {
     texture.renderTexture.draw(rect, ConvertBlendMove(blendMode));
     texture.renderTexture.display();
 }
@@ -402,7 +403,7 @@ void MLRoundedRect::draw(MLTexture& texture, MLBlendMode blendMode) const {
 //*************************************************************
 //*************************************************************
 
-MLSegment::MLSegment(const Vector2f& start, const Vector2f& end, const Color& color) {
+Segment::Segment(const Vector2f& start, const Vector2f& end, const Color& color) {
     setStart(start);
     setEnd(end);
     setColor(color);
@@ -410,40 +411,40 @@ MLSegment::MLSegment(const Vector2f& start, const Vector2f& end, const Color& co
 
 //*************************************************************
 
-void MLSegment::setStart(const Vector2f& start) {
+void Segment::setStart(const Vector2f& start) {
     segment[0].position = ConvertVectorToSFMLVector(start);
 }
 
-void MLSegment::setEnd(const Vector2f& end) {
+void Segment::setEnd(const Vector2f& end) {
     segment[1].position = ConvertVectorToSFMLVector(end);
 }
 
-void MLSegment::setColor(const Color& color) {
+void Segment::setColor(const Color& color) {
     segment[0].color = ConvertColorToSFMLColor(color);
     segment[1].color = ConvertColorToSFMLColor(color);
 }
 
 //*************************************************************
 
-const Vector2f& MLSegment::getStart() const {
+Vector2f Segment::getStart() const {
     return ConvertSFMLVectorToVector(segment[0].position);
 }
 
-const Vector2f& MLSegment::getEnd()   const {
+Vector2f Segment::getEnd()   const {
     return ConvertSFMLVectorToVector(segment[1].position);
 }
 
-const Color& MLSegment::getColor() const {
+Color Segment::getColor() const {
     return ConvertSFMLColorToColor(segment[0].color);
 }
 
 //*************************************************************
 
-void MLSegment::draw(MLWindow& window, MLBlendMode blendMode) const {
-    window.windowSFML.draw(segment.data(), 2, sf::Lines, ConvertBlendMove(blendMode));
-    window.windowSFML.display();
+void Segment::draw(Window& window, BlendMode blendMode) const {
+    window.window.draw(segment.data(), 2, sf::Lines, ConvertBlendMove(blendMode));
+    window.window.display();
 }
-void MLSegment::draw(MLTexture& texture, MLBlendMode blendMode) const {
+void Segment::draw(Texture& texture, BlendMode blendMode) const {
     texture.renderTexture.draw(segment.data(), 2, sf::Lines, ConvertBlendMove(blendMode));
     texture.renderTexture.display();
 }
@@ -451,74 +452,108 @@ void MLSegment::draw(MLTexture& texture, MLBlendMode blendMode) const {
 //*************************************************************
 //*************************************************************
 
-MLFont::MLFont(const std::string& filename) {
-    if (!fontSFML.loadFromFile(filename)) {
+Font::Font() :
+    isOk(false)
+{}
+
+Font::Font(const std::string& filename) noexcept(false) {
+    if (!create(filename)) {
         throw std::invalid_argument("can't load " + filename + " file as font");
     }
 }
 
+bool Font::create(const std::string& filename) {
+    isOk = font.loadFromFile(filename);
+
+    return isOk;
+}
+
+bool Font::operator!() const {
+    return !isOk;
+}
+
 //*************************************************************
 //*************************************************************
 
-MLText::MLText(const std::string& str, const Vector2f& pos,
+Text::Text(const std::string& str, const Vector2f& pos,
                unsigned charSize, const Color& color,
-               const MLFont& font,
+               const Font& font,
                float outline, const Color& outlineColor) :
-    font(font) {
-    setString(str);
-    setCharSize(charSize);
+    text(str, font.font, charSize) {
+    setPosition(pos);
     setColor(color); 
-    text.setFont(font.fontSFML);
+    setOutline(outline);
+    setOutlineColor(outlineColor);
 }
 
 //*************************************************************
 
-void MLText::setString(const std::string& str) {
+void Text::setString(const std::string& str) {
     text.setString(str);
 }
 
-void MLText::setCharSize(unsigned charSize) {
-    text.setCharacterSize(charSize);
+void Text::setPosition(const Vector2f& pos) {
+    text.setPosition(ConvertVectorToSFMLVector(pos));
 }
 
-void MLText::setColor(const Color& color) {
+void Text::setColor(const Color& color) {
     text.setFillColor(ConvertColorToSFMLColor(color));
 }
 
-void MLText::setPosition(const Vector2f& pos) {
-    text.setPosition(ConvertVectorToSFMLVector(pos));
+void Text::setCharSize(unsigned charSize) {
+    text.setCharacterSize(charSize);
+}
+
+void Text::setOutline(float outline) {
+    text.setOutlineThickness(outline);
+}
+
+void Text::setOutlineColor(const Color& outlineColor) {
+    text.setOutlineColor(ConvertColorToSFMLColor(outlineColor));
 }
 
 //*************************************************************
 
-Color MLText::getColor() const {
-    return ConvertSFMLColorToColor(text.getFillColor());
+std::string Text::getString() const {
+    return text.getString();
 }
 
-Vector2f MLText::getSize() const {
-    return Vector2f(text.getLocalBounds().width, text.getLocalBounds().height);
-}
-
-int MLText::getHeight() const {
-    return text.getCharacterSize();
-}
-
-Vector2f MLText::getPosition() const {
+Vector2f Text::getPosition() const {
     return ConvertSFMLVectorToVector(text.getPosition());
 }
 
-Vector2f MLText::getCharPos(unsigned pos) const {
+Color Text::getColor() const {
+    return ConvertSFMLColorToColor(text.getFillColor());
+}
+
+unsigned Text::getCharSize() const {
+    return text.getCharacterSize();
+}
+
+float Text::getOutline() const {
+    return text.getOutlineThickness();
+}
+
+Color Text::getOutlineColor() const {
+    return ConvertSFMLColorToColor(text.getOutlineColor());
+}
+
+Vector2f Text::getBorders() const {
+    return Vector2f(text.getLocalBounds().width, text.getLocalBounds().height);
+}
+
+Vector2f Text::getCharPos(unsigned pos) const {
     return ConvertSFMLVectorToVector(text.findCharacterPos(pos));
 }
 
 //*************************************************************
 
-void MLText::draw(MLWindow& window, MLBlendMode blendMode) const {
-    window.windowSFML.draw(text, ConvertBlendMove(blendMode));
-    window.windowSFML.display();
+void Text::draw(Window& window, BlendMode blendMode) const {
+    window.window.draw(text, ConvertBlendMove(blendMode));
+    window.window.display();
 }
 
-void MLText::draw(MLTexture& texture, MLBlendMode blendMode) const {
+void Text::draw(Texture& texture, BlendMode blendMode) const {
     texture.renderTexture.draw(text, ConvertBlendMove(blendMode));
     texture.renderTexture.display();
 }
@@ -526,78 +561,107 @@ void MLText::draw(MLTexture& texture, MLBlendMode blendMode) const {
 //*************************************************************
 //*************************************************************
 
-MLPicture::MLPicture()
+Picture::Picture() :
+    isOk(false)
 {}
 
-MLPicture::MLPicture(const std::string& filename) {
-    isOk = texture.loadFromFile(filename);
-    isOk = true;
+Picture::Picture(const std::string& filename) noexcept(false) {
+    if (!create(filename)) {
+        throw std::invalid_argument("can't load " + filename + " file as picture");
+    }
 }
 
-Vector2f MLPicture::getSize() const {
+bool Picture::create(const std::string& filename) {
+    isOk = texture.loadFromFile(filename);
+
+    return isOk;
+}
+
+//*************************************************************
+
+Vector2f Picture::getSize() const {
     return Vector2f(texture.getSize().x, texture.getSize().y);
 }
 
-bool MLPicture::operator!() const {
+bool Picture::operator!() const {
     return !isOk;
 }
 
 //*************************************************************
 //*************************************************************
 
-MLSprite::MLSprite(const MLPicture& picture, const Vector2f& size,
-                   const Vector2f& pos) {
-    sprite.setTexture(picture.texture);
-    float scale = float(size.x) / picture.texture.getSize().x;
-    sprite.setScale(sf::Vector2f(scale, scale));
+Sprite::Sprite(const Picture& picture, const Vector2f& size,
+               const Vector2f& pos, const Vector2f& picPos) : 
+    sprite(picture.texture, 
+           sf::IntRect(sf::Vector2i(picPos.x, picPos.y), sf::Vector2i(size.x, size.y))) {
     setPosition(pos);
 }
 
-MLSprite::MLSprite(const MLPicture& picture, const Vector2f& pos) {
-    sprite.setTexture(picture.texture);
+Sprite::Sprite(const Texture& texture, const Vector2f& size,
+               const Vector2f& pos, const Vector2f& texturePos) :
+    sprite(texture.renderTexture.getTexture(), 
+           sf::IntRect(sf::Vector2i(texturePos.x, texturePos.y), sf::Vector2i(size.x, size.y))) {
     setPosition(pos);
 }
 
-MLSprite::MLSprite(const MLPicture& picture, const Vector2f& picPos,
-                   const Vector2f& size, const Vector2f& pos) {
-    sprite.setTexture(picture.texture);
-    sprite.setTextureRect(sf::IntRect(sf::Vector2f(picPos.x, picPos.y), sf::Vector2f(size.x, size.y)));
-    setPosition(pos);
+// Get Sprite of full picture but with new size
+Sprite GetFittedSprite(const Picture& picture, const Vector2f& size) {
+    Sprite sprite(picture, picture.getSize(), Vector2f(0, 0));
+    sprite.resize(size);
+
+    return sprite;
 }
 
-MLSprite::MLSprite(const MLTexture& texture, const Vector2f& size, const Vector2f& pos) {
-    sprite.setTexture(texture.renderTexture.getTexture());
-    float scale = float(size.x) / texture.renderTexture.getSize().x;
-    sprite.setScale(sf::Vector2f(scale, scale));
-    setPosition(pos);
+Sprite GetFittedSprite(const Texture& texture, const Vector2f& size) {
+    Sprite sprite(texture, texture.getSize(), Vector2f(0, 0));
+    sprite.resize(size);
+
+    return sprite;
 }
 
-void MLSprite::setPosition(const Vector2f& pos) {
+//*************************************************************
+
+void Sprite::setPosition(const Vector2f& pos) {
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
 }
 
-void MLSprite::setColor(const Color& color) {
+void Sprite::setScale(const Vector2f& scale) {
+    sprite.setScale(ConvertVectorToSFMLVector(scale));
+}
+
+void Sprite::setColor(const Color& color) {
     sprite.setColor(ConvertColorToSFMLColor(color));
 }
 
-void MLSprite::scale(const Vector2f scale) {
-    sprite.setScale(sf::Vector2f(scale.x, scale.y));
+void Sprite::resize(const Vector2f& newSize) {
+    Vector2f currSize = getSize();
+    Vector2f scale(newSize.x / currSize.x, newSize.y / currSize.y);
+
+    setScale(scale);
 }
 
-Vector2f MLSprite::getPosition() const {
+//*************************************************************
+
+Vector2f Sprite::getPosition() const {
     return ConvertSFMLVectorToVector(sprite.getPosition());
 }
 
-Vector2f MLSprite::getSize() const {
+Vector2f Sprite::getSize() const {
     return Vector2f(sprite.getLocalBounds().width, sprite.getLocalBounds().height);
 }
 
-void MLSprite::draw(MLWindow& window) const {
-    window.windowSFML.draw(sprite);
-    window.windowSFML.display();
+Vector2f Sprite::getScale() const {
+    return ConvertSFMLVectorToVector(sprite.getScale());
 }
 
-void MLSprite::draw(MLTexture& texture, MLBlendMode blendMode) const {
+//*************************************************************
+
+void Sprite::draw(Window& window, BlendMode blendMode) const {
+    window.window.draw(sprite, ConvertBlendMove(blendMode));
+    window.window.display();
+}
+
+void Sprite::draw(Texture& texture, BlendMode blendMode) const {
     texture.renderTexture.draw(sprite, ConvertBlendMove(blendMode));
     texture.renderTexture.display();
 }
@@ -605,15 +669,17 @@ void MLSprite::draw(MLTexture& texture, MLBlendMode blendMode) const {
 //*************************************************************
 //*************************************************************
 
-MLTexture::MLTexture(const Vector2f& size, const Color& bg) {
-    create(size, bg);
-}
-
-MLTexture::MLTexture() :
+Texture::Texture() :
     isOk(false)
 {}
 
-bool MLTexture::create(const Vector2f& size, const Color& bg) {
+Texture::Texture(const Vector2f& size, const Color& bg) noexcept(false) {
+    if (!create(size, bg)) {
+        throw std::runtime_error("can't create texture");
+    }
+}
+
+bool Texture::create(const Vector2f& size, const Color& bg) {
     isOk = renderTexture.create(size.x, size.y);
     if (isOk) {
         clear(bg);
@@ -622,23 +688,20 @@ bool MLTexture::create(const Vector2f& size, const Color& bg) {
     return isOk;
 }
 
-void MLTexture::draw(MLWindow& window, const Vector2f& pos) {
+//*************************************************************
+
+void Texture::clear(const Color& color) {
+    renderTexture.clear(ConvertColorToSFMLColor(color));
     renderTexture.display();
-
-    sf::Sprite sprite(renderTexture.getTexture());
-    sprite.setPosition(ConvertVectorToSFMLVector(pos));
-
-    window.windowSFML.draw(sprite);
-    window.windowSFML.display();
 }
 
-Vector2f MLTexture::getSize() const {
+Vector2f Texture::getSize() const {
     return Vector2f(renderTexture.getSize().x, renderTexture.getSize().y);
 }
 
-uint32_t* MLTexture::getPixels() const {
+uint32_t* Texture::getPixels() const {
     Vector2f size(getSize());
-    uint32_t* ptr = new uint32_t[size.x * size.y];
+    uint32_t* ptr = new uint32_t[(size_t)size.x * (size_t)size.y];
 
     auto image = renderTexture.getTexture().copyToImage();
     auto pixels = image.getPixelsPtr();
@@ -648,9 +711,11 @@ uint32_t* MLTexture::getPixels() const {
     return ptr;
 }
 
-void MLTexture::update(const Vector2f& size, const Vector2f& pos, const uint32_t* pixels) {
-    assert(pixels != nullptr);
-    
+void Texture::update(const Vector2f& size, const Vector2f& pos, const uint32_t* pixels) {
+    if (pixels == nullptr) {
+        return;
+    }
+ 
     sf::Texture tmp;
     if (!tmp.create(size.x, size.y)) {
         return;
@@ -664,7 +729,17 @@ void MLTexture::update(const Vector2f& size, const Vector2f& pos, const uint32_t
     renderTexture.display();
 }
 
-void MLTexture::draw(MLTexture& texture, const Vector2f& pos, MLBlendMode blendMode) {
+//*************************************************************
+
+void Texture::draw(Window& window, const Vector2f& pos, BlendMode blendMode) {
+    sf::Sprite sprite(renderTexture.getTexture());
+    sprite.setPosition(ConvertVectorToSFMLVector(pos));
+
+    window.window.draw(sprite, ConvertBlendMove(blendMode));
+    window.window.display();
+}
+
+void Texture::draw(Texture& texture, const Vector2f& pos, BlendMode blendMode) {
     sf::Sprite sprite(renderTexture.getTexture());
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
     
@@ -672,73 +747,66 @@ void MLTexture::draw(MLTexture& texture, const Vector2f& pos, MLBlendMode blendM
     texture.renderTexture.display();
 }
 
-void MLTexture::clear(const Color& color) {
-    renderTexture.clear(ConvertColorToSFMLColor(color));
-    renderTexture.display();
-}
-
 //*************************************************************
 //*************************************************************
 
-MLWindow::MLWindow(const Vector2f& size, const Vector2f& pos, const char* name) :
-    windowSFML(sf::VideoMode(size.x, size.y), name, sf::Style::Fullscreen),
+Window::Window(const Vector2f& size, const Vector2f& pos, const char* name) :
+    window(sf::VideoMode(size.x, size.y), name, sf::Style::Fullscreen),
     isActive_(true)
 {
-    windowSFML.setVerticalSyncEnabled(true);
-    windowSFML.setKeyRepeatEnabled(false);
+    window.setVerticalSyncEnabled(true);
+    window.setKeyRepeatEnabled(false);
 }
 
-void MLWindow::setPosition(const Vector2f& pos) {
-    windowSFML.setPosition(sf::Vector2f(pos.x, pos.y));
+//*************************************************************
+
+void Window::setPosition(const Vector2f& pos) {
+    window.setPosition(sf::Vector2i(pos.x, pos.y));
 }
 
-void MLWindow::setBackGround(const Color& color) {
-    bg = color;
+void Window::clear(const Color& color) {
+    window.clear(ConvertColorToSFMLColor(color));
+    window.display();
 }
 
-Vector2f MLWindow::getPosition() const {
-    return Vector2f(windowSFML.getPosition().x, windowSFML.getPosition().y);
+Vector2f Window::getPosition() const {
+    return Vector2f(window.getPosition().x, window.getPosition().y);
 }
 
-Color MLWindow::getBackGround() const {
-    return bg;
+//*************************************************************
+
+bool Window::isOpen() const {
+    return window.isOpen();
 }
 
-void MLWindow::clear() {
-    windowSFML.clear(ConvertColorToSFMLColor(bg));
-    windowSFML.display();
-}
-
-bool MLWindow::isOpen() const {
-    return windowSFML.isOpen();
-}
-
-bool MLWindow::isActive() const {
+bool Window::isActive() const {
     return isActive_;
 }
 
-void MLWindow::close() {
-    windowSFML.close();
+void Window::close() {
+    window.close();
 }
 
-Vector2f MLWindow::getMousePosition() const {
-    return Vector2f(sf::Mouse::getPosition(windowSFML).x, 
-                    sf::Mouse::getPosition(windowSFML).y);
+//*************************************************************
+
+Vector2f Window::getMousePosition() const {
+    return Vector2f(sf::Mouse::getPosition(window).x, 
+                    sf::Mouse::getPosition(window).y);
 }
 
-bool MLWindow::isButtonPressed(Mouse::Button button) const {
+bool Window::isButtonPressed(Mouse::Button button) const {
     return sf::Mouse::isButtonPressed(ConvertButtonToSFMLButton(button));
 }
 
-bool MLWindow::isKeyPressed(Keyboard::Key key) const {
+bool Window::isKeyPressed(Keyboard::Key key) const {
     return sf::Keyboard::isKeyPressed(ConvertKeyToSFMLKey(key));
 }
 
-uint32_t MLWindow::isTextEntered() {    
+uint32_t Window::isTextEntered() {    
     
     sf::Event event;
 
-    while (windowSFML.pollEvent(event)) {
+    while (window.pollEvent(event)) {
         
         switch (event.type) {
         case sf::Event::GainedFocus:
@@ -757,12 +825,14 @@ uint32_t MLWindow::isTextEntered() {
     return 0;
 }
 
-std::string MLWindow::getClipBuffer() {
+std::string Window::getClipBuffer() const {
     return sf::Clipboard::getString();
 }
 
-void MLWindow::setClipBuffer(const std::string& str) {
+void Window::setClipBuffer(const std::string& str) const {
     sf::Clipboard::setString(str);
 }
 
 //*************************************************************
+
+} // namespace ML

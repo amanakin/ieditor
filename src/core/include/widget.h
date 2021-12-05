@@ -11,8 +11,8 @@
 struct WidgetManager;
 
 struct Widget {
-    Widget(const Vector2i& size, const Vector2i& pos,
-           WidgetManager* parent, bool isActive = true);
+    Widget(const Vector2f& size, const Vector2f& pos, WidgetManager* parent,
+           bool isActive = true);
     Widget();
     
     virtual ~Widget();
@@ -21,12 +21,12 @@ struct Widget {
     virtual void update();
 
     // Draw in absolute position
-    virtual void draw(MLTexture& texture, const Vector2i& absPosWidget);
+    virtual void draw(ML::Texture& texture, const Vector2f& absPosWidget);
     
     // Event and absolute position of widget
-    virtual bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget);
-    virtual bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget);
-    virtual bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget);
+    virtual bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget);
+    virtual bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget);
+    virtual bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2f& absPosWidget);
     
     virtual bool onKeyboard(  const Event::KeyClick&   key);
     virtual bool onTextEntered(const Event::Text& text);
@@ -34,11 +34,11 @@ struct Widget {
     virtual void onUnFocus();
 
     // Relative pos of mouse event
-    virtual bool testMouse(const Vector2i& relPosEvent);
+    virtual bool testMouse(const Vector2f& relPosEvent);
 
     // Relative position
-    Vector2i pos;
-    Vector2i size;
+    Vector2f pos;
+    Vector2f size;
 
     bool isActive;
     bool isFocus;
@@ -50,43 +50,42 @@ struct Widget {
 //*************************************************************
 
 struct WidgetManager: public Widget {
-    
-    WidgetManager(const Vector2i& size, const Vector2i& pos,
-                  const Color& bg, WidgetManager* parent,
-                  bool isActive = true);
+    WidgetManager(const Vector2f& size, const Vector2f& pos,
+                  WidgetManager* parent, bool isActive = true);
     ~WidgetManager();
 
-    void update()                                               override;
-    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
+    void update()                                                 override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
     
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
-    bool onMouseDrag(const Event::MouseDrag&   mouseDrag,  const Vector2i& absPosWidget) override;
-    bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
+    bool onMouseDrag(const Event::MouseDrag&   mouseDrag,  const Vector2f& absPosWidget) override;
+    bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2f& absPosWidget) override;
     
     bool onKeyboard(const Event::KeyClick& key) override;
     bool onTextEntered(const Event::Text& text) override;
 
     void onUnFocus() override;
 
-    bool testMouse(const Vector2i& relPosEvent) override;
+    bool testMouse(const Vector2f& relPosEvent) override;
     
     std::list<Widget*> subWidgets;
-    Color bg;
 };
 
 //*************************************************************
 
 struct RootWidget: public WidgetManager {
-    RootWidget(const Vector2i& size, const Vector2i& pos,
-               MLWindow* window, const Color& color);
+    RootWidget(const Vector2f& size, const Vector2f& pos, ML::Window* window,
+               const Color& color);
 
     virtual void start();
     virtual void stop();
     virtual void init();
 
-    MLTexture texture;
-    MLWindow* window;
+private:
+    ML::Texture texture;
+    ML::Window* window;
     EventManager eventManager;
+
     bool isStopped;
 
     Color color;

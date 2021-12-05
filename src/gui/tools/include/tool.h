@@ -8,9 +8,9 @@ struct Tool {
     virtual ~Tool();
 
     // Everywhere relative position to layout
-    virtual void onPress(Layout& layout, const Vector2i& pos);
-    virtual void onRelease(Layout& layout, const Vector2i& pos);
-    virtual void onMove(Layout& layout, const Vector2i& oldPos, const Vector2i& newPos);
+    virtual void onPress(Layout& layout, const Vector2f& pos);
+    virtual void onRelease(Layout& layout, const Vector2f& pos);
+    virtual void onMove(Layout& layout, const Vector2f& oldPos, const Vector2f& newPos);
 };
 
 #endif // TOOL_HEADER

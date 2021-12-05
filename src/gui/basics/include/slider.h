@@ -8,11 +8,11 @@
 
 struct Slider: virtual public Widget, public ITestableRectangle {
     // Real size of result widget, add 2 * SLIDER_RADIUS
-    Slider(int widgetLength, const Vector2i& pos, const Color& color);
+    Slider(int widgetLength, const Vector2f& pos, const Color& color);
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget)                          override;
-    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget)                          override;
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
 
     int getCurrPos() const;
     void setCurrPos(const int currPos);
@@ -29,32 +29,32 @@ private:
     // Slider center position [0, width]
     int currPos;
     Color bg;
-    MLSprite sprite;
+    ML::Sprite sprite;
 };
 
 //*************************************************************
 
 struct PlaneSlider: virtual public Widget, public ITestableRectangle {
     // Real size of result widget, add 2 * SLIDER_RADIUS
-    PlaneSlider(const Vector2i& size, const Vector2i& pos, const Color& color);
+    PlaneSlider(const Vector2f& size, const Vector2f& pos, const Color& color);
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget)                          override;
-    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    override;
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget)                          override;
+    bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
 
-    Vector2i getCurrPos() const;
-    void setCurrPos(const Vector2i& currPos);
+    Vector2f getCurrPos() const;
+    void setCurrPos(const Vector2f& currPos);
 
-    Vector2i getBgSize() const;
+    Vector2f getBgSize() const;
 
     static constexpr int SliderRadius = 14;
 
 private:
     // Relative slider center position
-    Vector2i currPos;
-    Vector2i bgSize;
+    Vector2f currPos;
+    Vector2f bgSize;
     Color bg;
-    MLSprite sprite;
+    ML::Sprite sprite;
 };
 
 //*************************************************************

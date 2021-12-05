@@ -47,10 +47,10 @@ struct PictureManager {
     PictureManager();
     ~PictureManager();
 
-    const MLPicture& getPicture(DefaultPictures::Picture picture);
+    const ML::Picture& getPicture(DefaultPictures::Picture picture);
 
 private:
-    std::vector<MLPicture*> pictures;
+    std::vector<ML::Picture*> pictures;
 };
 
 #endif // TEXTURE_HEADER

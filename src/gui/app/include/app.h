@@ -33,16 +33,16 @@ struct WorkSpace {
 struct App;
 
 struct AppWidget: public RootWidget {
-    AppWidget(const Vector2i& size, const Vector2i& pos, const Color& color, MLWindow* window);
+    AppWidget(const Vector2f& size, const Vector2f& pos, const Color& color, ML::Window* window);
 
     void update() override;
-    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
     
     void onUnFocus() override;
 
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) override;
-    bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) override;
-    bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) override;
+    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
+    bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget) override;
+    bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2f& absPosWidget) override;
 
     void init() override;
 
@@ -75,7 +75,7 @@ struct App {
     App(const App&) = delete;
 
     static App* getApp();
-    static void createApp(const Vector2i& size);
+    static void createApp(const Vector2f& size);
     static void destructApp();
 
     void run();
@@ -86,15 +86,15 @@ struct App {
 
     WorkSpace workSpace;
     
-    MLFont font;
-    MLWindow window;
+    ML::Font font;
+    ML::Window window;
 
     PictureManager pictManager;
     LayoutManager layoutManager;
 
     Loader loader;
 private:
-    App(const Vector2i& size);
+    App(const Vector2f& size);
     ~App();
 
     static App* app;

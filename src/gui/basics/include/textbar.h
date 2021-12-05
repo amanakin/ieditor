@@ -50,7 +50,7 @@ struct Cursor: public Widget, public IKeyHandler {
     void customPress(const Event::KeyClick& keyClick) override;
 
     void update() override;
-    void drawCustom(MLTexture& texture, const Vector2i& pos);
+    void drawCustom(ML::Texture& texture, const Vector2f& pos);
 
     bool isDraw;
     Timer timer;
@@ -64,7 +64,7 @@ private:
 //*************************************************************
 
 struct TextBar : public WidgetManager, public IKeyHandler {
-    TextBar(const Vector2i& size, const Vector2i& pos, const std::string& str = "");
+    TextBar(const Vector2f& size, const Vector2f& pos, const std::string& str = "");
 
     void update() override;
 
@@ -73,7 +73,7 @@ struct TextBar : public WidgetManager, public IKeyHandler {
 
     void customPress(const Event::KeyClick& key) override;
 
-    void draw(MLTexture& texture, const Vector2i& absPosWidget) override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
 
     const std::string& getStr() const;
 
@@ -85,11 +85,11 @@ private:
 
     Cursor* cursor;
     std::string str;
-    MLText text;
+    ML::Text text;
 
     unsigned char lastSym;
 
-    MLTexture texture;
+    ML::Texture texture;
 };
 
 #endif // TEXTBAR_HEADER

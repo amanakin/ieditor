@@ -2,11 +2,15 @@
 
 #include <app_interface.h>
 
-int main() {
-    AppInterface::init();
-    
-    App::createApp(Vector2i(1920, 1080));
-
-    App::getApp()->run();
-    App::destructApp();
+int main() {    
+    try {
+        AppInterface::init();
+        App::createApp(Vector2f(1920, 1080));
+        App::getApp()->run();
+        App::destructApp();
+    }
+    catch(const std::exception& err) {
+        std::cerr << err.what() << '\n';
+        return -1;
+    }
 }

@@ -16,7 +16,7 @@
 template <typename Handler>
 struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>,
                                public ITestableRectangle, public IDrawableRectangle {
-    ButtonPictureRectangle(Handler handler, const Color& color, const Vector2i& size, const Vector2i& pos) :
+    ButtonPictureRectangle(Handler handler, const Color& color, const Vector2f& size, const Vector2f& pos) :
         Widget(size, pos, nullptr),
         IClickable<Handler>(handler),
         IDrawableRectangle(color), 
@@ -31,11 +31,11 @@ struct AnimatedButton: virtual public Widget, public ITestableCircle, public IAn
 
     AnimatedButton(Handler handler,
                     FrameManager* frameManager,
-                    int radius, const Vector2i& pos) :
-        Widget(Vector2i(2 * radius, 2 * radius), pos, nullptr),
+                    int radius, const Vector2f& pos) :
+        Widget(Vector2f(2 * radius, 2 * radius), pos, nullptr),
         ITestableCircle(radius),
-        IAnimated(Vector2i(sqrt(2) * radius, sqrt(2) * radius) - Vector2i(6, 6),
-                           pos + Vector2i(3, 3),
+        IAnimated(Vector2f(sqrt(2) * radius, sqrt(2) * radius) - Vector2f(6, 6),
+                           pos + Vector2f(3, 3),
                            frameManager),
         handler(handler)
     {

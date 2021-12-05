@@ -10,23 +10,25 @@
 #include "color.h"
 #include "event.h"
 
+namespace ML {
+
 //*************************************************************
 
-enum class MLBlendMode {
+enum class BlendMode {
     BlendAlpha,
     BlendNone,
 };
 
-struct MLWindow;
-struct MLTexture;
-struct MLText;
+class Window;
+class Texture;
+class Text;
+class Sprite;
 
 //*************************************************************
 
-struct MLCircle {
-    MLCircle(const Vector2f& pos, float radius,
-             const Color& color, float outline = 0,
-             const Color& outlineColor = Colors::BLACK);
+struct Circle {
+    Circle(const Vector2f& pos, float radius, const Color& color,
+           float outline = 0, const Color& outlineColor = Colors::BLACK);
 
     void setColor(const Color& colors);
     void setPosition(const Vector2f& pos);
@@ -34,14 +36,14 @@ struct MLCircle {
     void setOutline(float outline);
     void setOutlineColor(const Color& outlineColor);
 
-    const Color& getColor()        const;
-    const Vector2f& getPosition()  const;
-    float getRadius()              const;
-    float getOutline()             const;
-    const Color& getOutlineColor() const;
+    Color getColor()        const;
+    Vector2f getPosition()  const;
+    float getRadius()             const;
+    float getOutline()            const;
+    Color getOutlineColor() const;
 
-    void draw(MLWindow&  window,  MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
-    void draw(MLTexture& texture, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
+    void draw(Window&  window,  BlendMode blendMode = BlendMode::BlendAlpha) const;
+    void draw(Texture& texture, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
 private:
     sf::CircleShape circle;
@@ -50,11 +52,10 @@ private:
 //*************************************************************
 
 // angle in radians
-struct MLRect {
-    MLRect(const Vector2f& size, const Vector2f& pos,
-           const Color& color, float angle = 0,
-           float outline = 0,
-           const Color& outlineColor = Colors::BLACK);
+struct Rect {
+    Rect(const Vector2f& size, const Vector2f& pos, const Color& color,
+         float angle = 0, float outline = 0,
+         const Color& outlineColor = Colors::BLACK);
 
     void setColor(const Color& color);
     void setPosition(const Vector2f& pos);
@@ -64,15 +65,15 @@ struct MLRect {
     void setOutline(float outline);
     void setOutlineColor(const Color& outlineColor);
 
-    const Color& getColor()        const;
-    const Vector2f& getPosition()  const;
-    const Vector2f& getSize()      const;
+    Color getColor()        const;
+    Vector2f getPosition()  const;
+    Vector2f getSize()      const;
     float getAngle()               const;
     float getOutline()             const;
-    const Color& getOutlineColor() const;
+    Color getOutlineColor() const;
 
-    void draw(MLWindow&  window,  MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
-    void draw(MLTexture& texture, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
+    void draw(Window&  window,  BlendMode blendMode = BlendMode::BlendAlpha) const;
+    void draw(Texture& texture, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
 private:
     sf::RectangleShape rect;
@@ -80,11 +81,10 @@ private:
 
 //*************************************************************
 
-struct MLRoundedRect {
-    MLRoundedRect(const Vector2f& size, const Vector2f& pos,
-                  float radius, const Color& color,
-                  float outline = 0,
-                  const Color& outlineColor = Colors::BLACK);
+struct RoundedRect {
+    RoundedRect(const Vector2f& size, const Vector2f& pos, float radius,
+                const Color& color, float outline = 0,
+                const Color& outlineColor = Colors::BLACK);
 
     void setColor(const Color& colors);
     void setPosition(const Vector2f& pos);
@@ -93,15 +93,15 @@ struct MLRoundedRect {
     void setOutline(float outline);
     void setOutlineColor(const Color& outlineColor);
 
-    const Color& getColor()        const;
-    const Vector2f& getPosition()  const;
-    const Vector2f& getSize()      const;
-    float getRadius()              const;
-    float getOutline()             const;
-    const Color& getOutlineColor() const;
+    Color getColor()        const;
+    Vector2f getPosition()  const;
+    Vector2f getSize()      const;
+    float getRadius()       const;
+    float getOutline()      const;
+    Color getOutlineColor() const;
 
-    void draw(MLWindow& window,   MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
-    void draw(MLTexture& texture, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
+    void draw(Window& window,   BlendMode blendMode = BlendMode::BlendAlpha) const;
+    void draw(Texture& texture, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
 private:
     void updateDots(const Vector2f& size, float radius);
@@ -116,19 +116,19 @@ private:
 
 //*************************************************************
 
-struct MLSegment {
-    MLSegment(const Vector2f& start, const Vector2f& end, const Color& color);
+struct Segment {
+    Segment(const Vector2f& start, const Vector2f& end, const Color& color);
 
     void setStart(const Vector2f& start);
     void setEnd(const Vector2f& end);
     void setColor(const Color& color);
 
-    const Vector2f& getStart() const;
-    const Vector2f& getEnd()   const;
-    const Color& getColor()    const;
+    Vector2f getStart() const;
+    Vector2f getEnd()   const;
+    Color getColor()    const;
 
-    void draw(MLWindow& window,   MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
-    void draw(MLTexture& texture, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
+    void draw(Window& window,   BlendMode blendMode = BlendMode::BlendAlpha) const;
+    void draw(Texture& texture, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
 private:
     std::array<sf::Vertex, 2> segment;
@@ -136,22 +136,27 @@ private:
 
 //*************************************************************
 
-struct MLFont {
-    MLFont(const std::string& filename) throw();
+struct Font {
+    Font();
+    Font(const std::string& filename) noexcept(false);
 
-    friend MLText;
+    bool create(const std::string& filename);
+
+    bool operator!() const;
+
+    friend Text;
 
 private:
-    sf::Font fontSFML;
+    sf::Font font;
+    bool isOk;
 };
 
 //*************************************************************
 
-struct MLText {
-    // size - height of symbol in pixels 
-    MLText(const std::string& str, const Vector2f& pos,
-           unsigned charSize, const Color& color, const MLFont& font,
-           float outline = 0, const Color& outlineColor = Colors::BLACK);
+struct Text {
+    Text(const std::string& str, const Vector2f& pos, unsigned charSize,
+         const Color& color, const Font& font, float outline = 0,
+         const Color& outlineColor = Colors::BLACK);
 
     void setString(const std::string& str);
     void setPosition(const Vector2f& pos);
@@ -161,34 +166,35 @@ struct MLText {
     void setOutlineColor(const Color& outlineColor);    
 
     // size - size of rectangle where text located
-    Color     getColor()    const;
-    Vector2f  getSize()     const;
-    int       getHeight()   const; 
-    Vector2f  getPosition() const;
-
+    std::string getString()           const;
+    Vector2f  getPosition()           const;
+    Color     getColor()              const;
+    unsigned getCharSize()                   const;
+    float getOutline()                       const;
+    Color getOutlineColor()           const;
+    Vector2f  getBorders()            const;
     Vector2f getCharPos(unsigned pos) const;
 
-    void draw(MLWindow&  window, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
-    void draw(MLTexture& layout, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
+    void draw(Window&  window, BlendMode blendMode = BlendMode::BlendAlpha) const;
+    void draw(Texture& layout, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
 private:
     sf::Text text;
-    MLFont font;
 };
 
 //*************************************************************
 
-struct MLSprite;
-
-struct MLPicture {
-    MLPicture();
-    MLPicture(const std::string& filename);
-
-    Vector2f getSize() const;
+struct Picture {
+    Picture();
+    Picture(const std::string& filename) noexcept(false);
+    
+    bool create(const std::string& filename);
 
     bool operator!() const;
 
-    friend MLSprite;
+    Vector2f getSize() const;
+
+    friend Sprite;
 
 private:
     sf::Texture texture;
@@ -197,31 +203,29 @@ private:
 
 //*************************************************************
 
-struct MLSprite {
-    // Sprite of new size, scaled
-    MLSprite(const MLPicture& picture, const Vector2f& size,
-             const Vector2f& pos);
-    // Sprite of size of texture
-    MLSprite(const MLPicture& picture, const Vector2f& pos);
+Sprite GetFittedSprite(const Picture& picture, const Vector2f& size);
+Sprite GetFittedSprite(const Texture& texture, const Vector2f& size);
 
-    MLSprite(const MLPicture& picture, const Vector2f& picPos,
-             const Vector2f& size, const Vector2f& pos);
-   
-    MLSprite(const MLTexture& texture, const Vector2f& size,
-             const Vector2f& pos);
-    
+struct Sprite {
+    Sprite(const Picture& picture, const Vector2f& size, const Vector2f& pos,
+           const Vector2f& picPos = Vector2f(0, 0));
+
+    Sprite(const Texture& texture, const Vector2f& size, const Vector2f& pos,
+           const Vector2f& texturePos = Vector2f(0, 0));
+
     void setPosition(const Vector2f& pos);
-    
+    void setScale(const Vector2f& scale);
     // Multiplyed
     void setColor(const Color& color);
-    
-    void scale(const Vector2f scale);
+    // Scaling
+    void resize(const Vector2f& newSize);
 
     Vector2f getPosition() const;
     Vector2f getSize()     const;
+    Vector2f getScale()    const;
 
-    void draw(MLWindow&  window)  const;
-    void draw(MLTexture& texture, MLBlendMode blendMode = MLBlendMode::BlendAlpha) const;
+    void draw(Window&  window, BlendMode blendMode = BlendMode::BlendAlpha)  const;
+    void draw(Texture& texture, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
 private:
     sf::Sprite sprite;
@@ -229,33 +233,32 @@ private:
 
 //*************************************************************
 
-struct MLTexture {
-    MLTexture(const Vector2f& size, const Color& bg = Color(0, 0, 0, 0));
-    MLTexture();
+struct Texture {
+    Texture();
+    Texture(const Vector2f& size, const Color& bg = Color(0, 0, 0, 0)) noexcept(false);
 
     bool create(const Vector2f& size, const Color& bg = Color(0, 0, 0, 0));
 
-    void draw(MLWindow& window, const Vector2f& pos);
-    void draw(MLTexture& texture, const Vector2f& pos, MLBlendMode blendMode = MLBlendMode::BlendAlpha);
-
-    Vector2f getSize() const;
-    // Return pointer and you are responsible for it (use delete[])
+    void clear(const Color& color = Color(0, 0, 0, 0));
+    // You are responsible for deleting this by delete []!!!
     uint32_t* getPixels() const;
+    Vector2f getSize() const;
 
     void update(const Vector2f& size, const Vector2f& pos, const uint32_t* pixels);
 
-    void clear(const Color& color = Color(0, 0, 0, 0));
-
     bool operator!() const;
 
-    friend MLCircle;
-    friend MLRect;
-    friend MLText;
-    friend MLSprite;
-    friend MLSegment;
-    friend MLRoundedRect;
+    void draw(Window& window, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha);
+    void draw(Texture& texture, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha);
 
-private:
+    friend Circle;
+    friend Rect;
+    friend Text;
+    friend Sprite;
+    friend Segment;
+    friend RoundedRect;
+
+//private:
     sf::RenderTexture renderTexture;
 
     bool isOk;
@@ -263,45 +266,42 @@ private:
 
 //*************************************************************
 
-struct MLWindow {
-    MLWindow(const Vector2f& size, const Vector2f& pos, const char* name);
+struct Window {
+    Window(const Vector2f& size, const Vector2f& pos, const char* name);
 
     void setPosition(const Vector2f& pos);
-    void setBackGround(const Color& color);
-    
-    Vector2f getPosition()   const;
-    Color    getBackGround() const;
+    void clear(const Color& color = Color(0, 0, 0, 0));
 
-    void clear();
+    Vector2f getPosition() const;
 
-    bool isOpen() const;
+    bool isOpen()   const;
     bool isActive() const;
     void close();
 
-    Vector2f getMousePosition()                const;
+    Vector2f getMousePosition()         const;
     bool isButtonPressed(Mouse::Button button) const;
     bool isKeyPressed(Keyboard::Key key)       const;
     uint32_t isTextEntered();
 
-    std::string getClipBuffer();
-    void setClipBuffer(const std::string& str);
+    std::string getClipBuffer() const;
+    void setClipBuffer(const std::string& str) const;
 
-    friend MLCircle;
-    friend MLRect;
-    friend MLText;
-    friend MLSprite;
-    friend MLTexture;
-    friend MLSegment;
-    friend MLRoundedRect;
+    friend Circle;
+    friend Rect;
+    friend Text;
+    friend Sprite;
+    friend Texture;
+    friend Segment;
+    friend RoundedRect;
 
 private:
-    sf::RenderWindow windowSFML;
+    sf::RenderWindow window;
 
     bool isActive_;
-
-    Color bg;
 };
 
 //*************************************************************
+
+} // namespace ML
 
 #endif // SFMLLIB_HEADER

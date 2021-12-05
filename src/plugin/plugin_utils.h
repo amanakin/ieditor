@@ -7,7 +7,7 @@
 PRGBA ConvertColorToPlugin(const Color& color);
 Color ConvertColorFromPlugin(const PRGBA& color);
 
-MLBlendMode ConvertBlendMode(PBlendMode pBlendMode);
+ML::BlendMode ConvertBlendMode(PBlendMode pBlendMode);
 
-Vector2i ConvertVectorFromPlugin(const PVec2f& pVec);
-PVec2f ConvertVectorToPlugin(const Vector2i& vec);
+Vector2f ConvertVectorFromPlugin(const PVec2f& pVec);
+PVec2f ConvertVectorToPlugin(const Vector2f& vec);

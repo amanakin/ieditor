@@ -18,7 +18,7 @@ bool ExtEnable(const char* name) {
     return false;
 }
 
-void* ExtGetFunction(const char* name) {
+void* ExtGetFunction(const char *extension, const char* name) {
     return nullptr;
 }
 
@@ -77,13 +77,13 @@ void TargetGetSize(size_t *width, size_t *height) {
     }                                                                           
 
 void RenderDrawCircle(PVec2f position, float radius, PRGBA color, const PRenderMode *render_mode) {
-    MLCircle object(ConvertVectorFromPlugin(position), radius, ConvertColorFromPlugin(color));
+    ML::Circle object(ConvertVectorFromPlugin(position), radius, ConvertColorFromPlugin(color));
     
     DrawObject
 }
 
 void RenderDrawLine(PVec2f start, PVec2f end, PRGBA color, const PRenderMode *render_mode) {
-    MLSegment object(ConvertVectorFromPlugin(start), ConvertVectorFromPlugin(end), ConvertColorFromPlugin(color));
+    ML::Segment object(ConvertVectorFromPlugin(start), ConvertVectorFromPlugin(end), ConvertColorFromPlugin(color));
 
     DrawObject
 }
@@ -92,10 +92,10 @@ void RenderDrawTriangle(PVec2f p1, PVec2f p2, PVec2f p3, PRGBA color, const PRen
 }
 
 void RenderDrawRect(PVec2f p1, PVec2f p2, PRGBA color, const PRenderMode *render_mode) {
-    Vector2i start(std::min(p1.x, p2.x), std::min(p1.y, p2.y));
-    Vector2i end(std::max(p1.x, p2.x), std::max(p1.y, p2.y));
+    Vector2f start(std::min(p1.x, p2.x), std::min(p1.y, p2.y));
+    Vector2f end(std::max(p1.x, p2.x), std::max(p1.y, p2.y));
     
-    MLRect object(end - start, start, ConvertColorFromPlugin(color));
+    ML::Rect object(end - start, start, ConvertColorFromPlugin(color));
 
     DrawObject
 }
@@ -105,7 +105,7 @@ void RenderDrawRect(PVec2f p1, PVec2f p2, PRGBA color, const PRenderMode *render
 void RenderDrawPixels(PVec2f position, const PRGBA *data, size_t width, size_t height, const PRenderMode *render_mode) {
     auto& texture = App::getApp()->layoutManager.getCurrLayout()->texture;
 
-    texture.update(Vector2i(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
+    texture.update(Vector2f(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
 }
 
 // Settings
@@ -115,9 +115,11 @@ void  SettingsCreateSurface(const PPluginInterface *self, size_t width, size_t h
 void  SettingsDeleteSurface(const PPluginInterface *self)
 {}
 
-void* SettingsAdd(const PPluginInterface *self, PSettingType type, const char *name)
-{}
-void  SettingsGet(const PPluginInterface *self, void *handle, void *answer)
+void* SettingsAdd(const PPluginInterface *self, PSettingType type, const char *name) {
+    return nullptr;
+}
+
+void  SettingsGet(const PPluginInterface *self, void *handle, void *answer) 
 {}
 
 // Init

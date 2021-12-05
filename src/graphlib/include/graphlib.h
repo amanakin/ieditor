@@ -14,51 +14,51 @@
 
 //*************************************************************
 
-struct MLWindow;
+struct ML::Window;
 
 //*************************************************************
 
-struct MLCircle {
-    MLCircle(const Vector2i& pos, unsigned radius, const Color& color);
+struct ML::Circle {
+    ML::Circle(const Vector2f& pos, unsigned radius, const Color& color);
 
     void setColor(const Color& colors);
-    void setPosition(const Vector2i& pos);
+    void setPosition(const Vector2f& pos);
     void setRadius(unsigned radius);
 
     Color    getColor()    const;
-    Vector2i getPosition() const;
+    Vector2f getPosition() const;
     float    getRadius()   const;
 
-    void draw(MLWindow& window) const;
+    void draw(ML::Window& window) const;
 };
 
 //*************************************************************
 
 // angle in radians
-struct MLRect {
-    MLRect(const Vector2i& size, const Vector2i& pos, const Color& color, float angle = 0);
+struct ML::Rect {
+    ML::Rect(const Vector2f& size, const Vector2f& pos, const Color& color, float angle = 0);
 
     void setColor(const Color& color);
-    void setPosition(const Vector2i& pos);
-    void setSize(const Vector2i& size);
+    void setPosition(const Vector2f& pos);
+    void setSize(const Vector2f& size);
     // Default angle from x coordinate 
     void setAngle(float angle);
 
     Color    getColor()    const;
-    Vector2i getPosition() const;
-    Vector2i getSize()     const;
+    Vector2f getPosition() const;
+    Vector2f getSize()     const;
     float    getAngle()    const;
 
-    void draw(MLWindow& window) const;
+    void draw(ML::Window& window) const;
 };
 
 //*************************************************************
 
 struct MLText;
 
-struct MLFont {
+struct ML::Font {
 
-    MLFont(const char* filename);
+    ML::Font(const char* filename);
 
     friend MLText;
 };
@@ -67,45 +67,45 @@ struct MLFont {
 
 struct MLText {
     // size - height of symbol in pixels 
-    MLText(const char* str, const Vector2i& pos, int height, const Color& color, const MLFont& font);
+    MLText(const char* str, const Vector2f& pos, int height, const Color& color, const ML::Font& font);
 
     void setString(const char* str);
     void setHeight(int height);
     void setColor(const Color& color);
-    void setPosition(const Vector2i& pos);
+    void setPosition(const Vector2f& pos);
 
     // size - size of rectangle where text located
     Color&    getColor()    const;
-    Vector2i  getSize()     const;
+    Vector2f  getSize()     const;
     int       getHeight()   const; 
-    Vector2i  getPosition() const; 
+    Vector2f  getPosition() const; 
 
-    void draw(MLWindow& window) const;
+    void draw(ML::Window& window) const;
 };
 
 //*************************************************************
 
-struct MLTexture {
-    MLTexture(const char* filename, const Vector2i& size, const Vector2i& pos);
+struct ML::Texture {
+    ML::Texture(const char* filename, const Vector2f& size, const Vector2f& pos);
 
-    void setPosition(const Vector2i& pos);
-    void setSize(const Vector2i& size);
+    void setPosition(const Vector2f& pos);
+    void setSize(const Vector2f& size);
     
-    Vector2i getPosition() const;
-    Vector2i getSize()     const;
+    Vector2f getPosition() const;
+    Vector2f getSize()     const;
 
-    void draw(MLWindow* window) const;
+    void draw(ML::Window* window) const;
 };
 
 //*************************************************************
 
-struct MLWindow {
-    MLWindow(const Vector2i& size, const Vector2i& pos, const char* name);
+struct ML::Window {
+    ML::Window(const Vector2f& size, const Vector2f& pos, const char* name);
 
-    void setPosition(const Vector2i& pos);
+    void setPosition(const Vector2f& pos);
     void setBackGround(const Color& color);
     
-    Vector2i getPosition()   const;
+    Vector2f getPosition()   const;
     Color    getBackGround() const;
 
     void display();
@@ -114,14 +114,14 @@ struct MLWindow {
     bool isOpen() const;
     void close();
 
-    Vector2i getMousePosition()                const;
+    Vector2f getMousePosition()                const;
     bool isButtonPressed(Mouse::Button button) const;
     bool isKeyPressed(Keyboard::Key key)       const;
 
-    friend MLCircle;
-    friend MLRect;
+    friend ML::Circle;
+    friend ML::Rect;
     friend MLText;
-    friend MLTexture;
+    friend ML::Texture;
 };
 
 //*************************************************************

@@ -41,8 +41,8 @@ float GetRotateAngle(const Vector2f& vector) {
 }
 
 
-bool IsInsideRect(const Vector2i& hit, const Vector2i& pos, const Vector2i& size) {
-    Vector2i rectBorder = pos + size;
+bool IsInsideRect(const Vector2f& hit, const Vector2f& pos, const Vector2f& size) {
+    Vector2f rectBorder = pos + size;
     return (pos.x <= hit.x && hit.x <= rectBorder.x &&
             pos.y <= hit.y && hit.y <= rectBorder.y);
 }
@@ -69,11 +69,11 @@ bool AreCrossing(const Vector2f& pos1, const Vector2f& dir1,
 }
 
 
-Vector2i ConvertVector2fToVecto2i(const Vector2f& vector) {
-    return Vector2i(vector.x, vector.y);
+Vector2f ConvertVector2fToVecto2i(const Vector2f& vector) {
+    return Vector2f(vector.x, vector.y);
 }
 
-Vector2f ConvertVector2iToVecto2f(const Vector2i& vector) {
+Vector2f ConvertVector2fToVecto2f(const Vector2f& vector) {
     return Vector2f(vector.x, vector.y);
 }  
 
@@ -85,7 +85,7 @@ float GetT(float t, float alpha, const Vector2f& p0, const Vector2f& p1 )
     return (b + t);
 }
 
-Vector2i CatmullRom(const Vector2f& p0, const Vector2f& p1, const Vector2f& p2, const Vector2f& p3, float t, float alpha )
+Vector2f CatmullRom(const Vector2f& p0, const Vector2f& p1, const Vector2f& p2, const Vector2f& p3, float t, float alpha )
 {
     float t0 = 0.0f;
     float t1 = GetT( t0, alpha, p0, p1 );
@@ -101,15 +101,15 @@ Vector2i CatmullRom(const Vector2f& p0, const Vector2f& p1, const Vector2f& p2, 
 
     Vector2f C  = ( t2-t )/( t2-t1 )*B1 + ( t-t1 )/( t2-t1 )*B2;
     
-    return Vector2i(roundf(C.x), roundf(C.y));
+    return Vector2f(roundf(C.x), roundf(C.y));
 }
 
-Vector2i FitRectInCenter(const Vector2i& rectSize, const Vector2i& availableArea) {
+Vector2f FitRectInCenter(const Vector2f& rectSize, const Vector2f& availableArea) {
     if (rectSize.x >= availableArea.x || rectSize.y >= availableArea.y) {
-        return Vector2i(0, 0);
+        return Vector2f(0, 0);
     }
 
-    return (availableArea  - rectSize) / 2;
+    return (availableArea  - rectSize) / 2.f;
 }
 
 bool IsCharacter(uint32_t unicode) {

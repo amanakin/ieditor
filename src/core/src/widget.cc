@@ -7,7 +7,7 @@
 
 //*************************************************************
 
-Widget::Widget(const Vector2i& size, const Vector2i& pos, WidgetManager* parent,
+Widget::Widget(const Vector2f& size, const Vector2f& pos, WidgetManager* parent,
                bool isActive)
     : pos(pos),
       size(size),
@@ -22,18 +22,18 @@ Widget::~Widget() {}
 
 void Widget::update() {}
 
-void Widget::draw(MLTexture& texture, const Vector2i& absPosWidget) {}
+void Widget::draw(ML::Texture& texture, const Vector2f& absPosWidget) {}
 
 bool Widget::onMouseClick(const Event::MouseClick& mouseClick,
-                          const Vector2i& absPosWidget) {
+                          const Vector2f& absPosWidget) {
     return false;
 }
 bool Widget::onMouseDrag(const Event::MouseDrag& mouseDrag,
-                         const Vector2i& absPosWidget) {
+                         const Vector2f& absPosWidget) {
     return false;
 }
 bool Widget::onMouseHover(const Event::MouseHover& mouseHover,
-                          const Vector2i& absPosWidget) {
+                          const Vector2f& absPosWidget) {
     return false;
 }
 
@@ -42,14 +42,14 @@ bool Widget::onTextEntered(const Event::Text& text) { return false; }
 
 void Widget::onUnFocus() { isFocus = false; }
 
-bool Widget::testMouse(const Vector2i& relPosEvent) { return IsInsideRect(relPosEvent, Vector2i(0, 0), size); }
+bool Widget::testMouse(const Vector2f& relPosEvent) { return IsInsideRect(relPosEvent, Vector2f(0, 0), size); }
 
 //*************************************************************
 
-WidgetManager::WidgetManager(const Vector2i& size, const Vector2i& pos,
-                             const Color& bg, WidgetManager* parent,
-                             bool isActive)
-    : Widget(size, pos, parent, isActive), bg(bg) {}
+WidgetManager::WidgetManager(const Vector2f& size, const Vector2f& pos,
+                             WidgetManager* parent, bool isActive) : 
+    Widget(size, pos, parent, isActive)
+{}
 
 WidgetManager::~WidgetManager() {
     for (auto& subWidget : subWidgets) {
@@ -70,10 +70,7 @@ void WidgetManager::update() {
     }
 }
 
-void WidgetManager::draw(MLTexture& texture, const Vector2i& absPosWidget) {
-    MLRect rect(size, absPosWidget, bg);
-    rect.draw(texture);
-
+void WidgetManager::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     for (auto it = subWidgets.rbegin(); it != subWidgets.rend(); ++it) {
         if ((*it)->isActive) {
             (*it)->draw(texture, (*it)->pos + absPosWidget);
@@ -84,7 +81,7 @@ void WidgetManager::draw(MLTexture& texture, const Vector2i& absPosWidget) {
 #include <iostream>
 
 bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick,
-                                 const Vector2i& absPosWidget) {
+                                 const Vector2f& absPosWidget) {
     if (mouseClick.type == Event::Type::MouseButtonReleased &&
         subWidgets.size() > 0) {
         return (*subWidgets.begin())
@@ -119,7 +116,7 @@ bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick,
 }
 
 bool WidgetManager::onMouseDrag(const Event::MouseDrag& mouseDrag,
-                                const Vector2i& absPosWidget) {
+                                const Vector2f& absPosWidget) {
     if (subWidgets.size() > 0) {
         auto widget = *subWidgets.begin();
 
@@ -133,7 +130,7 @@ bool WidgetManager::onMouseDrag(const Event::MouseDrag& mouseDrag,
 }
 
 bool WidgetManager::onMouseHover(const Event::MouseHover& mouseHover,
-                                 const Vector2i& absPosWidget) {      
+                                 const Vector2f& absPosWidget) {      
     if (mouseHover.type == Event::MouseHover::HoverSpecific::In) {
         for (auto& subWidget : subWidgets) {
             if (subWidget->isActive &&
@@ -179,21 +176,20 @@ void WidgetManager::onUnFocus() {
     }
 }
 
-bool WidgetManager::testMouse(const Vector2i& relPosEvent) {
-    return IsInsideRect(relPosEvent, Vector2i(0, 0), size);
+bool WidgetManager::testMouse(const Vector2f& relPosEvent) {
+    return IsInsideRect(relPosEvent, Vector2f(0, 0), size);
 }
 
 //*************************************************************
 
-RootWidget::RootWidget(const Vector2i& size, const Vector2i& pos,
-                       MLWindow* window, const Color& color)
-    : WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
-      texture(size),
-      window(window),
-      isStopped(false),
-      eventManager(window, this),
-      color(color)
-{
+RootWidget::RootWidget(const Vector2f& size, const Vector2f& pos,
+                       ML::Window* window, const Color& color) :
+    WidgetManager(size, pos, nullptr),
+    texture(size),
+    window(window),
+    isStopped(false),
+    eventManager(window, this),
+    color(color) {
     assert(window != nullptr);
 }
 
@@ -206,7 +202,7 @@ void RootWidget::start() {
         update();
 
         texture.clear(color);
-        draw(texture, Vector2i(0, 0));
+        draw(texture, Vector2f(0, 0));
 
         texture.draw(*window, pos);
     }

@@ -100,10 +100,10 @@ namespace Event {
     };
 
     struct MouseClick {
-        MouseClick(const Type type, const Vector2i& mousePos, const Mouse::Button button);
+        MouseClick(const Type type, const Vector2f& mousePos, const Mouse::Button button);
 
         Type type;
-        Vector2i mousePos;
+        Vector2f mousePos;
         Mouse::Button button;
     };
 
@@ -113,19 +113,19 @@ namespace Event {
             Out
         };
 
-        MouseHover(const Vector2i& prevPos, const Vector2i& currPos, HoverSpecific type);
+        MouseHover(const Vector2f& prevPos, const Vector2f& currPos, HoverSpecific type);
 
-        Vector2i prevPos;
-        Vector2i currPos;
+        Vector2f prevPos;
+        Vector2f currPos;
 
         HoverSpecific type;
     };
 
     struct MouseDrag {
-        MouseDrag(const Vector2i& prevPos, const Vector2i& currPos, const Mouse::Button button);
+        MouseDrag(const Vector2f& prevPos, const Vector2f& currPos, const Mouse::Button button);
 
-        Vector2i prevPos;
-        Vector2i currPos;    
+        Vector2f prevPos;
+        Vector2f currPos;    
         Mouse::Button button;
     };
 
@@ -150,11 +150,13 @@ namespace Event {
 
 //*************************************************************
 
-struct MLWindow;
+namespace ML {
+struct Window;
+}
 struct RootWidget;
 
 struct EventManager {
-    EventManager(MLWindow* window, RootWidget* rootWidget);
+    EventManager(ML::Window* window, RootWidget* rootWidget);
 
     // poll events and push them to widget
     bool pollEvent();
@@ -163,9 +165,9 @@ private:
     std::array<bool, Mouse::Button::SIZE> isButtonPressed;
     std::array<bool, Keyboard::Key::SIZE> isKeyPressed;
 
-    Vector2i mousePos;
+    Vector2f mousePos;
 
-    MLWindow* window;
+    ML::Window* window;
     RootWidget* rootWidget;
 };
 

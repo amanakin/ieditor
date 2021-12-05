@@ -28,13 +28,13 @@ void Plugin::apply(Layout& layout) {
     plugin->effect.apply();
 }
 
-void Plugin::onPress(Layout& layout, const Vector2i& pos) {
+void Plugin::onPress(Layout& layout, const Vector2f& pos) {
     plugin->tool.on_press(ConvertVectorToPlugin(pos));
 }
-void Plugin::onRelease(Layout& layout, const Vector2i& pos) {
+void Plugin::onRelease(Layout& layout, const Vector2f& pos) {
     plugin->tool.on_release(ConvertVectorToPlugin(pos));
 }
 
-void Plugin::onMove(Layout& layout, const Vector2i& oldPos, const Vector2i& newPos) {
+void Plugin::onMove(Layout& layout, const Vector2f& oldPos, const Vector2f& newPos) {
     plugin->tool.on_move(ConvertVectorToPlugin(oldPos), ConvertVectorToPlugin(newPos));
 }

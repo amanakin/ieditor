@@ -12,19 +12,19 @@ IDrawableRectangle::IDrawableRectangle(const Color& color) :
     bg(color)
 {}
     
-void IDrawableRectangle::draw(MLTexture& texture, const Vector2i& absPos) {
-    MLRect rect(size, absPos, bg);
+void IDrawableRectangle::draw(ML::Texture& texture, const Vector2f& absPos) {
+    ML::Rect rect(size, absPos, bg);
 
     rect.draw(texture);
 }
 
 //*************************************************************
 
-IDrawablePicture::IDrawablePicture(const MLPicture& picture) :
-    bg(picture, size, Vector2i(0, 0))
+IDrawablePicture::IDrawablePicture(const ML::Picture& picture) :
+    bg(picture, size, Vector2f(0, 0))
 {}
 
-void IDrawablePicture::draw(MLTexture& texture, const Vector2i& absPos) {
+void IDrawablePicture::draw(ML::Texture& texture, const Vector2f& absPos) {
     bg.setPosition(absPos);
 
     bg.draw(texture);
@@ -32,8 +32,8 @@ void IDrawablePicture::draw(MLTexture& texture, const Vector2i& absPos) {
 
 //*************************************************************
 
-bool ITestableRectangle::testMouse(const Vector2i& relPosEvent) {
-    return IsInsideRect(relPosEvent, Vector2i(0, 0), size);
+bool ITestableRectangle::testMouse(const Vector2f& relPosEvent) {
+    return IsInsideRect(relPosEvent, Vector2f(0, 0), size);
 }
 
 //*************************************************************
@@ -42,13 +42,13 @@ ITestableCircle::ITestableCircle(float radius) :
     radius(radius)
 {}
 
-bool ITestableCircle::testMouse(const Vector2i& relPosEvent) {
-    return (relPosEvent - Vector2i(radius, radius)).getLen() <= radius;
+bool ITestableCircle::testMouse(const Vector2f& relPosEvent) {
+    return (relPosEvent - Vector2f(radius, radius)).getLen() <= radius;
 }
 
 //*************************************************************
 
-bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget) {
     if (!testMouse(mouseDrag.currPos - absPosWidget)) {
         isHover = false;
         return false;
@@ -58,7 +58,7 @@ bool IHoverable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& 
     return true;
 }
 
-bool IHoverable::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {        
+bool IHoverable::onMouseHover(const Event::MouseHover& mouseHover, const Vector2f& absPosWidget) {        
     if (mouseHover.type == Event::MouseHover::HoverSpecific::Out) {
         isHover = false;
         return true;
@@ -79,7 +79,7 @@ IMovable::IMovable() :
     isPressed(false)
 {}
 
-bool IMovable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+bool IMovable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget) {
     if (mouseDrag.button == Mouse::Button::Left) {
         if (isPressed) {
             pos += mouseDrag.currPos - mouseDrag.prevPos;
@@ -91,7 +91,7 @@ bool IMovable::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& ab
     return false;
 }
 
-bool IMovable::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool IMovable::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
     if (mouseClick.button == Mouse::Button::Left) {
         if (mouseClick.type == Event::Type::MouseButtonPressed) {
             isPressed = true;
@@ -120,15 +120,16 @@ Frames3::Frames3(DefaultPictures::Picture mainPicture,
     pressPicture(pressPicture)
 {}
 
-MLSprite Frames3::getMainPict(const Vector2i& size) {
-    return MLSprite(App::getApp()->pictManager.getPicture(mainPicture), size, Vector2i(0, 0));
+ML::Sprite Frames3::getMainPict(const Vector2f& size) {
+    return GetFittedSprite(App::getApp()->pictManager.getPicture(mainPicture), size);
 }
 
-MLSprite Frames3::getHoverPict(const Vector2i& size) {
-    return MLSprite(App::getApp()->pictManager.getPicture(hoverPicture), size, Vector2i(0, 0));
+ML::Sprite Frames3::getHoverPict(const Vector2f& size) {
+    return GetFittedSprite(App::getApp()->pictManager.getPicture(hoverPicture), size);
 }
-MLSprite Frames3::getPressPict(const Vector2i& size) {
-    return MLSprite(App::getApp()->pictManager.getPicture(pressPicture), size, Vector2i(0, 0));
+
+ML::Sprite Frames3::getPressPict(const Vector2f& size) {
+    return GetFittedSprite(App::getApp()->pictManager.getPicture(pressPicture), size);
 }
 
 //*************************************************************
@@ -136,39 +137,49 @@ MLSprite Frames3::getPressPict(const Vector2i& size) {
 Frames1::Frames1(DefaultPictures::Picture picture) :
     picture(picture)
 {
-    MLSprite pict(App::getApp()->pictManager.getPicture(picture), Vector2i(0, 0));
-    auto size = pict.getSize();
+    auto pict = App::getApp()->pictManager.getPicture(picture);
+    auto size = pict.getSize(); 
+    ML::Sprite sprite(pict, size, Vector2f(0, 0));
 
-    assert(hoverTexture.create(size, Color(0, 0, 0, 0)));
-    assert(pressTexture.create(size, Color(0, 0, 0, 0)));
+    if (!hoverTexture.create(size)) {
+        //throw std::runtime_error("can't create hoverTexture in frame");
+        return;
+    }
+    
+    if (!pressTexture.create(size)) {
+        //throw std::runtime_error("can't create pressTexture in frame");
+        return;
+    }
 
-    MLRoundedRect roundRect(size, size.x / 5, Colors::GREY);
-    roundRect.setPosition(Vector2i(0, 0));
+    ML::RoundedRect roundRect(size, Vector2f(0, 0), size.x / 5, Colors::GREY);
     roundRect.draw(hoverTexture);
 
     roundRect.setColor(Colors::DARK_GREY);
     roundRect.draw(pressTexture);
 
-    pict.draw(hoverTexture);
-    pict.draw(pressTexture);
+    sprite.draw(hoverTexture);
+    sprite.draw(pressTexture);
+
+    auto image = hoverTexture.renderTexture.getTexture().copyToImage();
+    image.saveToFile("debug.png");
 }
 
-MLSprite Frames1::getMainPict(const Vector2i& size)  {
-    return MLSprite(App::getApp()->pictManager.getPicture(picture), size, Vector2i(0, 0));
+ML::Sprite Frames1::getMainPict(const Vector2f& size) {
+    return GetFittedSprite(App::getApp()->pictManager.getPicture(picture), size);
 }
 
-MLSprite Frames1::getHoverPict(const Vector2i& size) {
-    return MLSprite(hoverTexture, size, Vector2i(0, 0));
+ML::Sprite Frames1::getHoverPict(const Vector2f& size) {
+    return GetFittedSprite(hoverTexture, size);
 }
 
-MLSprite Frames1::getPressPict(const Vector2i& size) {
-    return MLSprite(pressTexture, size, Vector2i(0, 0));
+ML::Sprite Frames1::getPressPict(const Vector2f& size) {
+    return GetFittedSprite(pressTexture, size);
 }
 
 //*************************************************************
 
 IAnimated::IAnimated(
-    const Vector2i& size, const Vector2i& pos,
+    const Vector2f& size, const Vector2f& pos,
     FrameManager* frameManager) :
     Widget(size, pos, nullptr),
     frameManager(frameManager),
@@ -183,7 +194,7 @@ IAnimated::~IAnimated() {
     delete frameManager;
 }
 
-bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
     if (mouseClick.type == Event::Type::MouseButtonReleased) {
         if (isPressed) {
             if (testMouse(mouseClick.mousePos - absPosWidget)) {
@@ -203,7 +214,7 @@ bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i
     return false;
 }
 
-void IAnimated::draw(MLTexture& texture, const Vector2i& absPos) {
+void IAnimated::draw(ML::Texture& texture, const Vector2f& absPos) {
     if (isPressed) {
         auto pressSprite = frameManager->getPressPict(size);
         pressSprite.setPosition(absPos);

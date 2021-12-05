@@ -32,8 +32,8 @@ WorkSpace::~WorkSpace() {
 
 //*************************************************************
 
-AppWidget::AppWidget(const Vector2i& size, const Vector2i& pos,
-                     const Color& color, MLWindow* window) :
+AppWidget::AppWidget(const Vector2f& size, const Vector2f& pos,
+                     const Color& color, ML::Window* window) :
     RootWidget(size, pos, window, color)
 {
     assert(window != nullptr);
@@ -46,7 +46,7 @@ void AppWidget::update() {
     }
 }
 
-void AppWidget::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+void AppWidget::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     for (auto widget: staticWidgets) {
         widget->draw(texture, absPosWidget + widget->pos);
     }
@@ -62,7 +62,7 @@ void AppWidget::onUnFocus() {
     }
 }
 
-bool AppWidget::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool AppWidget::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
     
     if (mouseClick.type == Event::Type::MouseButtonReleased) {
         for (auto widget: staticWidgets) {
@@ -114,7 +114,7 @@ bool AppWidget::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i
     return false;
 }
 
-bool AppWidget::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i& absPosWidget) {
+bool AppWidget::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget) {
     
     for (auto widget: staticWidgets) {
         if (widget->isFocus) {
@@ -133,7 +133,7 @@ bool AppWidget::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2i
     return false;
 }
 
-bool AppWidget::onMouseHover(const Event::MouseHover& mouseHover, const Vector2i& absPosWidget) {
+bool AppWidget::onMouseHover(const Event::MouseHover& mouseHover, const Vector2f& absPosWidget) {
     if (!WidgetManager::onMouseHover(mouseHover, absPosWidget)) {
         for (auto widget: staticWidgets) {
             if (widget->onMouseHover(mouseHover, absPosWidget + widget->pos)) {
@@ -153,46 +153,46 @@ void AppWidget::init() {
         },
         new Frames1(DefaultPictures::Exit),
         50,
-        Vector2i(0, 0)
+        Vector2f(0, 0)
     );
 
     subWidgets.push_back(exitButton);
 
     auto layoutButton = new AnimatedButton(
         [this]() {
-            auto layoutWindow = new DefaultWindow(Vector2i(700, 500), Vector2i(300, 300));
-            layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2i(690, 490), Vector2i(5, 5)));
+            auto layoutWindow = new DefaultWindow(Vector2f(700, 500), Vector2f(300, 300));
+            layoutWindow->workManager->subWidgets.push_back(new Layout(Vector2f(690, 490), Vector2f(5, 5)));
             this->subWidgets.push_front(layoutWindow);
         },
         new Frames1(DefaultPictures::Easel),
         50,
-        Vector2i(0, 100)
+        Vector2f(0, 100)
     );
 
     subWidgets.push_back(layoutButton);
 
     auto colorPickerButton = new AnimatedButton(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(700, 300), Vector2i(100, 100));
-            pickerWindow->workManager->subWidgets.push_back(new ColorPicker(Vector2i(700, 300), Vector2i(0, 0)));
+            auto pickerWindow = new DefaultWindow(Vector2f(700, 300), Vector2f(100, 100));
+            pickerWindow->workManager->subWidgets.push_back(new ColorPicker(Vector2f(700, 300), Vector2f(0, 0)));
             this->subWidgets.push_front(pickerWindow);
         },
         new Frames1(DefaultPictures::Palette),
         50,
-        Vector2i(0, 200)
+        Vector2f(0, 200)
     );
 
     subWidgets.push_back(colorPickerButton);
 
     auto brushSizePicker = new AnimatedButton(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(100, 300), Vector2i(300, 300));
-            pickerWindow->workManager->subWidgets.push_back(new BrushSizePicker(Vector2i(100, 300), Vector2i(0, 0)));
+            auto pickerWindow = new DefaultWindow(Vector2f(100, 300), Vector2f(300, 300));
+            pickerWindow->workManager->subWidgets.push_back(new BrushSizePicker(Vector2f(100, 300), Vector2f(0, 0)));
             this->subWidgets.push_front(pickerWindow);
         },
         new Frames1(DefaultPictures::Brush),
         50,
-        Vector2i(0, 300)
+        Vector2f(0, 300)
     );
 
     subWidgets.push_back(brushSizePicker);
@@ -200,26 +200,26 @@ void AppWidget::init() {
 
     auto spliner = new AnimatedButton(
         [this]() {
-            auto pickerWindow = new DefaultWindow(Vector2i(500, 500), Vector2i(300, 300));
-            pickerWindow->workManager->subWidgets.push_back(new Curves(Vector2i(500 - 10, 500 - 10), Vector2i(5, 5)));
+            auto pickerWindow = new DefaultWindow(Vector2f(500, 500), Vector2f(300, 300));
+            pickerWindow->workManager->subWidgets.push_back(new Curves(Vector2f(500 - 10, 500 - 10), Vector2f(5, 5)));
             this->subWidgets.push_front(pickerWindow);
         },
         new Frames1(DefaultPictures::Curve),
         50,
-        Vector2i(0, 400)
+        Vector2f(0, 400)
     );
 
     subWidgets.push_back(spliner);
 
     auto saveFileButton = new AnimatedButton(
         [this]() {
-            auto openWindow = new DefaultWindow(Vector2i(810, 260), Vector2i(500, 350));
-            openWindow->workManager->subWidgets.push_back(new OpenFile(Vector2i(5, 5), this, openWindow));
+            auto openWindow = new DefaultWindow(Vector2f(810, 260), Vector2f(500, 350));
+            openWindow->workManager->subWidgets.push_back(new OpenFile(Vector2f(5, 5), this, openWindow));
             this->subWidgets.push_front(openWindow);
         },
         new Frames1(DefaultPictures::Floppy),
         50,
-        Vector2i(0, 500)
+        Vector2f(0, 500)
     );
 
     subWidgets.push_front(saveFileButton);
@@ -232,7 +232,7 @@ void AppWidget::init() {
                 // delete App::getApp()->workSpace.tool;
                 App::getApp()->workSpace.tool = plugin;
             },
-            new Frames1(DefaultPictures::Brush), 50, Vector2i(0, 600 + 100 * idx));
+            new Frames1(DefaultPictures::Brush), 50, Vector2f(0, 600 + 100 * idx));
 
         subWidgets.push_front(brush);
         idx++;
@@ -243,14 +243,14 @@ void AppWidget::init() {
 
 App* App::app = nullptr;
 
-App::App(const Vector2i& size) :
-    window(size, Vector2i(0, 0), AppName),
+App::App(const Vector2f& size) :
+    window(size, Vector2f(0, 0), AppName),
     font(std::string(StuffFolder) + FontFilename),
-    layoutManager(Vector2i(1670, 888), Vector2i(225, 65)),
+    layoutManager(Vector2f(1670, 888), Vector2f(225, 65)),
     pictManager(),
     loader("./plugins/")
 {
-    appWidget = new AppWidget(Vector2i(1920, 1080), Vector2i(0, 0), Color(210, 204, 215), &window);
+    appWidget = new AppWidget(Vector2f(1920, 1080), Vector2f(0, 0), Color(210, 204, 215), &window);
     appWidget->staticWidgets.push_back(&layoutManager);
 }
 
@@ -266,7 +266,7 @@ App* App::getApp() {
 
     return app;
 }
-void App::createApp(const Vector2i& size) {
+void App::createApp(const Vector2f& size) {
     app = new App(size);
 }
 

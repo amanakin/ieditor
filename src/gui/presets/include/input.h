@@ -13,7 +13,7 @@ enum class InputTemplates  {
 
 
 struct InputWidget: public WidgetManager {
-    InputWidget(const Vector2i& size, const Vector2i& pos,
+    InputWidget(const Vector2f& size, const Vector2f& pos,
                 const std::string& name, const Color& buttonColor);
 
     const std::string& getInput() const;

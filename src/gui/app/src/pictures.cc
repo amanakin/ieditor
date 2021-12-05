@@ -56,7 +56,7 @@ PictureManager::PictureManager() {
         filename = App::StuffFolder;
         filename += GetPictureName(currTexture);
         
-        pictures.push_back(new MLPicture(filename));
+        pictures.push_back(new ML::Picture(filename));
 
         assert(!!pictures[pictures.size() - 1]);
     }
@@ -68,6 +68,6 @@ PictureManager::~PictureManager() {
     }
 }
 
-const MLPicture& PictureManager::getPicture(DefaultPictures::Picture picture) {
+const ML::Picture& PictureManager::getPicture(DefaultPictures::Picture picture) {
     return *pictures[picture];
 }

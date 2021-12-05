@@ -25,112 +25,115 @@ const int WINDOW_TITLE_BAR_SIZE = 44;
 const int WINDOW_TITLE_BAR_OPACITY = 255;
 const int SIDE_PIXELS = 10;
 
-void DrawWindow(MLTexture& texture, const Vector2i& size,
-                const Vector2i& absPosWidget) {
+void DrawWindow(ML::Texture& texture, const Vector2f& size,
+                const Vector2f& absPosWidget) {
     float scale = float(TITLE_BAR_SIZE) / WINDOW_TITLE_BAR_SIZE;
 
-    MLSprite sideUpBorder(
+    ML::Sprite sideUpBorder(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
-        Vector2i(0, 0),
-        Vector2i(WINDOW_EDGE_SIDE + SIDE_PIXELS,
-                 WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE - 1),
-        absPosWidget - Vector2i(WINDOW_EDGE_SIDE, scale * WINDOW_EDGE_UP));
+        Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
+                 WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE),
+        absPosWidget - Vector2f(WINDOW_EDGE_SIDE, scale * WINDOW_EDGE_UP),
+        Vector2f(0, 0)
+    );
 
-    sideUpBorder.scale(Vector2f(1, scale));
+    sideUpBorder.setScale(Vector2f(1, scale));
     sideUpBorder.draw(texture);
 
-    sideUpBorder.scale(Vector2f(-1, scale));
-    sideUpBorder.setPosition(absPosWidget + Vector2i(size.x + WINDOW_EDGE_SIDE,
+    sideUpBorder.setScale(Vector2f(-1, scale));
+    sideUpBorder.setPosition(absPosWidget + Vector2f(size.x + WINDOW_EDGE_SIDE,
                                                      -scale * WINDOW_EDGE_UP));
     sideUpBorder.draw(texture);
 
     // ----------------------
 
-    MLSprite midUpBorder(
+    ML::Sprite midUpBorder(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
-        Vector2i(WINDOW_EDGE_SIDE + SIDE_PIXELS, 0),
-        Vector2i(WINDOW_X - SIDE_PIXELS * 2,
+        Vector2f(WINDOW_X - SIDE_PIXELS * 2,
                  WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE),
-        Vector2i(absPosWidget +
-                 Vector2i(SIDE_PIXELS, -scale * WINDOW_EDGE_UP)));
+        absPosWidget + Vector2f(SIDE_PIXELS, -scale * WINDOW_EDGE_UP),
+        Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS, 0)
+    );
 
-    midUpBorder.scale(Vector2f(
+    midUpBorder.setScale(Vector2f(
         float(size.x - 2 * SIDE_PIXELS) / (WINDOW_X - SIDE_PIXELS * 2), scale));
     midUpBorder.draw(texture);
 
     // ----------------------
 
-    MLSprite midSideBorder(
+    ML::Sprite midSideBorder(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
-        Vector2i(0, WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE),
-        Vector2i(WINDOW_EDGE_SIDE + SIDE_PIXELS,
+        Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
                  WINDOW_Y - 2 * WINDOW_TITLE_BAR_SIZE),
-        absPosWidget + Vector2i(-WINDOW_EDGE_SIDE, TITLE_BAR_SIZE));
+        absPosWidget + Vector2f(-WINDOW_EDGE_SIDE, TITLE_BAR_SIZE),
+        Vector2f(0, WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE)
+    );
 
-    midSideBorder.scale(
+    midSideBorder.setScale(
         Vector2f(1, float(size.y - TITLE_BAR_SIZE) /
                         (WINDOW_Y - 2 * WINDOW_TITLE_BAR_SIZE)));
     midSideBorder.draw(texture);
 
-    midSideBorder.scale(
+    midSideBorder.setScale(
         Vector2f(-1, float(size.y - TITLE_BAR_SIZE) /
                          (WINDOW_Y - 2 * WINDOW_TITLE_BAR_SIZE)));
-    midSideBorder.setPosition(Vector2i(
-        absPosWidget + Vector2i(size.x + WINDOW_EDGE_SIDE, TITLE_BAR_SIZE)));
+    midSideBorder.setPosition(Vector2f(
+        absPosWidget + Vector2f(size.x + WINDOW_EDGE_SIDE, TITLE_BAR_SIZE)));
     midSideBorder.draw(texture);
 
     // ----------------------
 
-    MLSprite center(
+    ML::Sprite center(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
-        Vector2i(WINDOW_EDGE_SIDE + SIDE_PIXELS,
-                 WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE),
-        Vector2i(1, 1), absPosWidget + Vector2i(SIDE_PIXELS, TITLE_BAR_SIZE));
+        Vector2f(1, 1),
+        absPosWidget + Vector2f(SIDE_PIXELS, TITLE_BAR_SIZE),
+        Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
+                 WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE)
+    );
 
-    center.scale(Vector2f(size.x - 2 * SIDE_PIXELS, size.y - TITLE_BAR_SIZE));
+    center.setScale(Vector2f(size.x - 2 * SIDE_PIXELS, size.y - TITLE_BAR_SIZE));
     center.draw(texture);
 
     // ----------------------
 
-    MLSprite downSideBorder(
+    ML::Sprite downSideBorder(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
-        Vector2i(0, WINDOW_EDGE_UP + WINDOW_Y - WINDOW_TITLE_BAR_SIZE),
-        Vector2i(WINDOW_EDGE_SIDE + SIDE_PIXELS,
+        Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
                  WINDOW_EDGE_DOWN + WINDOW_TITLE_BAR_SIZE),
-        absPosWidget + Vector2i(-WINDOW_EDGE_SIDE, size.y));
+        absPosWidget + Vector2f(-WINDOW_EDGE_SIDE, size.y),
+        Vector2f(0, WINDOW_EDGE_UP + WINDOW_Y - WINDOW_TITLE_BAR_SIZE)
+    );
 
-    downSideBorder.scale(Vector2f(1, scale));
+    downSideBorder.setScale(Vector2f(1, scale));
     downSideBorder.draw(texture);
 
-    downSideBorder.scale(Vector2f(-1, scale));
+    downSideBorder.setScale(Vector2f(-1, scale));
     downSideBorder.setPosition(absPosWidget +
-                               Vector2i(size.x + WINDOW_EDGE_SIDE, size.y));
+                               Vector2f(size.x + WINDOW_EDGE_SIDE, size.y));
     downSideBorder.draw(texture);
 
     // ----------------------
 
-    MLSprite downCenterBorder(
+    ML::Sprite downCenterBorder(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
-        Vector2i(WINDOW_EDGE_SIDE + SIDE_PIXELS,
-                 WINDOW_EDGE_UP + WINDOW_Y - WINDOW_TITLE_BAR_SIZE),
-        Vector2i(WINDOW_X - SIDE_PIXELS * 2,
+        Vector2f(WINDOW_X - SIDE_PIXELS * 2,
                  WINDOW_EDGE_DOWN + WINDOW_TITLE_BAR_SIZE),
-        Vector2i(absPosWidget + Vector2i(SIDE_PIXELS, size.y)));
+        Vector2f(absPosWidget + Vector2f(SIDE_PIXELS, size.y)),
+        Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
+                 WINDOW_EDGE_UP + WINDOW_Y - WINDOW_TITLE_BAR_SIZE)
+    );
 
-    downCenterBorder.scale(Vector2f(
+    downCenterBorder.setScale(Vector2f(
         float(size.x - 2 * SIDE_PIXELS) / (WINDOW_X - SIDE_PIXELS * 2), scale));
     downCenterBorder.draw(texture);
 }
 
-DefaultWindow::DefaultWindow(const Vector2i& size, const Vector2i& pos) :
-    WidgetManager(size + Vector2i(0, TITLE_BAR_SIZE), pos,
-    Color(0, 0, 0, 0),
-    nullptr) {
-    
-    workManager = new WidgetManager(size, Vector2i(0, TITLE_BAR_SIZE), Color(0, 0, 0, 0), this);
+DefaultWindow::DefaultWindow(const Vector2f& size, const Vector2f& pos) :
+    WidgetManager(size + Vector2f(0, TITLE_BAR_SIZE), pos, nullptr) {
+    workManager = new WidgetManager(size, Vector2f(0, TITLE_BAR_SIZE), this);
     subWidgets.push_back(workManager);
 
-    auto windowPanel = new WindowPanel(size.x, Vector2i(0, 0), this);
+    auto windowPanel = new WindowPanel(size.x, Vector2f(0, 0), this);
     windowPanel->subWidgets.push_back(new AnimatedButton(
         [this]() {   
             this->toClose = true;                    
@@ -140,24 +143,23 @@ DefaultWindow::DefaultWindow(const Vector2i& size, const Vector2i& pos) :
         DefaultPictures::CloseHover,
         DefaultPictures::ClosePressed),
         10,
-        Vector2i(5, 5)
+        Vector2f(5, 5)
     ));
     subWidgets.push_back(windowPanel);
 }
 
-
-void DefaultWindow::draw(MLTexture& texture, const Vector2i& absPosWidget) {
-    DrawWindow(texture, size - Vector2i(0, TITLE_BAR_SIZE), absPosWidget);
+void DefaultWindow::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
+    DrawWindow(texture, size - Vector2f(0, TITLE_BAR_SIZE), absPosWidget);
 
     WidgetManager::draw(texture, absPosWidget);
 }
 
-WindowPanel::WindowPanel(const int len, const Vector2i& pos, WidgetManager* parent) :
-    WidgetManager(Vector2i(len, TITLE_BAR_SIZE), pos, Color(0, 0, 0, 0), parent),
+WindowPanel::WindowPanel(const int len, const Vector2f& pos, WidgetManager* parent) :
+    WidgetManager(Vector2f(len, TITLE_BAR_SIZE), pos, parent),
     isPressed(false)
 {}
 
-bool WindowPanel::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+bool WindowPanel::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget) {
     if (WidgetManager::onMouseDrag(mouseDrag, absPosWidget)) {
         return true;
     }
@@ -170,7 +172,7 @@ bool WindowPanel::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i&
     return false;
 }
 
-bool WindowPanel::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool WindowPanel::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
     if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
         return true;
     }
@@ -186,23 +188,23 @@ bool WindowPanel::onMouseClick(const Event::MouseClick& mouseClick, const Vector
 
 //*************************************************************
 
-OpenFile::OpenFile(const Vector2i& pos, WidgetManager* manager, WidgetManager* window) :
-    WidgetManager(Vector2i(800, 250), pos, Color(0, 0, 0, 0), nullptr)
+OpenFile::OpenFile(const Vector2f& pos, WidgetManager* manager, WidgetManager* window) :
+    WidgetManager(Vector2f(800, 250), pos, nullptr)
 {   
-    auto textBar = new TextBar(Vector2i(500, 40), Vector2i(150, 100));
+    auto textBar = new TextBar(Vector2f(500, 40), Vector2f(150, 100));
     
     subWidgets.push_back(textBar);
-    subWidgets.push_back(new TextWidget(Vector2i(1, 40), Vector2i(320, 30), "Open file"));
+    subWidgets.push_back(new TextWidget(Vector2f(1, 40), Vector2f(320, 30), "Open file"));
 
-    subWidgets.push_back(new TextWidget(Vector2i(1, 40), Vector2i(350, 150), "OK"));
+    subWidgets.push_back(new TextWidget(Vector2f(1, 40), Vector2f(350, 150), "OK"));
     subWidgets.push_back(new ButtonPictureRectangle(
         [manager, window, textBar]() {
-            MLPicture file(textBar->getStr());
+            ML::Picture file(textBar->getStr());
             if (!file) {
                 return;
             }
 
-            MLSprite sprite(file, Vector2i(0, 0));
+            ML::Sprite sprite(file, file.getSize(), Vector2f(0, 0));
             
             App::getApp()->layoutManager.addLayout(sprite.getSize());
             sprite.draw(App::getApp()->layoutManager.getCurrLayout()->texture);
@@ -210,19 +212,19 @@ OpenFile::OpenFile(const Vector2i& pos, WidgetManager* manager, WidgetManager* w
             window->toClose = true;    
         },
         Colors::LIGHT_BLUE,
-        Vector2i(100, 50),
-        Vector2i(350, 150)
+        Vector2f(100, 50),
+        Vector2f(350, 150)
     ));
 }
 
 //*************************************************************
 
-TextWidget::TextWidget(const Vector2i& size, const Vector2i& pos, const std::string& str) :
+TextWidget::TextWidget(const Vector2f& size, const Vector2f& pos, const std::string& str) :
     Widget(size, pos, nullptr),
-    text(str, Vector2i(0, 0), size.y, Colors::BLACK, App::getApp()->font)
+    text(str, Vector2f(0, 0), size.y, Colors::BLACK, App::getApp()->font)
 {}
   
-void TextWidget::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+void TextWidget::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     text.setPosition(absPosWidget);
     text.draw(texture);
 }

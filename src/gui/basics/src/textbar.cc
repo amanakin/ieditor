@@ -59,7 +59,7 @@ void IKeyHandler::customPress(const Event::KeyClick& keyClick)
 //*************************************************************
 
 Cursor::Cursor(unsigned height, unsigned border) :
-    Widget(Vector2i(100, 100), Vector2i(0, 0), nullptr),
+    Widget(Vector2f(100, 100), Vector2f(0, 0), nullptr),
     border(border),
     isDraw(true),
     height(height),
@@ -123,16 +123,16 @@ void Cursor::customPress(const Event::KeyClick& keyClick) {
     timer.start();
 }
 
-void Cursor::drawCustom(MLTexture& texture, const Vector2i& pos) {
+void Cursor::drawCustom(ML::Texture& texture, const Vector2f& pos) {
     auto currTime = timer.elapsed();
     
     if (isDraw) {
         if (currTime < 500) {
-            MLSegment segment(pos, pos + Vector2i(0, height), Colors::BLACK);
+            ML::Segment segment(pos, pos + Vector2f(0, height), Colors::BLACK);
             
             for (int i = 0; i < 2; i++) {
-                segment.setStart(pos + Vector2i(i, 0));
-                segment.setEnd(pos + Vector2i(i, height));
+                segment.setStart(pos + Vector2f(i, 0));
+                segment.setEnd(pos + Vector2f(i, height));
                 segment.draw(texture);
             }
         } else {
@@ -151,12 +151,12 @@ void Cursor::drawCustom(MLTexture& texture, const Vector2i& pos) {
 
 constexpr int TEXT_BAR_EDGE = 3;
 
-TextBar::TextBar(const Vector2i& size, const Vector2i& pos, const std::string& str) :
-    WidgetManager(size, pos, Colors::SEA_GREEN, nullptr),
-    text(str, Vector2i(0, 0), size.y - 2 * TEXT_BAR_EDGE, Colors::BLACK, App::getApp()->font),
+TextBar::TextBar(const Vector2f& size, const Vector2f& pos, const std::string& str) :
+    WidgetManager(size, pos, nullptr),
+    text(str, Vector2f(0, 0), size.y - 2 * TEXT_BAR_EDGE, Colors::BLACK, App::getApp()->font),
     str(str),
     cursor(new Cursor(size.y - 2 * TEXT_BAR_EDGE, str.size())),
-    texture(size - Vector2i(TEXT_BAR_EDGE, TEXT_BAR_EDGE), Colors::SEA_GREEN),
+    texture(size - Vector2f(TEXT_BAR_EDGE, TEXT_BAR_EDGE), Colors::SEA_GREEN),
     lastSym(0)
 {
     subWidgets.push_back(cursor);
@@ -195,12 +195,14 @@ void TextBar::customPress(const Event::KeyClick& keyClick) {
     switch (keyClick.key) {
         case Keyboard::Key::Backspace:
             deleteChar();
-            return;
+            break;
         case Keyboard::Key::V: 
             if (keyClick.control) {  
                 addStr(App::getApp()->window.getClipBuffer());
-                return;
             }
+            break;
+        default:
+            break;
     }
 
     if (lastSym != 0) {
@@ -236,10 +238,10 @@ void TextBar::addStr(const std::string& str) {
     }
 }
 
-void TextBar::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+void TextBar::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     WidgetManager::draw(texture, absPosWidget);
     
-    text.setPosition(Vector2i(0, -4));
+    text.setPosition(Vector2f(0, -4));
     text.setString(str);
 
     auto pos = text.getCharPos(cursor->getPos());
@@ -250,5 +252,5 @@ void TextBar::draw(MLTexture& texture, const Vector2i& absPosWidget) {
     }
     text.draw(this->texture);
 
-    this->texture.draw(texture, absPosWidget + Vector2i(TEXT_BAR_EDGE, TEXT_BAR_EDGE));
+    this->texture.draw(texture, absPosWidget + Vector2f(TEXT_BAR_EDGE, TEXT_BAR_EDGE));
 }

@@ -10,26 +10,26 @@
 
 //*************************************************************
 
-CurvesSlider::CurvesSlider(const Vector2i& size, const Vector2i& pos) :
-    Widget(Vector2i(2 * SliderRadius, 2 * SliderRadius), pos, nullptr),
-    bgSize(Vector2i(size.x - 2 * SliderRadius, size.y - 2 * SliderRadius)),
+CurvesSlider::CurvesSlider(const Vector2f& size, const Vector2f& pos) :
+    Widget(Vector2f(2 * SliderRadius, 2 * SliderRadius), pos, nullptr),
+    bgSize(Vector2f(size.x - 2 * SliderRadius, size.y - 2 * SliderRadius)),
     sprite(App::getApp()->pictManager.getPicture(DefaultPictures::CurveSlider),
-            Vector2i(SliderRadius * 2, SliderRadius * 2), pos)
+            Vector2f(SliderRadius * 2, SliderRadius * 2), pos)
 {}
 
-void CurvesSlider::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+void CurvesSlider::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     sprite.setPosition(absPosWidget);
     sprite.draw(texture);
 }
 
-bool CurvesSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget)    {    
+bool CurvesSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    {    
     if (mouseDrag.button != Mouse::Button::Left) {
         return false;
     }
 
     auto parentPos = absPosWidget - pos;
 
-    pos = (mouseDrag.currPos - parentPos) - Vector2i(SliderRadius, SliderRadius);
+    pos = (mouseDrag.currPos - parentPos) - Vector2f(SliderRadius, SliderRadius);
 
     if (pos.x < 0) {
         pos.x = 0;
@@ -46,7 +46,7 @@ bool CurvesSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i
     return true;
 }
 
-bool CurvesSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool CurvesSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
     if (mouseClick.button == Mouse::Button::Right &&
         mouseClick.type == Event::Type::MouseButtonPressed) {
        this->toClose = true;
@@ -57,9 +57,9 @@ bool CurvesSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vecto
 
 //*************************************************************
 
-Curves::Curves(const Vector2i& size,
-            const Vector2i& pos) :
-    WidgetManager(size, pos, Color(0, 0, 0, 0), nullptr),
+Curves::Curves(const Vector2f& size,
+            const Vector2f& pos) :
+    WidgetManager(size, pos, nullptr),
     texture(size, Colors::AQUA),
     catmullRom(size.x, 0)
 {
@@ -67,11 +67,11 @@ Curves::Curves(const Vector2i& size,
     updateCatmullRom();
 }
 
-void Curves::addSlider(const Vector2i& pos) {
+void Curves::addSlider(const Vector2f& pos) {
     subWidgets.push_front(new CurvesSlider(size, pos));
 }
 
-void Curves::draw(MLTexture& texture, const Vector2i& absPosWidget) {
+void Curves::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     this->texture.draw(texture, absPosWidget);
     WidgetManager::draw(texture, absPosWidget);
 }
@@ -79,17 +79,17 @@ void Curves::draw(MLTexture& texture, const Vector2i& absPosWidget) {
 void Curves::redraw() {
     this->texture.clear();
 
-    MLSegment segment(Vector2i(0, 0), Vector2i(0, 0), Colors::BLACK);
-    segment.setStart(Vector2i(0, catmullRom[0]));
+    ML::Segment segment(Vector2f(0, 0), Vector2f(0, 0), Colors::BLACK);
+    segment.setStart(Vector2f(0, catmullRom[0]));
 
     for (size_t idx = 1; idx < catmullRom.size(); ++idx) {
-        segment.setEnd(Vector2i(idx, catmullRom[idx]));
+        segment.setEnd(Vector2f(idx, catmullRom[idx]));
         segment.draw(this->texture);
-        segment.setStart(Vector2i(idx, catmullRom[idx]));
+        segment.setStart(Vector2f(idx, catmullRom[idx]));
     }
 }
 
-bool Curves::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& absPosWidget) {
+bool Curves::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
 
     if (WidgetManager::onMouseClick(mouseClick, absPosWidget)) {
         WidgetManager::update();
@@ -106,8 +106,8 @@ bool Curves::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
     auto mouseRelPos = mouseClick.mousePos - absPosWidget;  
     
     for (size_t idx = 0; idx < catmullRom.size(); ++idx) {
-        if ((Vector2i(idx, catmullRom[idx]) - mouseRelPos).getLen() < 4) {
-            addSlider(mouseRelPos - Vector2i(CurvesSlider::SliderRadius, CurvesSlider::SliderRadius));
+        if ((Vector2f(idx, catmullRom[idx]) - mouseRelPos).getLen() < 4) {
+            addSlider(mouseRelPos - Vector2f(CurvesSlider::SliderRadius, CurvesSlider::SliderRadius));
             syncDots();
             updateCatmullRom();
 
@@ -119,7 +119,7 @@ bool Curves::onMouseClick(const Event::MouseClick& mouseClick, const Vector2i& a
 
 } 
 
-bool Curves::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2i& absPosWidget) {
+bool Curves::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget) {
     bool isDragged = WidgetManager::onMouseDrag(mouseDrag, absPosWidget);
 
     if (isDragged) {
@@ -136,7 +136,7 @@ const std::vector<float>& Curves::getSplain() const {
 }
 
 void Curves::updateCatmullRom() {
-    std::sort(dots.begin(), dots.end(), [](const Vector2i& a, const Vector2i& b) -> bool {
+    std::sort(dots.begin(), dots.end(), [](const Vector2f& a, const Vector2f& b) -> bool {
         return (a.x) < (b.x);
     });
 
@@ -154,17 +154,17 @@ void Curves::updateCatmullRom() {
             continue;
         }
 
-        Vector2i prevCatmull = dots[idx];
+        Vector2f prevCatmull = dots[idx];
 
         for (int i = 0; i <= dist; i++) {
             
             float t = float(i) / dist;
             
             auto posCatmull = CatmullRom(
-                ConvertVector2iToVecto2f(dots[idx - 1]),
-                ConvertVector2iToVecto2f(dots[idx]),
-                ConvertVector2iToVecto2f(dots[idx + 1]),
-                ConvertVector2iToVecto2f(dots[idx + 2]),
+                ConvertVector2fToVecto2f(dots[idx - 1]),
+                ConvertVector2fToVecto2f(dots[idx]),
+                ConvertVector2fToVecto2f(dots[idx + 1]),
+                ConvertVector2fToVecto2f(dots[idx + 2]),
                 t);
 
             if (posCatmull.y >= size.y) {
@@ -210,14 +210,14 @@ void Curves::updateCatmullRom() {
 void Curves::syncDots() {
     dots.resize(subWidgets.size() + 4);
 
-    dots[1] = Vector2i(-1, 1 + size.y);
-    dots[0] = Vector2i(0, size.y);
-    dots[dots.size() - 2] = Vector2i(size.x, 0);
-    dots[dots.size() - 1] = Vector2i(1 + size.x, -1);
+    dots[1] = Vector2f(-1, 1 + size.y);
+    dots[0] = Vector2f(0, size.y);
+    dots[dots.size() - 2] = Vector2f(size.x, 0);
+    dots[dots.size() - 1] = Vector2f(1 + size.x, -1);
 
     size_t idx = 2;
     for (auto it = subWidgets.begin(); it != subWidgets.end(); ++it, ++idx) {
-        dots[idx] = (*it)->pos + Vector2i(CurvesSlider::SliderRadius, CurvesSlider::SliderRadius);
+        dots[idx] = (*it)->pos + Vector2f(CurvesSlider::SliderRadius, CurvesSlider::SliderRadius);
     }
 }
 
