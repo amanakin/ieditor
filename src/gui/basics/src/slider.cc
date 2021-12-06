@@ -10,9 +10,11 @@ Slider::Slider(int widgetLength, const Vector2f& pos, const Color& color) :
     width(widgetLength - 2 * SliderRadius),
     currPos(width / 2),
     bg(color),
-    sprite(App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
-            Vector2f(SliderRadius * 2, SliderRadius * 2), pos)
-{}
+    sprite(GetFittedSprite(
+           App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
+           Vector2f(2 * SliderRadius, 2 * SliderRadius))) {
+    sprite.setPosition(pos);
+}
 
 void Slider::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     ML::Rect back(Vector2f(width, SliderHeight), absPosWidget + Vector2f(SliderRadius, SliderRadius - SliderHeight / 2), bg);
@@ -68,14 +70,17 @@ int Slider::getWidth() const {
 
 //*************************************************************
 
-PlaneSlider::PlaneSlider(const Vector2f& size, const Vector2f& pos, const Color& color) :
+PlaneSlider::PlaneSlider(const Vector2f& size, const Vector2f& pos,
+                         const Color& color):
     Widget(size, pos, nullptr),
     currPos(pos),
     bgSize(Vector2f(size.x - 2 * SliderRadius, size.y - 2 * SliderRadius)),
     bg(color),
-    sprite(App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
-            Vector2f(SliderRadius * 2, SliderRadius * 2), pos)
-{}
+    sprite(GetFittedSprite(
+           App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
+           Vector2f(2 * SliderRadius, 2 * SliderRadius))) {
+    sprite.setPosition(pos);
+}
 
 void PlaneSlider::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     ML::Rect back(bgSize, absPosWidget + Vector2f(SliderRadius, SliderRadius), bg);

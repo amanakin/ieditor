@@ -12,6 +12,7 @@
 #include <textbar.h>
 #include <tool.h>
 #include <brush.h>
+#include <selector.h>
 
 #include <loader.h>
 #include <app_interface.h>
@@ -21,14 +22,8 @@
 //*************************************************************
 
 WorkSpace::WorkSpace() :
-    size(5), color(Colors::BLACK),
-    tool(new Tool), effect(new Effect)
+    size(5), color(Colors::BLACK)
 {}
-
-WorkSpace::~WorkSpace() {
-    // delete tool;
-    // delete effect;
-}
 
 //*************************************************************
 
@@ -47,8 +42,10 @@ void AppWidget::update() {
 }
 
 void AppWidget::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
-    for (auto widget: staticWidgets) {
-        widget->draw(texture, absPosWidget + widget->pos);
+    for (auto it = staticWidgets.rbegin(); it != staticWidgets.rend(); ++it) {
+        if ((*it)->isActive) {
+            (*it)->draw(texture, (*it)->pos + absPosWidget);
+        }
     }
 
     WidgetManager::draw(texture, absPosWidget);
@@ -224,19 +221,16 @@ void AppWidget::init() {
 
     subWidgets.push_front(saveFileButton);
 
-    size_t idx = 0;
-
-    for (auto plugin: App::getApp()->loader.plugins) {
-        auto brush = new AnimatedButton(
-            [plugin]() {
-                // delete App::getApp()->workSpace.tool;
-                App::getApp()->workSpace.tool = plugin;
-            },
-            new Frames1(DefaultPictures::Brush), 50, Vector2f(0, 600 + 100 * idx));
-
-        subWidgets.push_front(brush);
-        idx++;
+    for (auto& plugin: App::getApp()->loader.plugins) {
+        App::getApp()->toolManager.addTool(plugin, plugin->plugin->general.get_info()->name);
     }
+
+    auto selector = new Selector(Vector2f(100, 30), Vector2f(400, 0), "File", Vector2f(300, 30), 25);
+    AddSelectorButton(*selector, [](){printf("haha");}, "haha");
+    AddSelectorButton(*selector, [](){}, "lol");
+    AddSelectorButton(*selector, [](){}, "button");
+
+    staticWidgets.push_front(selector);
 }
 
 //*************************************************************

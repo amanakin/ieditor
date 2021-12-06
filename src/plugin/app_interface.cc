@@ -12,9 +12,9 @@
 
 PAppInterface AppInterface::pAppInterface;
 
-// Extensions
+    // Extensions
 
-bool ExtEnable(const char* name) {
+    bool ExtEnable(const char* name) {
     return false;
 }
 
@@ -29,6 +29,8 @@ void GeneralLogger(const char* fmt, ...) {
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
     va_end(args);
+
+    std::cout << '\n';
 }
 
 double GeneralGetAbsoluteTime() {
@@ -77,7 +79,7 @@ void TargetGetSize(size_t *width, size_t *height) {
     }                                                                           
 
 void RenderDrawCircle(PVec2f position, float radius, PRGBA color, const PRenderMode *render_mode) {
-    ML::Circle object(ConvertVectorFromPlugin(position), radius, ConvertColorFromPlugin(color));
+    ML::Circle object(ConvertVectorFromPlugin(position) - Vector2f(radius, radius), radius, ConvertColorFromPlugin(color));
     
     DrawObject
 }
@@ -103,9 +105,14 @@ void RenderDrawRect(PVec2f p1, PVec2f p2, PRGBA color, const PRenderMode *render
 #undef DrawObject
 
 void RenderDrawPixels(PVec2f position, const PRGBA *data, size_t width, size_t height, const PRenderMode *render_mode) {
-    auto& texture = App::getApp()->layoutManager.getCurrLayout()->texture;
+    
+    if (render_mode->draw_policy == PPDP_ACTIVE) {
+        App::getApp()->layoutManager.getCurrLayout()->texture.update(Vector2f(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
+    
+    } else {
+        App::getApp()->layoutManager.getCurrLayout()->preview.update(Vector2f(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
+    }
 
-    texture.update(Vector2f(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
 }
 
 // Settings

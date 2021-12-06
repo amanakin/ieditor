@@ -12,10 +12,13 @@
 
 CurvesSlider::CurvesSlider(const Vector2f& size, const Vector2f& pos) :
     Widget(Vector2f(2 * SliderRadius, 2 * SliderRadius), pos, nullptr),
+    ITestableCircle(SliderRadius),
     bgSize(Vector2f(size.x - 2 * SliderRadius, size.y - 2 * SliderRadius)),
-    sprite(App::getApp()->pictManager.getPicture(DefaultPictures::CurveSlider),
-            Vector2f(SliderRadius * 2, SliderRadius * 2), pos)
-{}
+    sprite(GetFittedSprite(
+           App::getApp()->pictManager.getPicture(DefaultPictures::CurveSlider),
+           Vector2f(2 * SliderRadius, 2 * SliderRadius))) {
+    sprite.setPosition(pos);
+}
 
 void CurvesSlider::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     sprite.setPosition(absPosWidget);

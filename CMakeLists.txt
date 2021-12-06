@@ -46,6 +46,8 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/app.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/pictures.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/layout_manager.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/tool_manager.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gui/app/src/selector.cc
 )
 
 set(SOURCES
@@ -93,5 +95,5 @@ target_link_libraries(${PROJECT_NAME} sfml-graphics sfml-window sfml-system ${CM
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
-file(COPY stuff DESTINATION .)
+file(COPY resources DESTINATION .)
 file(COPY plugins DESTINATION .)

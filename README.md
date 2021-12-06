@@ -3,7 +3,7 @@
 ## --IN PROGRESS--
 
 Example of program:
-![Example of work](https://github.com/amanakin/ieditor/blob/master/images/example.png)
+![Example of work](https://github.com/amanakin/ieditor/blob/master/showcase/example.png)
 
 ## Explanation
 

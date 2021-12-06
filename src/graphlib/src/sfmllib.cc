@@ -152,7 +152,7 @@ void Circle::setOutline(float outline) {
 }
 
 void Circle::setOutlineColor(const Color& outlineColor) {
-    circle.setFillColor(ConvertColorToSFMLColor(outlineColor));
+    circle.setOutlineColor(ConvertColorToSFMLColor(outlineColor));
 }
 
 //*************************************************************
@@ -228,7 +228,7 @@ void Rect::setOutline(float outline) {
 }
 
 void Rect::setOutlineColor(const Color& outlineColor) {
-    rect.setFillColor(ConvertColorToSFMLColor(outlineColor));
+    rect.setOutlineColor(ConvertColorToSFMLColor(outlineColor));
 }
 
 //*************************************************************
@@ -725,7 +725,7 @@ void Texture::update(const Vector2f& size, const Vector2f& pos, const uint32_t* 
     sf::Sprite sprite(tmp);
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
 
-    renderTexture.draw(sprite);
+    renderTexture.draw(sprite, ConvertBlendMove(BlendMode::BlendNone));
     renderTexture.display();
 }
 

@@ -7,7 +7,7 @@
 
 struct Curves;
 
-struct CurvesSlider: virtual public Widget, public ITestableRectangle {
+struct CurvesSlider: virtual public Widget, public ITestableCircle {
     // size - borders of the rectangle 
     CurvesSlider(const Vector2f& size, const Vector2f& pos);
 

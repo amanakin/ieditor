@@ -6,24 +6,15 @@
 #include <pictures.h>
 #include <layout_manager.h>
 #include <loader.h>
+#include <tool_manager.h>
 
 //*************************************************************
 
-struct Tool;
-struct Effect;
-
 struct WorkSpace {
     WorkSpace();
-    ~WorkSpace();
-
-    void changeTool(const Tool* tool);
-    void changeEffect(const Effect* effect);
 
     Color color;
     float size;
-
-    Tool* tool;
-    Effect* effect;
 
     static constexpr float MaxBrushSize = 25;
 };
@@ -48,19 +39,13 @@ struct AppWidget: public RootWidget {
 
     friend App;
     
-private:
-    std::vector<Widget*> staticWidgets;
+    std::list<Widget*> staticWidgets;
 };
 
 //*************************************************************
 
 // GO TO MENU MANAGER
 struct MenuManager {
-
-};
-
-// GO TO TOOLS MANAGER
-struct ToolManager {
 
 };
 
@@ -80,7 +65,7 @@ struct App {
 
     void run();
     
-    static constexpr const char* StuffFolder   = "stuff/";
+    static constexpr const char* StuffFolder   = "resources/";
     static constexpr const char* FontFilename  = "arial.ttf";
     static constexpr const char* AppName       = "iEditor"; 
 
@@ -93,13 +78,14 @@ struct App {
     LayoutManager layoutManager;
 
     Loader loader;
+    AppWidget* appWidget;
+
+    ToolManager toolManager;
 private:
     App(const Vector2f& size);
     ~App();
 
     static App* app;
-    
-    AppWidget* appWidget;
 };
 
 //*************************************************************

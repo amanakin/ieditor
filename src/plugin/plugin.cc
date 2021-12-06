@@ -5,6 +5,7 @@
 #include <plugin.h>
 #include <app_interface.h>
 #include <plugin_utils.h>
+#include <dlfcn.h>
 
 Plugin::Plugin(PPluginInterface* plugin) :
     plugin(plugin)
@@ -14,6 +15,13 @@ Plugin::Plugin(PPluginInterface* plugin) :
     if (plugin->std_version != AppInterface::AppInterfaceVersion) {
         assert("plugin has wrong version");
     }
+
+    std::cout << plugin->general.get_info()->name << ": " << int(plugin->general.get_info()->type) << '\n';
+}
+
+Plugin::~Plugin() {
+    deinit();
+    dlclose(handler);
 }
 
 PPluginStatus Plugin::init() {
@@ -31,6 +39,7 @@ void Plugin::apply(Layout& layout) {
 void Plugin::onPress(Layout& layout, const Vector2f& pos) {
     plugin->tool.on_press(ConvertVectorToPlugin(pos));
 }
+
 void Plugin::onRelease(Layout& layout, const Vector2f& pos) {
     plugin->tool.on_release(ConvertVectorToPlugin(pos));
 }

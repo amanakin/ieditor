@@ -30,16 +30,17 @@ void Layout::draw(ML::Texture& texture, const Vector2f& abs) {
 bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
 
     if (mouseClick.type == Event::Type::MouseButtonPressed) {
-        App::getApp()->workSpace.tool->onPress(*this, mouseClick.mousePos - absPosWidget);    
+        App::getApp()->toolManager.currTool->onPress(*this, mouseClick.mousePos - absPosWidget);    
     } else { 
-        App::getApp()->workSpace.tool->onRelease(*this, mouseClick.mousePos - absPosWidget);    
+        App::getApp()->toolManager.currTool->onRelease(*this, mouseClick.mousePos - absPosWidget);    
         dropPreview();
     }
 
     return true;
 }
+
 bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget) {
-    App::getApp()->workSpace.tool->onMove(*this, mouseDrag.prevPos - absPosWidget, mouseDrag.currPos - absPosWidget);
+    App::getApp()->toolManager.currTool->onMove(*this, mouseDrag.prevPos - absPosWidget, mouseDrag.currPos - absPosWidget);
     
     return true;
 }

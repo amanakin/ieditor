@@ -7,6 +7,7 @@
 
 struct Plugin: public Effect, public Tool {
     Plugin(PPluginInterface* plugin);
+    ~Plugin();
 
     PPluginStatus init();
     PPluginStatus deinit();

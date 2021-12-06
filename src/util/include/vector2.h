@@ -12,9 +12,6 @@ struct Vector2 {
     Vector2& operator=(const Vector2&) = default;
     ~Vector2()                         = default;
 
-    friend std::ostream& operator<<(std::ostream& out, const Vector2<T>& vector);
-    friend std::istream& operator>>(std::istream& in, Vector2<T>& vector);
-
     double getLen() const;
     Vector2 unit() const;
 

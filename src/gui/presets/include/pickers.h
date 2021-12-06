@@ -12,14 +12,14 @@ struct ColorPicker: public WidgetManager {
     Color getColor() const;
     void setColor(const Color& color);
 
-    void redrawTexture();
-
     void update()                                                                        override;
-    void draw(ML::Texture& texture, const Vector2f& absPosWidget)                          override;
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget)                        override;
     bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    override;
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
 
 private:
+    void redrawTexture();
+
     Slider* slider;
     PlaneSlider* planeSlider;
     

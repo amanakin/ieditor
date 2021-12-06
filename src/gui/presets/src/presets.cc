@@ -196,8 +196,7 @@ OpenFile::OpenFile(const Vector2f& pos, WidgetManager* manager, WidgetManager* w
     subWidgets.push_back(textBar);
     subWidgets.push_back(new TextWidget(Vector2f(1, 40), Vector2f(320, 30), "Open file"));
 
-    subWidgets.push_back(new TextWidget(Vector2f(1, 40), Vector2f(350, 150), "OK"));
-    subWidgets.push_back(new ButtonPictureRectangle(
+    subWidgets.push_back(new AnimatedButtonRect(
         [manager, window, textBar]() {
             ML::Picture file(textBar->getStr());
             if (!file) {
@@ -209,12 +208,11 @@ OpenFile::OpenFile(const Vector2f& pos, WidgetManager* manager, WidgetManager* w
             App::getApp()->layoutManager.addLayout(sprite.getSize());
             sprite.draw(App::getApp()->layoutManager.getCurrLayout()->texture);
 
-            window->toClose = true;    
+            window->toClose = true;
         },
-        Colors::LIGHT_BLUE,
-        Vector2f(100, 50),
-        Vector2f(350, 150)
-    ));
+        new FramesText("OK", Colors::LIGHT_BLUE, Colors::LIGHT_BLUE,
+                       Colors::LIGHT_BLUE, Colors::WHITE, Vector2f(100, 50), 40),
+        Vector2f(100, 50), Vector2f(350, 150)));
 }
 
 //*************************************************************

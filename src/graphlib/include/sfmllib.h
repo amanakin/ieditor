@@ -169,8 +169,8 @@ struct Text {
     std::string getString()           const;
     Vector2f  getPosition()           const;
     Color     getColor()              const;
-    unsigned getCharSize()                   const;
-    float getOutline()                       const;
+    unsigned getCharSize()            const;
+    float getOutline()                const;
     Color getOutlineColor()           const;
     Vector2f  getBorders()            const;
     Vector2f getCharPos(unsigned pos) const;
@@ -244,7 +244,8 @@ struct Texture {
     uint32_t* getPixels() const;
     Vector2f getSize() const;
 
-    void update(const Vector2f& size, const Vector2f& pos, const uint32_t* pixels);
+    void update(const Vector2f& size, const Vector2f& pos,
+                const uint32_t* pixels);
 
     bool operator!() const;
 
@@ -278,7 +279,7 @@ struct Window {
     bool isActive() const;
     void close();
 
-    Vector2f getMousePosition()         const;
+    Vector2f getMousePosition()                const;
     bool isButtonPressed(Mouse::Button button) const;
     bool isKeyPressed(Keyboard::Key key)       const;
     uint32_t isTextEntered();

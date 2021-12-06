@@ -51,8 +51,6 @@ Loader::Loader(const std::string& foldername) {
 }
 
 Loader::~Loader() {
-    for (auto plugin: plugins) {
-        plugin->deinit();
-        dlclose(plugin->handler);
-    }
+    //for (auto plugin: plugins) {
+    //}
 }

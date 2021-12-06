@@ -21,19 +21,13 @@ void IDrawableRectangle::draw(ML::Texture& texture, const Vector2f& absPos) {
 //*************************************************************
 
 IDrawablePicture::IDrawablePicture(const ML::Picture& picture) :
-    bg(picture, size, Vector2f(0, 0))
+    bg(GetFittedSprite(picture, size))
 {}
 
 void IDrawablePicture::draw(ML::Texture& texture, const Vector2f& absPos) {
     bg.setPosition(absPos);
 
     bg.draw(texture);
-}
-
-//*************************************************************
-
-bool ITestableRectangle::testMouse(const Vector2f& relPosEvent) {
-    return IsInsideRect(relPosEvent, Vector2f(0, 0), size);
 }
 
 //*************************************************************
@@ -159,9 +153,6 @@ Frames1::Frames1(DefaultPictures::Picture picture) :
 
     sprite.draw(hoverTexture);
     sprite.draw(pressTexture);
-
-    auto image = hoverTexture.renderTexture.getTexture().copyToImage();
-    image.saveToFile("debug.png");
 }
 
 ML::Sprite Frames1::getMainPict(const Vector2f& size) {
@@ -173,6 +164,47 @@ ML::Sprite Frames1::getHoverPict(const Vector2f& size) {
 }
 
 ML::Sprite Frames1::getPressPict(const Vector2f& size) {
+    return GetFittedSprite(pressTexture, size);
+}
+
+//*************************************************************
+
+FramesText::FramesText(const std::string& str, const Color& mainColor,
+               const Color& hoverColor, const Color& pressColor,
+               const Color& colorText, const Vector2f& size, float charSize) {
+    
+    if (!mainTexture.create(size)  ||
+        !hoverTexture.create(size) ||
+        !pressTexture.create(size) ) {
+        return;
+    }
+
+    std::cout << str << '\n';
+
+    ML::Text text(str, Vector2f(0, 0), charSize, colorText, App::getApp()->font);
+    ML::Rect rect(size, Vector2f(0, 0), mainColor);
+
+    rect.draw(mainTexture);
+    text.draw(mainTexture); 
+
+    rect.setColor(hoverColor);
+    rect.draw(hoverTexture);
+    text.draw(hoverTexture);
+
+    rect.setColor(pressColor);
+    rect.draw(pressTexture);
+    text.draw(pressTexture);
+}
+
+ML::Sprite FramesText::getMainPict(const Vector2f& size) {
+    return GetFittedSprite(mainTexture, size);
+}
+
+ML::Sprite FramesText::getHoverPict(const Vector2f& size) {
+    return GetFittedSprite(hoverTexture, size);
+}
+
+ML::Sprite FramesText::getPressPict(const Vector2f& size) {
     return GetFittedSprite(pressTexture, size);
 }
 

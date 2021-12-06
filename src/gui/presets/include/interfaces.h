@@ -27,18 +27,12 @@ struct IDrawablePicture: virtual public Widget {
 
 //*************************************************************
 
-struct ITestableRectangle: virtual public Widget {
-    bool testMouse(const Vector2f& relPosEvent) override;
-};
-
-//*************************************************************
-
 struct ITestableCircle: virtual public Widget {
     ITestableCircle(float radius);
 
     virtual bool testMouse(const Vector2f& relPosEvent) override;
 
-    int radius; 
+    float radius; 
 };
 
 //*************************************************************
@@ -135,8 +129,25 @@ private:
 
 //*************************************************************
 
+struct FramesText: public FrameManager {
+    FramesText(const std::string& text, const Color& mainColor,
+               const Color& hoverColor, const Color& pressColor,
+               const Color& colorText, const Vector2f& size, float charSize);
+
+    ML::Sprite getMainPict(const Vector2f& size)  override;
+    ML::Sprite getHoverPict(const Vector2f& size) override;
+    ML::Sprite getPressPict(const Vector2f& size) override;
+
+private:
+    ML::Texture mainTexture;
+    ML::Texture hoverTexture;
+    ML::Texture pressTexture;
+};
+
+//*************************************************************
+
 struct IAnimated: virtual public Widget, public IHoverable {
-    static constexpr uint32_t AnimationTime = 300;
+    static constexpr uint32_t AnimationTime = 200;
     
     IAnimated(const Vector2f& size, const Vector2f& pos, FrameManager* frameManager);
     ~IAnimated();

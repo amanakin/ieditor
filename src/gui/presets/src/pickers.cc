@@ -21,12 +21,12 @@ static void DrawPalette(ML::Texture& texture, const Vector2f& size, const Vector
 }
 
 static void DrawHSVLine(ML::Texture& texture, const Vector2f& size, const Vector2f& absPos){
-    float width = size.y / 360.f;
-    ML::Rect rect(Vector2f(size.x, ceil(width)), absPos, Colors::BLACK);
+    float width = size.x / 360.f;
+    ML::Rect rect(Vector2f(ceil(width), size.y), absPos, Color(0, 0, 0, 0));
 
-    for (int y = 0; y < 360; ++y) {
-        rect.setPosition(absPos + Vector2f(0, y * width));
-        rect.setColor(ConvertHSVAToRGBA(ColorHSVA(y, 100, 100, 1)));
+    for (int x = 0; x < 360; ++x) {
+        rect.setPosition(absPos + Vector2f(x * width, 400));
+        rect.setColor(ConvertHSVAToRGBA(ColorHSVA(x, 100, 100, 1)));
         rect.draw(texture);
     }
 }
@@ -35,9 +35,9 @@ static void DrawHSVLine(ML::Texture& texture, const Vector2f& size, const Vector
 
 ColorPicker::ColorPicker(const Vector2f& size, const Vector2f& pos) :
     WidgetManager(size, pos, nullptr),
-    texture(size, Color(0, 0, 0, 0))
+    texture(size)
 {
-    planeSlider = new PlaneSlider(Vector2f(size.x - 5 * 3 - Slider::SliderRadius * 2, size.y - 5 * 2), Vector2f(5, 5), Color(0, 0, 0, 0));
+    planeSlider = new PlaneSlider(Vector2f(size.x - 5 * 2 - Slider::SliderRadius * 2, size.y - 5 * 2), Vector2f(5, 5), Color(0, 0, 0, 0));
     slider      = new Slider(size.y - 5 * 2, Vector2f(planeSlider->size.x + 5 * 2, 5), Color(0, 0, 0, 0));
 
     subWidgets.push_back(slider);

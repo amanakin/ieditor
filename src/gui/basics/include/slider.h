@@ -6,7 +6,7 @@
 
 //*************************************************************
 
-struct Slider: virtual public Widget, public ITestableRectangle {
+struct Slider: public Widget {
     // Real size of result widget, add 2 * SLIDER_RADIUS
     Slider(int widgetLength, const Vector2f& pos, const Color& color);
 
@@ -34,7 +34,7 @@ private:
 
 //*************************************************************
 
-struct PlaneSlider: virtual public Widget, public ITestableRectangle {
+struct PlaneSlider: public Widget {
     // Real size of result widget, add 2 * SLIDER_RADIUS
     PlaneSlider(const Vector2f& size, const Vector2f& pos, const Color& color);
 

@@ -14,19 +14,6 @@
 //*************************************************************
 
 template <typename Handler>
-struct ButtonPictureRectangle: virtual public Widget, public IClickable<Handler>,
-                               public ITestableRectangle, public IDrawableRectangle {
-    ButtonPictureRectangle(Handler handler, const Color& color, const Vector2f& size, const Vector2f& pos) :
-        Widget(size, pos, nullptr),
-        IClickable<Handler>(handler),
-        IDrawableRectangle(color), 
-        ITestableRectangle()
-    {}
-};
-
-//*************************************************************
-
-template <typename Handler>
 struct AnimatedButton: virtual public Widget, public ITestableCircle, public IAnimated {
 
     AnimatedButton(Handler handler,
@@ -39,6 +26,26 @@ struct AnimatedButton: virtual public Widget, public ITestableCircle, public IAn
                            frameManager),
         handler(handler)
     {
+        IHoverable::isHover = false;
+    }
+
+    void update() override {        
+        if (isClicked) {
+            isClicked = false;
+            handler();
+        }
+    }
+
+    Handler handler;
+};
+
+template <typename Handler>
+struct AnimatedButtonRect: virtual public Widget, public IAnimated {
+    AnimatedButtonRect(Handler handler, FrameManager* frameManager,
+                   const Vector2f& size, const Vector2f& pos) :
+        Widget(size, pos, nullptr),
+        IAnimated(size, pos, frameManager),
+        handler(handler) {
         IHoverable::isHover = false;
     }
 
