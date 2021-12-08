@@ -5,7 +5,7 @@
 #include <app.h>
 #include <curve.h>
 #include <slider.h>
-#include <pictures.h>
+#include <picture_manager.h>
 #include <utils.h>
 
 //*************************************************************

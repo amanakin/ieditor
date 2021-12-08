@@ -1,17 +1,16 @@
 // loader.cc
 
 #include <cassert>
-
 #include <iostream>
+#include <filesystem>
 
 #include <dlfcn.h>
 #include <loader.h>
-
-#include <filesystem>
+#include <app.h>
 
 typedef PPluginInterface* (*PluginGet)();
 
-Loader::Loader(const std::string& foldername) {
+PluginLoader::PluginLoader(const std::string& foldername) {
     std::filesystem::path folderpath(foldername);
     
     for(auto const& dir_entry: std::filesystem::directory_iterator(folderpath)) {
@@ -39,18 +38,22 @@ Loader::Loader(const std::string& foldername) {
                     assert("Cant load plugin");
                 }
 
-                auto plugin = new Plugin(pPlugin);
-                plugin->handler = handle;
+                auto plugin = new Plugin(pPlugin, handle);
 
-                plugin->init();
+                if (plugin->init() != PPS_OK) {
+                    delete plugin;
+                    continue;
+                }
 
-                plugins.push_back(plugin);
+                if (plugin->pPlugin->general.get_info()->type == PPT_TOOL) {
+                    App::getApp()->toolManager->addTool(plugin);
+                } else if (plugin->pPlugin->general.get_info()->type == PPT_EFFECT) {
+                    App::getApp()->effectManager->addEffect(plugin);
+                }
             }
         }
     }
 }
 
-Loader::~Loader() {
-    //for (auto plugin: plugins) {
-    //}
+PluginLoader::~PluginLoader() {
 }

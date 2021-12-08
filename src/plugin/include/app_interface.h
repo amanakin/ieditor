@@ -1,7 +1,7 @@
 #ifndef APP_INTERFACE_HEADER
 #define APP_INTERFACE_HEADER
 
-#include <EditorPluginAPI/plugin_std.hpp>
+#include <plugin_std.hpp>
 
 struct AppInterface {
     static void init();    

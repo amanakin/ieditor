@@ -8,7 +8,7 @@ struct ToolManager {
     ToolManager();
     ~ToolManager();
 
-    void addTool(Tool* tool, const std::string& name);
+    void addTool(Tool* tool);
 
     Tool* currTool;
 

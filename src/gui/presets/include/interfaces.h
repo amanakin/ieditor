@@ -2,7 +2,7 @@
 #define INTERFACES_HEADER
 
 #include <widget.h>
-#include <pictures.h>
+#include <picture_manager.h>
 #include <timer.h>
 
 //*************************************************************
@@ -94,7 +94,6 @@ struct FrameManager {
     virtual ML::Sprite getPressPict(const Vector2f& size) = 0;
 };
 
-
 //*************************************************************
 
 struct Frames3: public FrameManager {
@@ -132,7 +131,8 @@ private:
 struct FramesText: public FrameManager {
     FramesText(const std::string& text, const Color& mainColor,
                const Color& hoverColor, const Color& pressColor,
-               const Color& colorText, const Vector2f& size, float charSize);
+               const Color& colorText, const Vector2f& size, float charSize,
+               float outline = 0, const Color& outlineColor = Colors::BLACK);
 
     ML::Sprite getMainPict(const Vector2f& size)  override;
     ML::Sprite getHoverPict(const Vector2f& size) override;

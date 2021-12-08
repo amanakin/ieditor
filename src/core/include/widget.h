@@ -79,7 +79,6 @@ struct RootWidget: public WidgetManager {
 
     virtual void start();
     virtual void stop();
-    virtual void init();
 
 private:
     ML::Texture texture;

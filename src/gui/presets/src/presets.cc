@@ -5,7 +5,7 @@
 #include <button.h>
 #include <presets.h>
 #include <pickers.h>
-#include <pictures.h>
+#include <picture_manager.h>
 #include <app.h>
 #include <slider.h>
 #include <textbar.h>
@@ -13,21 +13,20 @@
 
 //*************************************************************
 
-const int TITLE_BAR_SIZE = 30;
-
-const int WINDOW_EDGE_UP = 64;
-const int WINDOW_EDGE_SIDE = 112;
-const int WINDOW_EDGE_DOWN = 160;
-const int WINDOW_X = 960;
-const int WINDOW_Y = 584;
-const int WINDOW_TITLE_BAR_SIZE = 44;
-
-const int WINDOW_TITLE_BAR_OPACITY = 255;
-const int SIDE_PIXELS = 10;
-
 void DrawWindow(ML::Texture& texture, const Vector2f& size,
                 const Vector2f& absPosWidget) {
-    float scale = float(TITLE_BAR_SIZE) / WINDOW_TITLE_BAR_SIZE;
+    
+    static const int WINDOW_EDGE_UP = 64;
+    static const int WINDOW_EDGE_SIDE = 112;
+    static const int WINDOW_EDGE_DOWN = 160;
+    static const int WINDOW_X = 960;
+    static const int WINDOW_Y = 584;
+    static const int WINDOW_TITLE_BAR_SIZE = 44;
+
+    static const int WINDOW_TITLE_BAR_OPACITY = 255;
+    static const int SIDE_PIXELS = 10;
+    
+    float scale = float(DefaultWindow::TitleBarSize) / WINDOW_TITLE_BAR_SIZE;
 
     ML::Sprite sideUpBorder(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
@@ -65,20 +64,20 @@ void DrawWindow(ML::Texture& texture, const Vector2f& size,
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
         Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
                  WINDOW_Y - 2 * WINDOW_TITLE_BAR_SIZE),
-        absPosWidget + Vector2f(-WINDOW_EDGE_SIDE, TITLE_BAR_SIZE),
+        absPosWidget + Vector2f(-WINDOW_EDGE_SIDE, DefaultWindow::TitleBarSize),
         Vector2f(0, WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE)
     );
 
     midSideBorder.setScale(
-        Vector2f(1, float(size.y - TITLE_BAR_SIZE) /
+        Vector2f(1, float(size.y - DefaultWindow::TitleBarSize) /
                         (WINDOW_Y - 2 * WINDOW_TITLE_BAR_SIZE)));
     midSideBorder.draw(texture);
 
     midSideBorder.setScale(
-        Vector2f(-1, float(size.y - TITLE_BAR_SIZE) /
+        Vector2f(-1, float(size.y - DefaultWindow::TitleBarSize) /
                          (WINDOW_Y - 2 * WINDOW_TITLE_BAR_SIZE)));
     midSideBorder.setPosition(Vector2f(
-        absPosWidget + Vector2f(size.x + WINDOW_EDGE_SIDE, TITLE_BAR_SIZE)));
+        absPosWidget + Vector2f(size.x + WINDOW_EDGE_SIDE, DefaultWindow::TitleBarSize)));
     midSideBorder.draw(texture);
 
     // ----------------------
@@ -86,12 +85,12 @@ void DrawWindow(ML::Texture& texture, const Vector2f& size,
     ML::Sprite center(
         App::getApp()->pictManager.getPicture(DefaultPictures::Window),
         Vector2f(1, 1),
-        absPosWidget + Vector2f(SIDE_PIXELS, TITLE_BAR_SIZE),
+        absPosWidget + Vector2f(SIDE_PIXELS, DefaultWindow::TitleBarSize),
         Vector2f(WINDOW_EDGE_SIDE + SIDE_PIXELS,
                  WINDOW_EDGE_UP + WINDOW_TITLE_BAR_SIZE)
     );
 
-    center.setScale(Vector2f(size.x - 2 * SIDE_PIXELS, size.y - TITLE_BAR_SIZE));
+    center.setScale(Vector2f(size.x - 2 * SIDE_PIXELS, size.y - DefaultWindow::TitleBarSize));
     center.draw(texture);
 
     // ----------------------
@@ -128,36 +127,54 @@ void DrawWindow(ML::Texture& texture, const Vector2f& size,
     downCenterBorder.draw(texture);
 }
 
-DefaultWindow::DefaultWindow(const Vector2f& size, const Vector2f& pos) :
-    WidgetManager(size + Vector2f(0, TITLE_BAR_SIZE), pos, nullptr) {
-    workManager = new WidgetManager(size, Vector2f(0, TITLE_BAR_SIZE), this);
+//*************************************************************
+
+DefaultWindow::DefaultWindow(const Vector2f& size, const Vector2f& pos, const std::string& name) :
+    WidgetManager(size + Vector2f(2 * WindowBorder, TitleBarSize + WindowBorder), pos, nullptr) {
+    
+    workManager = new WidgetManager(size, Vector2f(WindowBorder, DefaultWindow::TitleBarSize), this);
     subWidgets.push_back(workManager);
 
-    auto windowPanel = new WindowPanel(size.x, Vector2f(0, 0), this);
-    windowPanel->subWidgets.push_back(new AnimatedButton(
-        [this]() {   
-            this->toClose = true;                    
-        },
-        new Frames3(
-        DefaultPictures::Close,
-        DefaultPictures::CloseHover,
-        DefaultPictures::ClosePressed),
-        10,
-        Vector2f(5, 5)
-    ));
+    auto windowPanel = new WindowPanel(Vector2f(size.x, TitleBarSize), Vector2f(0, 0), name, this);
     subWidgets.push_back(windowPanel);
 }
 
 void DefaultWindow::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
-    DrawWindow(texture, size - Vector2f(0, TITLE_BAR_SIZE), absPosWidget);
+    DrawWindow(texture, size - Vector2f(0, DefaultWindow::TitleBarSize), absPosWidget);
 
     WidgetManager::draw(texture, absPosWidget);
 }
 
-WindowPanel::WindowPanel(const int len, const Vector2f& pos, WidgetManager* parent) :
-    WidgetManager(Vector2f(len, TITLE_BAR_SIZE), pos, parent),
-    isPressed(false)
-{}
+WidgetManager* DefaultWindow::getWorkSpace() {
+    return workManager;
+}
+
+
+//*************************************************************
+
+WindowPanel::WindowPanel(const Vector2f& size, const Vector2f& pos,
+                         const std::string& name, WidgetManager* parent) : 
+    WidgetManager(size, pos, parent), isPressed(false) {
+
+    subWidgets.push_back(new AnimatedButtonCircle(
+        [parent]() {   
+            parent->toClose = true;
+        },
+        new Frames3(
+            DefaultPictures::Close,
+            DefaultPictures::CloseHover,
+            DefaultPictures::ClosePressed),
+        (DefaultWindow::TitleBarSize - 10) / 2,
+        Vector2f(5, 5)
+    ));
+
+    auto textWidget = new TextWidget(size.y * 2 / 3, Vector2f(0, 0), name, Colors::BLACK);
+
+    auto textPos = FitRectInCenter(textWidget->getSize(), size);
+    textWidget->pos.x = textPos.x;
+    
+    subWidgets.push_back(textWidget);
+}
 
 bool WindowPanel::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget) {
     if (WidgetManager::onMouseDrag(mouseDrag, absPosWidget)) {
@@ -177,7 +194,7 @@ bool WindowPanel::onMouseClick(const Event::MouseClick& mouseClick, const Vector
         return true;
     }
 
-    if (mouseClick.type == Event::Type::MouseButtonPressed &&  mouseClick.button == Mouse::Button::Left) {
+    if (mouseClick.type == Event::Type::MouseButtonPressed && mouseClick.button == Mouse::Button::Left) {
         isPressed = true;
     } else {
         isPressed = false;
@@ -194,7 +211,7 @@ OpenFile::OpenFile(const Vector2f& pos, WidgetManager* manager, WidgetManager* w
     auto textBar = new TextBar(Vector2f(500, 40), Vector2f(150, 100));
     
     subWidgets.push_back(textBar);
-    subWidgets.push_back(new TextWidget(Vector2f(1, 40), Vector2f(320, 30), "Open file"));
+    subWidgets.push_back(new TextWidget(40, Vector2f(320, 30), "Open file", Colors::BLACK));
 
     subWidgets.push_back(new AnimatedButtonRect(
         [manager, window, textBar]() {
@@ -217,11 +234,19 @@ OpenFile::OpenFile(const Vector2f& pos, WidgetManager* manager, WidgetManager* w
 
 //*************************************************************
 
-TextWidget::TextWidget(const Vector2f& size, const Vector2f& pos, const std::string& str) :
-    Widget(size, pos, nullptr),
-    text(str, Vector2f(0, 0), size.y, Colors::BLACK, App::getApp()->font)
-{}
-  
+TextWidget::TextWidget(float charSize, const Vector2f& pos, const std::string& name,
+               const Color& color, float outline,
+               const Color& outlineColor) :
+    Widget(Vector2f(0, 0), pos, nullptr),
+    text(name, pos, charSize, color, App::getApp()->font, outline, outlineColor) {
+    size = text.getBorders();
+}
+
+Vector2f TextWidget::getSize() const {
+    return size;
+}
+
+
 void TextWidget::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     text.setPosition(absPosWidget);
     text.draw(texture);

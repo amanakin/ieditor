@@ -12,9 +12,9 @@
 
 PAppInterface AppInterface::pAppInterface;
 
-    // Extensions
+// Extensions
 
-    bool ExtEnable(const char* name) {
+bool ExtEnable(const char* name) {
     return false;
 }
 

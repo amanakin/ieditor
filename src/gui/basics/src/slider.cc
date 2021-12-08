@@ -1,14 +1,16 @@
 // slider.cc
 
 #include <slider.h>
-#include <pictures.h>
+#include <picture_manager.h>
 #include <utils.h>
 #include <app.h>
 
-Slider::Slider(int widgetLength, const Vector2f& pos, const Color& color) :
+//*************************************************************
+
+Slider::Slider(float widgetLength, const Vector2f& pos, const Color& color) :
     Widget(Vector2f(widgetLength, SliderRadius * 2), pos, nullptr),
     width(widgetLength - 2 * SliderRadius),
-    currPos(width / 2),
+    currPos(0),
     bg(color),
     sprite(GetFittedSprite(
            App::getApp()->pictManager.getPicture(DefaultPictures::Slider),
@@ -17,7 +19,10 @@ Slider::Slider(int widgetLength, const Vector2f& pos, const Color& color) :
 }
 
 void Slider::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
-    ML::Rect back(Vector2f(width, SliderHeight), absPosWidget + Vector2f(SliderRadius, SliderRadius - SliderHeight / 2), bg);
+    ML::Rect back(
+        Vector2f(width, SliderHeight),
+        absPosWidget + Vector2f(SliderRadius, SliderRadius - SliderHeight / 2),
+        bg);
     back.draw(texture);
 
     sprite.setPosition(absPosWidget + Vector2f(currPos, 0));
@@ -29,13 +34,7 @@ bool Slider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absP
         return false;
     }
 
-    currPos = mouseDrag.currPos.x - absPosWidget.x;;
-
-    if (currPos < 0) {
-        currPos = 0;
-    } else if (currPos > width) {
-        currPos = width;
-    } 
+    setCurrPos((mouseDrag.currPos.x - absPosWidget.x - SliderRadius) / width);
 
     return true;
 }
@@ -45,26 +44,26 @@ bool Slider::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& a
         return false;
     }
 
-    currPos = mouseClick.mousePos.x - absPosWidget.x - SliderRadius;
+    setCurrPos((mouseClick.mousePos.x - absPosWidget.x - SliderRadius) / width);
+
+    return true;
+}
+
+float Slider::getCurrPos() const {
+    return currPos / width;
+}
+
+void Slider::setCurrPos(float newPos) {
+    currPos = newPos * width;
 
     if (currPos < 0) {
         currPos = 0;
     } else if (currPos > width) {
         currPos = width;
     }
-
-    return true;
 }
 
-int Slider::getCurrPos() const {
-    return currPos;
-}
-
-void Slider::setCurrPos(const int currPos) {
-    this->currPos = currPos;
-}
-
-int Slider::getWidth() const {
+float Slider::getWidth() const {
     return width;
 }
 
@@ -95,19 +94,8 @@ bool PlaneSlider::onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f&
         return false;
     }
     
-    currPos = (mouseDrag.currPos - absPosWidget) - Vector2f(SliderRadius, SliderRadius);
-
-    if (currPos.x < 0) {
-        currPos.x = 0;
-    } else if (currPos.x > bgSize.x) {
-        currPos.x = bgSize.x;
-    }
-
-    if (currPos.y < 0) {
-        currPos.y = 0;
-    } else if (currPos.y > bgSize.y) {
-        currPos.y = bgSize.y;
-    }
+    auto newPos = mouseDrag.currPos - absPosWidget - Vector2f(SliderRadius, SliderRadius);
+    setCurrPos(Vector2f(newPos.x / bgSize.x, newPos.y / bgSize.y));
 
     return true;
 }
@@ -117,7 +105,18 @@ bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector
         return false;
     }
 
-    currPos = mouseClick.mousePos - absPosWidget - Vector2f(SliderRadius, SliderRadius);
+    auto newPos = mouseClick.mousePos - absPosWidget - Vector2f(SliderRadius, SliderRadius);
+    setCurrPos(Vector2f(newPos.x / bgSize.x, newPos.y / bgSize.y));
+    
+    return true;
+}
+
+Vector2f PlaneSlider::getCurrPos() const {
+    return Vector2f(currPos.x / bgSize.x, currPos.y / bgSize.y);
+}
+
+void PlaneSlider::setCurrPos(const Vector2f& newPos) {
+    currPos = Vector2f(newPos.x * bgSize.x, newPos.y * bgSize.y);
 
     if (currPos.x < 0) {
         currPos.x = 0;
@@ -130,16 +129,6 @@ bool PlaneSlider::onMouseClick(const Event::MouseClick& mouseClick, const Vector
     } else if (currPos.y > bgSize.y) {
         currPos.y = bgSize.y;
     }
-
-    return true;
-}
-
-Vector2f PlaneSlider::getCurrPos() const {
-    return currPos;
-}
-
-void PlaneSlider::setCurrPos(const Vector2f& currPos) {
-    this->currPos = currPos;
 }
 
 Vector2f PlaneSlider::getBgSize() const {

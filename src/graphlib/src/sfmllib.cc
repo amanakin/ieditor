@@ -224,7 +224,7 @@ void Rect::setAngle(float angle) {
 }
 
 void Rect::setOutline(float outline) {
-    rect.setOutlineThickness(outline);
+    rect.setOutlineThickness(-outline);
 }
 
 void Rect::setOutlineColor(const Color& outlineColor) {

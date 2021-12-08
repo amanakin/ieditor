@@ -16,18 +16,23 @@ struct WidgetPicture: virtual public Widget, public IDrawablePicture {
 
 //*************************************************************
 
-// By Y axe
-extern const int TITLE_BAR_SIZE;
-
 struct DefaultWindow: public WidgetManager {
-    DefaultWindow(const Vector2f& size, const Vector2f& pos);
+    DefaultWindow(const Vector2f& size, const Vector2f& pos, const std::string& name = "");
 
     void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
+
+    WidgetManager* getWorkSpace();
+
+    static constexpr float TitleBarSize = 30;
+
+private:
+    static constexpr float WindowBorder = 5;
+
     WidgetManager* workManager;
 };
 
 struct WindowPanel: public WidgetManager {
-    WindowPanel(const int len, const Vector2f& pos, WidgetManager* parent);
+    WindowPanel(const Vector2f& size, const Vector2f& pos, const std::string& name, WidgetManager* parent);
 
     bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget) override;
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
@@ -45,9 +50,13 @@ struct OpenFile: public WidgetManager {
 //*************************************************************
 
 struct TextWidget: public Widget {
-    TextWidget(const Vector2f& size, const Vector2f& pos, const std::string& str);
-    
+    TextWidget(float charSize, const Vector2f& pos, const std::string& name,
+               const Color& color, float outline = 0,
+               const Color& outlineColor = Colors::WHITE);
+
     void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
+
+    Vector2f getSize() const;
 
     ML::Text text;
 };

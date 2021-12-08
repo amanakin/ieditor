@@ -11,11 +11,24 @@
 //*************************************************************
 
 Layout::Layout(const Vector2f& size,
-           const Vector2f& pos) :
+           const Vector2f& pos, PictureManager& pictManager) :
     Widget(size, pos, nullptr),
     preview(size, Color(0, 0, 0, 0)),
-    texture(size, Colors::WHITE)
-{}
+    texture(size, Colors::WHITE),
+    sum(size, Color(0, 0, 0, 0)),
+    transparent(size, Color(0, 0, 0, 0))
+{
+    auto pic = pictManager.getPicture(DefaultPictures::Transparent);
+    ML::Sprite sprite(pic, pic.getSize(), Vector2f(0, 0));
+    sprite.resize(size);
+    sprite.draw(transparent, ML::BlendMode::BlendNone);
+
+    ML::Picture picture("2021-12-08_10-10.png");
+    if (!!picture) {
+        ML::Sprite pictSprite(picture, picture.getSize(), Vector2f(0, 0));
+        pictSprite.draw(texture);
+    }
+}
 
 void Layout::dropPreview() {
     preview.draw(texture, Vector2f(0, 0));
@@ -23,16 +36,21 @@ void Layout::dropPreview() {
 }
 
 void Layout::draw(ML::Texture& texture, const Vector2f& abs) {
-    this->texture.draw(texture, abs);
-    this->preview.draw(texture, abs);
+    transparent.draw(texture, abs);
+    
+    sum.clear();    
+    this->texture.draw(sum, Vector2f(0, 0), ML::BlendMode::BlendNone);
+    this->preview.draw(sum, Vector2f(0, 0));
+
+    this->sum.draw(texture, abs);
 }
 
 bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
 
     if (mouseClick.type == Event::Type::MouseButtonPressed) {
-        App::getApp()->toolManager.currTool->onPress(*this, mouseClick.mousePos - absPosWidget);    
+        App::getApp()->toolManager->currTool->onPress(*this, mouseClick.mousePos - absPosWidget);    
     } else { 
-        App::getApp()->toolManager.currTool->onRelease(*this, mouseClick.mousePos - absPosWidget);    
+        App::getApp()->toolManager->currTool->onRelease(*this, mouseClick.mousePos - absPosWidget);    
         dropPreview();
     }
 
@@ -40,7 +58,7 @@ bool Layout::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& a
 }
 
 bool Layout::onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget) {
-    App::getApp()->toolManager.currTool->onMove(*this, mouseDrag.prevPos - absPosWidget, mouseDrag.currPos - absPosWidget);
+    App::getApp()->toolManager->currTool->onMove(*this, mouseDrag.prevPos - absPosWidget, mouseDrag.currPos - absPosWidget);
     
     return true;
 }

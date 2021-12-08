@@ -1,6 +1,3 @@
-/* GIMP RGBA C-Source image dump (dick.c) */
-
-#include <ctype.h>
 
 static const struct {
   int  	 width;

@@ -194,8 +194,6 @@ RootWidget::RootWidget(const Vector2f& size, const Vector2f& pos,
 }
 
 void RootWidget::start() {
-    init();
-
     while (window->isOpen() && !isStopped) {
         eventManager.pollEvent();
 
@@ -209,5 +207,3 @@ void RootWidget::start() {
 }
 
 void RootWidget::stop() { isStopped = true; }
-
-void RootWidget::init() {}

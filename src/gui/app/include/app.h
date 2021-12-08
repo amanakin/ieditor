@@ -3,10 +3,13 @@
 
 #include <widget.h>
 #include <graphlib.h>
-#include <pictures.h>
+
+#include <picture_manager.h>
 #include <layout_manager.h>
-#include <loader.h>
+#include <effect_manager.h>
 #include <tool_manager.h>
+#include <loader.h>
+#include <app_widget.h>
 
 //*************************************************************
 
@@ -21,30 +24,6 @@ struct WorkSpace {
 
 //*************************************************************
 
-struct App;
-
-struct AppWidget: public RootWidget {
-    AppWidget(const Vector2f& size, const Vector2f& pos, const Color& color, ML::Window* window);
-
-    void update() override;
-    void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
-    
-    void onUnFocus() override;
-
-    bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
-    bool onMouseDrag( const Event::MouseDrag&  mouseDrag,  const Vector2f& absPosWidget) override;
-    bool onMouseHover(const Event::MouseHover& mouseHover, const Vector2f& absPosWidget) override;
-
-    void init() override;
-
-    friend App;
-    
-    std::list<Widget*> staticWidgets;
-};
-
-//*************************************************************
-
-// GO TO MENU MANAGER
 struct MenuManager {
 
 };
@@ -63,29 +42,38 @@ struct App {
     static void createApp(const Vector2f& size);
     static void destructApp();
 
+    void init();
     void run();
     
     static constexpr const char* StuffFolder   = "resources/";
     static constexpr const char* FontFilename  = "arial.ttf";
     static constexpr const char* AppName       = "iEditor"; 
 
+    // Init basics
     WorkSpace workSpace;
-    
+
+    // Init multimedia
     ML::Font font;
     ML::Window window;
 
+    // Init basic managers
     PictureManager pictManager;
     LayoutManager layoutManager;
-
-    Loader loader;
+    
     AppWidget* appWidget;
 
-    ToolManager toolManager;
+    // Init tools and effect and load them to appWidget
+    ToolManager* toolManager;
+    EffectManager* effectManager;
+    PluginLoader* pluginLoader;
+    
 private:
     App(const Vector2f& size);
     ~App();
 
     static App* app;
+
+    Vector2f size;
 };
 
 //*************************************************************

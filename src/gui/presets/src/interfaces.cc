@@ -171,7 +171,8 @@ ML::Sprite Frames1::getPressPict(const Vector2f& size) {
 
 FramesText::FramesText(const std::string& str, const Color& mainColor,
                const Color& hoverColor, const Color& pressColor,
-               const Color& colorText, const Vector2f& size, float charSize) {
+               const Color& colorText, const Vector2f& size, float charSize, 
+               float outline, const Color& outlineColor) {
     
     if (!mainTexture.create(size)  ||
         !hoverTexture.create(size) ||
@@ -179,10 +180,10 @@ FramesText::FramesText(const std::string& str, const Color& mainColor,
         return;
     }
 
-    std::cout << str << '\n';
-
     ML::Text text(str, Vector2f(0, 0), charSize, colorText, App::getApp()->font);
     ML::Rect rect(size, Vector2f(0, 0), mainColor);
+    rect.setOutline(outline);
+    rect.setOutlineColor(outlineColor);
 
     rect.draw(mainTexture);
     text.draw(mainTexture); 

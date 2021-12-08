@@ -9,8 +9,8 @@ struct Selector: public WidgetManager {
              const Vector2f& buttonSize, float charSize);
 
     bool testMouse(const Vector2f& relPosEvent) override;
+    void update() override;
 
-    void addButton(Widget* button);
 
     void showButtons();
     void hideButtons();
@@ -22,6 +22,23 @@ struct Selector: public WidgetManager {
     void deActivateSubWidgets();
     void activateSubWidgets();
 
+    template <typename Handler>
+    void AddSelectorButton(Handler handler, const std::string& buttonName) {
+        addButton(new AnimatedButtonRect(
+            handler,
+            new FramesText(
+                buttonName,
+                SelectorColor,
+                SelectorHoverColor,
+                SelectorPressColor,
+                Colors::WHITE,
+                buttonSize,
+                charSize),
+            buttonSize,
+            Vector2f(0, 0) 
+        ));
+    }
+
     bool isPressed;
 
     const Vector2f buttonSize;
@@ -30,24 +47,9 @@ struct Selector: public WidgetManager {
     std::string name;
 
 private:    
+    void addButton(Widget* button);
+
     Widget* mainButton;
 };
-
-template <typename Handler>
-void AddSelectorButton(Selector& selector, Handler handler, const std::string& name) {
-    selector.addButton(new AnimatedButtonRect(
-        handler,
-        new FramesText(
-            name,
-            Selector::SelectorColor,
-            Selector::SelectorHoverColor,
-            Selector::SelectorPressColor,
-            Colors::WHITE,
-            selector.buttonSize,
-            selector.charSize),
-        selector.buttonSize,
-        Vector2f(0, 0) 
-    ));
-}
 
 #endif // FRONTEND_HEADER

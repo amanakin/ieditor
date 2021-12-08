@@ -7,6 +7,8 @@ struct Effect {
     virtual ~Effect();
 
     virtual void apply(Layout& layout);
+
+    virtual std::string_view getName() const;
 };
 
 #endif // EFFECT_HEADER

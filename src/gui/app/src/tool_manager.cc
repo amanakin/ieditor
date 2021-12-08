@@ -3,9 +3,13 @@
 #include <tool_manager.h>
 #include <app.h>
 #include <button.h>
+#include <brush.h>
+#include <selector.h>
 
-ToolManager::ToolManager()
-{}
+ToolManager::ToolManager() {
+    currTool = new Brush;
+    addTool(currTool);
+}
 
 ToolManager::~ToolManager() {
     for (auto& tool: tools) {
@@ -13,17 +17,13 @@ ToolManager::~ToolManager() {
     }
 }
 
-void ToolManager::addTool(Tool* tool, const std::string& name) {
-    App::getApp()->appWidget->subWidgets.push_back(
-        new AnimatedButtonRect(
-        [this, tool]() {
-            this->currTool = tool;
-        },
-        new FramesText(name, Color(132, 132, 168), Color(182, 182, 218),
-                       Color(82, 82, 118), Colors::WHITE, Vector2f(200, 40), 30),
-        Vector2f(200, 40),
-        Vector2f(10, 700 + tools.size() * 40))
-    );
-    
+void ToolManager::addTool(Tool* tool) {
     tools.push_back(tool);
+    
+    App::getApp()->appWidget->toolsSelector->AddSelectorButton(
+        [tool](){
+            App::getApp()->toolManager->currTool = tool;
+        }, 
+        std::string(tool->getName())
+    );
 }

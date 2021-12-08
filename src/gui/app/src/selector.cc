@@ -13,7 +13,8 @@ Selector::Selector(const Vector2f& size, const Vector2f& pos,
                    float charSize) : 
     WidgetManager(size, pos, nullptr),
     buttonSize(buttonSize),
-    isPressed(false) {
+    isPressed(false),
+    charSize(charSize) {
 
     mainButton = new AnimatedButtonRect(
         [this]() {
@@ -26,7 +27,7 @@ Selector::Selector(const Vector2f& size, const Vector2f& pos,
             isPressed = !isPressed;
         },
         new FramesText(name, SelectorColor, SelectorHoverColor, SelectorPressColor,
-                       Colors::WHITE, size, charSize),
+                       Colors::WHITE, size, charSize, 1),
         size, Vector2f(0, 0)
     );
 
@@ -47,6 +48,15 @@ bool Selector::testMouse(const Vector2f& relPosEvent) {
     }
 }
 
+void Selector::update() {
+    if (!isFocus) {
+        isPressed = false;
+        hideButtons();
+    }
+
+    WidgetManager::update();
+}
+
 void Selector::addButton(Widget* button) {
     if (button == nullptr) {
         return;
@@ -54,6 +64,8 @@ void Selector::addButton(Widget* button) {
 
     button->pos = Vector2f(0, mainButton->size.y + (subWidgets.size() - 1) * buttonSize.y);
     subWidgets.push_back(button);
+
+    hideButtons();
 }
 
 void Selector::showButtons() {

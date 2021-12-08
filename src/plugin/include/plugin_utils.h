@@ -1,7 +1,7 @@
 #pragma once
 
 #include <color.h>
-#include <EditorPluginAPI/plugin_std.hpp>
+#include <plugin_std.hpp>
 #include <graphlib.h>
 
 PRGBA ConvertColorToPlugin(const Color& color);

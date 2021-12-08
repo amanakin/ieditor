@@ -63,11 +63,6 @@ bool EventManager::pollEvent() {
 
     bool isEvented = false;
 
-    uint32_t unicode = window->isTextEntered();
-    if (!window->isActive()) {
-        return false;
-    }
-
     Vector2f newMousePos = window->getMousePosition();
 
     bool isMousePosChanged = newMousePos != mousePos;
@@ -124,6 +119,11 @@ bool EventManager::pollEvent() {
 
             if (!isKeyPressed[idx]) {
                 isKeyPressed[idx] = true;
+
+                uint32_t unicode = window->isTextEntered();
+                if (!window->isActive()) {
+                    return false;
+                }
 
                 if (unicode != 0) {
                     rootWidget->onTextEntered(Event::Text(unicode));    

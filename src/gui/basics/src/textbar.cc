@@ -171,7 +171,7 @@ void TextBar::update() {
 bool TextBar::onKeyboard(const Event::KeyClick& keyClick) {
     if (WidgetManager::onKeyboard(keyClick)) {
         return true;
-    }                       
+    }
 
     if (keyClick.type == Event::Type::KeyboardKeyReleased) {
         onRelease(keyClick.key);
@@ -195,10 +195,11 @@ void TextBar::customPress(const Event::KeyClick& keyClick) {
     switch (keyClick.key) {
         case Keyboard::Key::Backspace:
             deleteChar();
-            break;
+            return;
         case Keyboard::Key::V: 
             if (keyClick.control) {  
                 addStr(App::getApp()->window.getClipBuffer());
+                return;
             }
             break;
         default:

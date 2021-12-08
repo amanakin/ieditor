@@ -8,36 +8,22 @@ namespace DefaultPictures {
 enum Picture {
     Slider,
     Window,
+    Transparent,
+    Empty,
 
     Close,
     CloseHover,
     ClosePressed,
     
     Exit,
-    ExitHover,
-    ExitPressed,
-    
     Palette,
-    PaletteHover,
-    PalettePressed,
-    
     Easel,
-    EaselHover,
-    EaselPressed,
-    
     Brush,
-    BrushHover,
-    BrushPressed,
+    Floppy,
 
     Curve,
-    CurveHover,
-    CurverPressed,
-    CurveSlider,
-    
-    Floppy,
-    FloppyHover,
-    FloppyPressed,
-    
+    CurveSlider,    
+
     SIZE
 };
 

@@ -1,20 +1,21 @@
 // layout_manager.cc 
 
 #include <layout_manager.h>
+#include <app.h>
 #include <utils.h>
 
 //*************************************************************
 
-LayoutManager::LayoutManager(const Vector2f& size, const Vector2f& pos) :
+LayoutManager::LayoutManager(const Vector2f& size, const Vector2f& pos, PictureManager& pictManager) :
     WidgetManager(size, pos, nullptr)
 {
-    currLayout = new Layout(size, Vector2f(0, 0));
+    currLayout = new Layout(size, Vector2f(0, 0), pictManager);
     subWidgets.push_front(currLayout);
 }
 
 void LayoutManager::addLayout(const Vector2f& size) {
     delete currLayout;
-    currLayout = new Layout(size, FitRectInCenter(size, this->size));
+    currLayout = new Layout(size, FitRectInCenter(size, this->size), App::getApp()->pictManager);
     
     *(subWidgets.begin()) = currLayout;
 }

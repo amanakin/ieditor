@@ -20,10 +20,12 @@ struct ColorPicker: public WidgetManager {
 private:
     void redrawTexture();
 
-    Slider* slider;
+    Slider* sliderColor;
+    Slider* sliderOpacity;
     PlaneSlider* planeSlider;
     
     ML::Texture texture;
+    ML::Texture transparent;
 };
 
 //*************************************************************
@@ -39,7 +41,11 @@ struct BrushSizePicker: public WidgetManager {
     bool onMouseDrag(const Event::MouseDrag& mouseDrag, const Vector2f& absPosWidget)    override;
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
 
+    // void draw(ML::Texture& texture, const Vector2f& absPosWidget)                        override;
+
+private:
     Slider* slider;
+    // ML::Texture texture;
 };
 
 //*************************************************************
