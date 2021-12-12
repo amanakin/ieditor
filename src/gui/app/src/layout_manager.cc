@@ -13,11 +13,13 @@ LayoutManager::LayoutManager(const Vector2f& size, const Vector2f& pos, PictureM
     subWidgets.push_front(currLayout);
 }
 
-void LayoutManager::addLayout(const Vector2f& size) {
+Layout* LayoutManager::addLayout(const Vector2f& size) {
     delete currLayout;
     currLayout = new Layout(size, FitRectInCenter(size, this->size), App::getApp()->pictManager);
     
     *(subWidgets.begin()) = currLayout;
+
+    return currLayout;
 }
 
 Layout* LayoutManager::getCurrLayout() {

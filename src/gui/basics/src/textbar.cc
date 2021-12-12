@@ -68,7 +68,6 @@ Cursor::Cursor(unsigned height, unsigned border) :
     timer.start();
 }
 
-
 unsigned Cursor::getPos() {
     return pos;
 }
@@ -162,6 +161,11 @@ TextBar::TextBar(const Vector2f& size, const Vector2f& pos, const std::string& s
     subWidgets.push_back(cursor);
 }
 
+void TextBar::center(const Vector2f& availableArea) {
+    auto textPos = FitRectInCenter(size, availableArea);
+    pos.x = textPos.x;
+}
+
 void TextBar::update() {
     IKeyHandler::update();
 
@@ -169,7 +173,7 @@ void TextBar::update() {
 }
 
 bool TextBar::onKeyboard(const Event::KeyClick& keyClick) {
-    if (WidgetManager::onKeyboard(keyClick)) {
+    if (cursor->onKeyboard(keyClick)) {
         return true;
     }
 
@@ -247,7 +251,7 @@ void TextBar::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
 
     auto pos = text.getCharPos(cursor->getPos());
 
-    this->texture.clear();
+    this->texture.clear(Colors::SEA_GREEN);
     if (isFocus) {
         cursor->drawCustom(this->texture, pos);
     }

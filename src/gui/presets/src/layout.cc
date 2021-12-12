@@ -22,12 +22,6 @@ Layout::Layout(const Vector2f& size,
     ML::Sprite sprite(pic, pic.getSize(), Vector2f(0, 0));
     sprite.resize(size);
     sprite.draw(transparent, ML::BlendMode::BlendNone);
-
-    ML::Picture picture("2021-12-08_10-10.png");
-    if (!!picture) {
-        ML::Sprite pictSprite(picture, picture.getSize(), Vector2f(0, 0));
-        pictSprite.draw(texture);
-    }
 }
 
 void Layout::dropPreview() {

@@ -227,6 +227,13 @@ IAnimated::~IAnimated() {
     delete frameManager;
 }
 
+void IAnimated::reset() {
+    isClicked = false;
+    isAnimated = false;
+    isPressed = false;
+    isHover = false;
+}
+
 bool IAnimated::onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) {
     if (mouseClick.type == Event::Type::MouseButtonReleased) {
         if (isPressed) {

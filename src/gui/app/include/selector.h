@@ -15,9 +15,9 @@ struct Selector: public WidgetManager {
     void showButtons();
     void hideButtons();
 
-    static const Color SelectorColor;
-    static const Color SelectorHoverColor;
-    static const Color SelectorPressColor;
+    static const Color MainColor;
+    static const Color HoverColor;
+    static const Color PressColor;
 
     void deActivateSubWidgets();
     void activateSubWidgets();
@@ -28,9 +28,9 @@ struct Selector: public WidgetManager {
             handler,
             new FramesText(
                 buttonName,
-                SelectorColor,
-                SelectorHoverColor,
-                SelectorPressColor,
+                MainColor,
+                HoverColor,
+                PressColor,
                 Colors::WHITE,
                 buttonSize,
                 charSize),

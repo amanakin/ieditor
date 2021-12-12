@@ -38,13 +38,19 @@ struct WindowPanel: public WidgetManager {
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
 
     bool isPressed;
+
+    IAnimated* button;
 };
 
 //*************************************************************
 
 
-struct OpenFile: public WidgetManager {
-    OpenFile(const Vector2f& pos, WidgetManager* manager, WidgetManager* window);
+struct OpenFileWidget: public DefaultWindow {
+    OpenFileWidget(const Vector2f& pos);
+};
+
+struct SaveFileWidget: public DefaultWindow {
+    SaveFileWidget(const Vector2f& pos);
 };
 
 //*************************************************************
@@ -54,8 +60,10 @@ struct TextWidget: public Widget {
                const Color& color, float outline = 0,
                const Color& outlineColor = Colors::WHITE);
 
-    void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
+    void center(const Vector2f& availableArea);
 
+    void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
+    
     Vector2f getSize() const;
 
     ML::Text text;

@@ -155,6 +155,8 @@ struct IAnimated: virtual public Widget, public IHoverable {
     bool onMouseClick(const Event::MouseClick& mouseClick, const Vector2f& absPosWidget) override;
     void draw(ML::Texture& texture, const Vector2f& absPos) override;
 
+    void reset();
+
     bool isClicked;
 
 private:

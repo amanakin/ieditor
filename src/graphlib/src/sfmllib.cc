@@ -729,6 +729,12 @@ void Texture::update(const Vector2f& size, const Vector2f& pos, const uint32_t* 
     renderTexture.display();
 }
 
+bool Texture::saveFile(const std::string& filename) const {
+    auto image = renderTexture.getTexture().copyToImage();
+    
+    return image.saveToFile(filename);
+}
+
 //*************************************************************
 
 void Texture::draw(Window& window, const Vector2f& pos, BlendMode blendMode) {

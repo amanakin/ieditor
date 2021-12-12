@@ -4,9 +4,9 @@
 #include <button.h>
 #include <algorithm>
 
-const Color Selector::SelectorColor(132, 132, 168);
-const Color Selector::SelectorHoverColor(182, 182, 218);
-const Color Selector::SelectorPressColor(82, 82, 118);
+const Color Selector::MainColor(132, 132, 168);
+const Color Selector::HoverColor(182, 182, 218);
+const Color Selector::PressColor(82, 82, 118);
 
 Selector::Selector(const Vector2f& size, const Vector2f& pos,
                    const std::string& name, const Vector2f& buttonSize,
@@ -26,7 +26,7 @@ Selector::Selector(const Vector2f& size, const Vector2f& pos,
 
             isPressed = !isPressed;
         },
-        new FramesText(name, SelectorColor, SelectorHoverColor, SelectorPressColor,
+        new FramesText(name, MainColor, HoverColor, PressColor,
                        Colors::WHITE, size, charSize, 1),
         size, Vector2f(0, 0)
     );

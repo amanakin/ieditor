@@ -252,6 +252,8 @@ struct Texture {
     void draw(Window& window, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha);
     void draw(Texture& texture, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha);
 
+    bool saveFile(const std::string& filename) const;
+
     friend Circle;
     friend Rect;
     friend Text;

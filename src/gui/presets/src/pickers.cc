@@ -31,17 +31,17 @@ static void DrawHSVLine(ML::Texture& texture, const Vector2f& size, const Vector
     }
 }
 
-static void DrawTransparentLine(ML::Texture& texture, const Vector2f& size, const Vector2f& absPos) {
+static void DrawTransparentLine(ML::Texture& texture, const Vector2f& size, const Vector2f& absPos, const Color& color) {
     float delta = 1 / size.x;
-    ML::Rect rect(Vector2f(1, size.y), absPos, Colors::WHITE);
+    ML::Rect rect(Vector2f(1, size.y), absPos, color);
     
-    auto color = Colors::WHITE;
-    color.t = 0;
+    auto currColor = color;
+    currColor.t = 0;
 
     for (int x = 0; x < size.x; ++x) {
         rect.setPosition(absPos + Vector2f(x, 0));
-        color.t += delta;
-        rect.setColor(color);
+        currColor.t += delta;
+        rect.setColor(currColor);
         rect.draw(texture);
     }
 }
@@ -72,13 +72,6 @@ ColorPicker::ColorPicker(const Vector2f& size, const Vector2f& pos) :
                       Vector2f(sliderOpacity->getWidth(), Slider::SliderHeight),
                       Vector2f(0, 0));
     sprite.draw(transparent);
-
-    DrawTransparentLine(transparent, transparent.getSize(), Vector2f(0, 0));
-
-    transparent.draw(texture,
-                 sliderOpacity->pos +
-                    Vector2f(Slider::SliderRadius,
-                    Slider::SliderRadius - Slider::SliderHeight / 2));
 
     subWidgets.push_back(planeSlider);
     subWidgets.push_back(sliderColor);
@@ -117,6 +110,17 @@ void ColorPicker::redrawTexture() {
     DrawHSVLine(this->texture,
             Vector2f(sliderColor->getWidth(), Slider::SliderHeight),
             sliderColor->pos + Vector2f(Slider::SliderRadius, Slider::SliderRadius - Slider::SliderHeight / 2));
+
+    auto sliderPos = sliderOpacity->pos +
+                     Vector2f(Slider::SliderRadius,
+                              Slider::SliderRadius - Slider::SliderHeight / 2);
+
+    transparent.draw(texture, sliderPos);
+
+    DrawTransparentLine(
+        texture, transparent.getSize(),
+        sliderPos,
+        getColor());
 }
 
 void ColorPicker::update() {

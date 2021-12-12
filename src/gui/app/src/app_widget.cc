@@ -186,6 +186,28 @@ void AppWidget::init() {
     toolsSelector   = new Selector(Vector2f(250, 40), Vector2f(249, 0), "Tools",   Vector2f(400, 40), 30);
     effectsSelector = new Selector(Vector2f(250, 40), Vector2f(498, 0), "Effects", Vector2f(400, 40), 30);
     
+    auto openFile = new OpenFileWidget(Vector2f(400, 300));
+    openFile->isActive = false;
+    subWidgets.push_back(openFile);
+
+    fileSelector->AddSelectorButton(
+        [openFile] {
+            openFile->isActive = !(openFile->isActive);
+        },
+        "Open File"
+    );
+
+    auto saveFile = new SaveFileWidget(Vector2f(400, 300));
+    saveFile->isActive = false;
+    subWidgets.push_back(saveFile);
+
+    fileSelector->AddSelectorButton(
+        [saveFile] {
+            saveFile->isActive = !(saveFile->isActive);
+        },
+        "Save File"
+    );
+
     staticWidgets.push_front(fileSelector);
     staticWidgets.push_front(toolsSelector);
     staticWidgets.push_front(effectsSelector);

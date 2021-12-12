@@ -10,11 +10,8 @@ enum class InputTemplates  {
     FloatNumber,
 };
 
-
-
 struct InputWidget: public WidgetManager {
-    InputWidget(const Vector2f& size, const Vector2f& pos,
-                const std::string& name, const Color& buttonColor);
+    InputWidget(const Vector2f& size, const Vector2f& pos, const Color& buttonColor);
 
     const std::string& getInput() const;
     void setInput(const std::string& str);
