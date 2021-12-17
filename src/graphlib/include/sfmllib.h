@@ -249,8 +249,8 @@ struct Texture {
 
     bool operator!() const;
 
-    void draw(Window& window, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha);
-    void draw(Texture& texture, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha);
+    void draw(Window& window, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha) const;
+    void draw(Texture& texture, const Vector2f& pos, BlendMode blendMode = BlendMode::BlendAlpha) const;
 
     bool saveFile(const std::string& filename) const;
 

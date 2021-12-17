@@ -3,12 +3,6 @@
 
 #include <plugin_std.hpp>
 
-struct AppInterface {
-    static void init();    
 
-    static PAppInterface pAppInterface;
-
-    static constexpr uint32_t AppInterfaceVersion = 0;
-};
 
 #endif // APP_INTERFACE_HEADER

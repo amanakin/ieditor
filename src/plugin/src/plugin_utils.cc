@@ -4,28 +4,30 @@
 
 #include <plugin_utils.h>
 
-PRGBA ConvertColorToPlugin(const Color& color) {
-    return PRGBA(color.x * 255, color.y * 255, color.z * 255, color.t * 255);
+PUPPY::RGBA ConvertColorToPlugin(const Color& color) {
+    return {color.x * 255, color.y * 255, color.z * 255, color.t * 255};
 }
 
-Color ConvertColorFromPlugin(const PRGBA& color) {
-    return Color(color.r, color.g, color.b, color.a);
+Color ConvertColorFromPlugin(const PUPPY::RGBA& color) {
+    return {color.r, color.g, color.b, color.a};
 }
 
-ML::BlendMode ConvertBlendMode(PBlendMode pBlendMode) {
-    switch (pBlendMode) {
-    case PBlendMode::PPBM_ALPHA_BLEND: return ML::BlendMode::BlendAlpha;
-    case PBlendMode::PPBM_COPY: return ML::BlendMode::BlendNone;
-    default:
-        assert("Plugin wrong blend mode");
+ML::BlendMode ConvertRenderModeFromPlugin(const PUPPY::RenderMode& renderMode) {
+    switch (renderMode.blend) {
+    case PUPPY::BlendMode::ALPHA_BLEND:
         return ML::BlendMode::BlendAlpha;
+    case PUPPY::BlendMode::COPY:
+        return ML::BlendMode::BlendNone;
+    default:
+        assert("Wrong blend mode in convering");
+        return ML::BlendMode::BlendNone;
     }
 }
 
-Vector2f ConvertVectorFromPlugin(const PVec2f& pVec) {
-    return Vector2f(pVec.x, pVec.y);
+Vector2f ConvertVectorFromPlugin(const PUPPY::Vec2f& pVec) {
+    return {pVec.x, pVec.y};
 }
 
-PVec2f ConvertVectorToPlugin(const Vector2f& vec) {
-    return PVec2f(vec.x, vec.y);
+PUPPY::Vec2f ConvertVectorToPlugin(const Vector2f& vec) {
+    return {vec.x, vec.y};
 }

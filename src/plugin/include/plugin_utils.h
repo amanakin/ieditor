@@ -4,10 +4,10 @@
 #include <plugin_std.hpp>
 #include <graphlib.h>
 
-PRGBA ConvertColorToPlugin(const Color& color);
-Color ConvertColorFromPlugin(const PRGBA& color);
+PUPPY::RGBA ConvertColorToPlugin(const Color& color);
+Color ConvertColorFromPlugin(const PUPPY::RGBA& color);
 
-ML::BlendMode ConvertBlendMode(PBlendMode pBlendMode);
+ML::BlendMode ConvertRenderModeFromPlugin(const PUPPY::RenderMode& blendMode);
 
-Vector2f ConvertVectorFromPlugin(const PVec2f& pVec);
-PVec2f ConvertVectorToPlugin(const Vector2f& vec);
+Vector2f ConvertVectorFromPlugin(const PUPPY::Vec2f& pVec);
+PUPPY::Vec2f ConvertVectorToPlugin(const Vector2f& vec);

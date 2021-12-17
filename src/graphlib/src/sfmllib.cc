@@ -737,7 +737,7 @@ bool Texture::saveFile(const std::string& filename) const {
 
 //*************************************************************
 
-void Texture::draw(Window& window, const Vector2f& pos, BlendMode blendMode) {
+void Texture::draw(Window& window, const Vector2f& pos, BlendMode blendMode) const {
     sf::Sprite sprite(renderTexture.getTexture());
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
 
@@ -745,7 +745,7 @@ void Texture::draw(Window& window, const Vector2f& pos, BlendMode blendMode) {
     window.window.display();
 }
 
-void Texture::draw(Texture& texture, const Vector2f& pos, BlendMode blendMode) {
+void Texture::draw(Texture& texture, const Vector2f& pos, BlendMode blendMode) const {
     sf::Sprite sprite(renderTexture.getTexture());
     sprite.setPosition(ConvertVectorToSFMLVector(pos));
     
