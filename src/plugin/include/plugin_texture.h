@@ -47,6 +47,6 @@ struct PluginTexture: public PUPPY::RenderTarget {
 
     void apply_shader(const PUPPY::Shader *shader) override;
 
-private:
+//private:
     ML::Texture texture;
 };

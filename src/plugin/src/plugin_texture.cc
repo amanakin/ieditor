@@ -83,6 +83,9 @@ void PluginTexture::render_texture(const PUPPY::Vec2f &position,
                     const PUPPY::RenderMode &render_mode = {})
 {
     auto customTaget = dynamic_cast<const PluginTexture*>(renderTarget);
+    if (customTaget == nullptr) {
+        return;
+    }
     customTaget->texture.draw(texture,
                               ConvertVectorFromPlugin(position),
                               ConvertRenderModeFromPlugin(render_mode));
