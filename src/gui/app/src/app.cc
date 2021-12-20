@@ -23,7 +23,9 @@
 
 WorkSpace::WorkSpace() :
     size(5), color(Colors::BLACK)
-{}
+{
+    timer.start();
+}
 
 //*************************************************************
 
@@ -40,9 +42,12 @@ App::App(const Vector2f& size) :
 
 App::~App() {
     delete appWidget;
+
     delete toolManager;
     delete effectManager;
+    
     delete pluginLoader;
+    delete appInterface;
 }
 
 App* App::getApp() {
@@ -64,8 +69,10 @@ void App::destructApp() {
 void App::init() {
     appWidget = new AppWidget(size, Vector2f(0, 0), Color(210, 204, 215));
 
-    toolManager = new ToolManager();
+    toolManager   = new ToolManager();
     effectManager = new EffectManager();
+
+    appInterface = new PluginAppInterface();
     pluginLoader = new PluginLoader("./plugins/");
 }
 

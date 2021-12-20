@@ -36,6 +36,9 @@ struct PluginRenderTargetFactory: public PUPPY::RenderTargetFactory {
 //*************************************************************
 
 struct PluginAppInterface: public PUPPY::AppInterface {
+    PluginAppInterface();
+    ~PluginAppInterface();
+
 // extension
     // enables specified extension
     bool ext_enable(const char *name) const override;
@@ -66,6 +69,10 @@ struct PluginAppInterface: public PUPPY::AppInterface {
     PUPPY::RenderTarget *get_target()  const override; // returns actual active  layer, drawing in it changes app's layer
     PUPPY::RenderTarget *get_preview() const override; // returns actual preview layer, drawing in it changes app's layer
     void flush_preview() const override;
+
+private:
+    PluginRoot* pluginRoot;
+    Timer timer;
 };
 
 #endif // APP_INTERFACE_HEADER

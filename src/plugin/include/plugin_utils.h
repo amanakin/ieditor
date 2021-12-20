@@ -11,3 +11,10 @@ ML::BlendMode ConvertRenderModeFromPlugin(const PUPPY::RenderMode& blendMode);
 
 Vector2f ConvertVectorFromPlugin(const PUPPY::Vec2f& pVec);
 PUPPY::Vec2f ConvertVectorToPlugin(const Vector2f& vec);
+
+
+Vector2f PosFromBody(const PUPPY::WBody& body);
+
+Vector2f SizeFromBody(const PUPPY::WBody& body);
+
+PUPPY::WBody WBodyFromVectors(const Vector2f& size, const Vector2f& pos);

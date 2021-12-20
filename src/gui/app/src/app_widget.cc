@@ -26,6 +26,16 @@ AppWidget::~AppWidget() {
 }
 
 void AppWidget::update() {
+    static int64_t prev;
+    auto curr = App::getApp()->workSpace.timer.elapsed();
+    auto delta = static_cast<double>(curr - prev) / 1000;
+
+    for (auto& plugin: App::getApp()->pluginLoader->extensions) {
+        plugin->pPlugin->on_tick(delta);
+    }
+
+    prev = curr;
+
     WidgetManager::update();
     for (auto widget: staticWidgets) {
         widget->update();

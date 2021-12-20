@@ -6,6 +6,8 @@
 
 struct PluginTexture: public PUPPY::RenderTarget {
     PluginTexture(const Vector2f& size);
+    PluginTexture(ML::Texture* texture);
+    ~PluginTexture();
 
     PUPPY::RenderTarget* get_copy() const override;
 
@@ -48,5 +50,6 @@ struct PluginTexture: public PUPPY::RenderTarget {
     void apply_shader(const PUPPY::Shader *shader) override;
 
 //private:
-    ML::Texture texture;
+    ML::Texture* texture;
+    bool isOwn;
 };

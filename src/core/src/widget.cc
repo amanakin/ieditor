@@ -78,8 +78,6 @@ void WidgetManager::draw(ML::Texture& texture, const Vector2f& absPosWidget) {
     }
 }
 
-#include <iostream>
-
 bool WidgetManager::onMouseClick(const Event::MouseClick& mouseClick,
                                  const Vector2f& absPosWidget) {
     if (mouseClick.type == Event::Type::MouseButtonReleased &&
@@ -170,6 +168,7 @@ bool WidgetManager::onTextEntered(const Event::Text& text) {
 }
 
 void WidgetManager::onUnFocus() {
+
     isFocus = false;
     for (auto& subWidget : subWidgets) {
         subWidget->onUnFocus();

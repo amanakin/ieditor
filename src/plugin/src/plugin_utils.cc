@@ -5,11 +5,11 @@
 #include <plugin_utils.h>
 
 PUPPY::RGBA ConvertColorToPlugin(const Color& color) {
-    return {color.x * 255, color.y * 255, color.z * 255, color.t * 255};
+    return PUPPY::RGBA(color.x * 255, color.y * 255, color.z * 255, color.t * 255);
 }
 
 Color ConvertColorFromPlugin(const PUPPY::RGBA& color) {
-    return {color.r, color.g, color.b, color.a};
+    return Color(color.r, color.g, color.b, color.a);
 }
 
 ML::BlendMode ConvertRenderModeFromPlugin(const PUPPY::RenderMode& renderMode) {
@@ -30,4 +30,18 @@ Vector2f ConvertVectorFromPlugin(const PUPPY::Vec2f& pVec) {
 
 PUPPY::Vec2f ConvertVectorToPlugin(const Vector2f& vec) {
     return {vec.x, vec.y};
+}
+
+
+Vector2f PosFromBody(const PUPPY::WBody& body) {
+    return ConvertVectorFromPlugin(body.position);
+}
+
+Vector2f SizeFromBody(const PUPPY::WBody& body) {
+    return ConvertVectorFromPlugin(body.size);
+}
+
+PUPPY::WBody WBodyFromVectors(const Vector2f& size, const Vector2f& pos) {
+    return PUPPY::WBody(ConvertVectorToPlugin(pos),
+                        ConvertVectorToPlugin(size));
 }

@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cassert>
 
+#include <presets.h>
 #include <app_interface.h>
 #include <app.h>
 #include <plugin_utils.h>
@@ -10,21 +11,124 @@
 #include <cstring>
 #include <iostream>
 
-PAppInterface AppInterface::pAppInterface;
+//*************************************************************
 
-// Extensions
-
-bool ExtEnable(const char* name) {
-    return false;
+PUPPY::Button* PluginWidgetFactory::button(const PUPPY::WBody &body, PUPPY::Widget *parent) const 
+{
+    printf("getting button\n");
+    return new PluginButton("", SizeFromBody(body), PosFromBody(body), parent);
 }
 
-void* ExtGetFunction(const char *extension, const char* name) {
+PUPPY::Button* PluginWidgetFactory::button(const PUPPY::Vec2f &pos,  const char *caption, PUPPY::Widget *parent) const 
+{
+    printf("getting button\n");
+    return new PluginButton(caption, Vector2f(strlen(caption) * 30, 30), ConvertVectorFromPlugin(pos), parent);
+}
+
+PUPPY::Slider* PluginWidgetFactory::slider(PUPPY::Slider::Type type, const PUPPY::WBody &body, PUPPY::Widget *parent) const 
+{
     return nullptr;
 }
 
-// General
+PUPPY::TextField* PluginWidgetFactory::text_field(const PUPPY::WBody &body, PUPPY::Widget *parent) const 
+{
+    return nullptr;
+}
 
-void GeneralLogger(const char* fmt, ...) {
+PUPPY::Window* PluginWidgetFactory::window(const char *name, const PUPPY::WBody &body, PUPPY::Widget *parent) const 
+{
+    printf("gettings window\n");
+    return new PluginWindow(name, SizeFromBody(body), PosFromBody(body), parent);
+}
+
+PUPPY::ColorPicker* PluginWidgetFactory::color_picker (const PUPPY::WBody &body, PUPPY::Widget *parent) const 
+{
+    return nullptr;
+}
+
+PUPPY::Label* PluginWidgetFactory::label(const PUPPY::Vec2f &pos, const char *text, PUPPY::Widget *parent) const 
+{
+    return nullptr;
+}
+
+PUPPY::Widget* PluginWidgetFactory::abstract(const PUPPY::WBody &body, PUPPY::Widget *parent) const
+{
+    return new PluginWidgetManager(body, parent);
+}
+
+//*************************************************************
+
+PUPPY::RenderTarget* PluginRenderTargetFactory::spawn(
+    const PUPPY::Vec2s &size, const PUPPY::RGBA &color) const 
+{
+    auto texture = new PluginTexture(Vector2f(size.x, size.y));
+    texture->clear(color);
+
+    return texture;
+}
+
+PUPPY::RenderTarget* PluginRenderTargetFactory::from_pixels(
+    const PUPPY::Vec2s &size, const PUPPY::RGBA *data) const
+{
+    auto texture = new PluginTexture(Vector2f(size.x, size.y));
+    texture->render_pixels(PUPPY::Vec2f(0, 0), size, data, PUPPY::BlendMode::COPY);
+
+    return texture;
+}
+
+PUPPY::RenderTarget* PluginRenderTargetFactory::from_file(const char *path) const 
+{
+    auto texture = new PluginTexture(Vector2f(1, 1));
+    ML::Picture picture(path);
+    if (!picture) {
+        return nullptr;
+    }
+
+    texture->set_size(picture.getSize().x, picture.getSize().y);
+    ML::Sprite sprite(picture, picture.getSize(), Vector2f(0, 0));
+    sprite.draw(*(texture->texture));
+
+    return texture;
+}
+
+//*************************************************************
+
+PluginAppInterface::PluginAppInterface()
+{
+    std_version = PUPPY::STD_VERSION;
+    feature_level = 0;
+
+    factory.shader = nullptr;
+    factory.target = new PluginRenderTargetFactory();
+    factory.widget = new PluginWidgetFactory();
+
+    pluginRoot = new PluginRoot(App::getApp()->appWidget);
+
+    timer.start();
+}
+
+PluginAppInterface::~PluginAppInterface() {
+    delete factory.target;
+    delete factory.widget;
+    delete pluginRoot;
+}
+
+bool PluginAppInterface::ext_enable(const char *name) const {
+    return false;
+}
+
+void* PluginAppInterface::ext_get_func(const char *extension, const char *func) const {
+    return nullptr;
+}
+    
+void* PluginAppInterface::ext_get_interface(const char *extension, const char *name) const {
+    return nullptr;
+}
+
+void PluginAppInterface::ext_register_as(const char *extension) const 
+{}
+
+void PluginAppInterface::log(const char *fmt, ...) const {
     va_list args;
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
@@ -33,130 +137,52 @@ void GeneralLogger(const char* fmt, ...) {
     std::cout << '\n';
 }
 
-double GeneralGetAbsoluteTime() {
-    return 0;
+double PluginAppInterface::get_absolute_time() const {
+    return static_cast<double>(App::getApp()->workSpace.timer.elapsed()) / 1000;
 }
 
-void GeneralReleasePixels(PRGBA *pixels) {
-    delete[] pixels;
-}
-
-PRGBA GeneralGetColor() {
+PUPPY::RGBA PluginAppInterface::get_color() const {
     return ConvertColorToPlugin(App::getApp()->workSpace.color);
 }
 
-float GeneralGetSize() {
-    return 2 * App::getApp()->workSpace.size;
+float PluginAppInterface::get_size() const {
+    return App::getApp()->workSpace.size;
 }
 
-// Target
-
-PRGBA* TargetGetPixels() {
-    const auto& texture = App::getApp()->layoutManager.getCurrLayout()->texture;
-
-    return (PRGBA*)texture.getPixels();
+void PluginAppInterface::set_color(const PUPPY::RGBA &color) const {
+    App::getApp()->workSpace.color = ConvertColorFromPlugin(color);
 }
 
-void TargetGetSize(size_t *width, size_t *height) {
-    *width = App::getApp()->layoutManager.getCurrLayout()->size.x;
-    *height = App::getApp()->layoutManager.getCurrLayout()->size.y;
+void PluginAppInterface::set_size(float size) const {
+    App::getApp()->workSpace.size = size;
 }
 
-// Render
+const std::vector<PUPPY::WBody> PluginAppInterface::get_windows() const {
+    std::vector<PUPPY::WBody> windows;
 
-#define DrawObject                                                              \
-    switch (render_mode->draw_policy) {                                         \
-    case PDrawPolicy::PPDP_ACTIVE:                                              \
-        object.draw(App::getApp()->layoutManager.getCurrLayout()->texture,      \
-                    ConvertBlendMode(render_mode->blend));                      \
-        return;                                                                 \
-    case PDrawPolicy::PPDP_PREVIEW:                                             \
-        object.draw(App::getApp()->layoutManager.getCurrLayout()->preview,      \
-                    ConvertBlendMode(render_mode->blend));                      \
-        return;                                                                 \
-    default:                                                                    \
-        assert("Plugin wring Render Policy");                                   \
-    }                                                                           
-
-void RenderDrawCircle(PVec2f position, float radius, PRGBA color, const PRenderMode *render_mode) {
-    ML::Circle object(ConvertVectorFromPlugin(position) - Vector2f(radius, radius), radius, ConvertColorFromPlugin(color));
-    
-    DrawObject
-}
-
-void RenderDrawLine(PVec2f start, PVec2f end, PRGBA color, const PRenderMode *render_mode) {
-    ML::Segment object(ConvertVectorFromPlugin(start), ConvertVectorFromPlugin(end), ConvertColorFromPlugin(color));
-
-    DrawObject
-}
-
-void RenderDrawTriangle(PVec2f p1, PVec2f p2, PVec2f p3, PRGBA color, const PRenderMode *render_mode) {
-}
-
-void RenderDrawRect(PVec2f p1, PVec2f p2, PRGBA color, const PRenderMode *render_mode) {
-    Vector2f start(std::min(p1.x, p2.x), std::min(p1.y, p2.y));
-    Vector2f end(std::max(p1.x, p2.x), std::max(p1.y, p2.y));
-    
-    ML::Rect object(end - start, start, ConvertColorFromPlugin(color));
-
-    DrawObject
-}
-
-#undef DrawObject
-
-void RenderDrawPixels(PVec2f position, const PRGBA *data, size_t width, size_t height, const PRenderMode *render_mode) {
-    
-    if (render_mode->draw_policy == PPDP_ACTIVE) {
-        App::getApp()->layoutManager.getCurrLayout()->texture.update(Vector2f(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
-    
-    } else {
-        App::getApp()->layoutManager.getCurrLayout()->preview.update(Vector2f(width, height), ConvertVectorFromPlugin(position), &(data[0].ui32));
+    for (auto& widget: App::getApp()->appWidget->subWidgets) {
+        auto window = dynamic_cast<DefaultWindow*>(widget);
+        if (window != nullptr && window->isActive) {
+            windows.push_back(WBodyFromVectors(window->size, window->pos));
+        }
     }
 
+    return windows;
 }
 
-// Settings
-
-void  SettingsCreateSurface(const PPluginInterface *self, size_t width, size_t height)
-{}
-void  SettingsDeleteSurface(const PPluginInterface *self)
-{}
-
-void* SettingsAdd(const PPluginInterface *self, PSettingType type, const char *name) {
-    return nullptr;
+PUPPY::Widget* PluginAppInterface::get_root_widget() const {
+    printf("requested plugin root %p\n", pluginRoot);
+    return pluginRoot;
 }
 
-void  SettingsGet(const PPluginInterface *self, void *handle, void *answer) 
-{}
+PUPPY::RenderTarget* PluginAppInterface::get_target()  const {
+    return new PluginTexture(&App::getApp()->layoutManager.getCurrLayout()->texture);
+}
 
-// Init
+PUPPY::RenderTarget* PluginAppInterface::get_preview() const {
+    return new PluginTexture(&App::getApp()->layoutManager.getCurrLayout()->preview);
+}
 
-void AppInterface::init() {
-
-    pAppInterface.std_version = AppInterfaceVersion;
-
-    pAppInterface.extensions.enable = &ExtEnable;
-    pAppInterface.extensions.get_func = &ExtGetFunction;
-
-    pAppInterface.general.feature_level     = 0;
-    pAppInterface.general.log               = &GeneralLogger;
-    pAppInterface.general.get_absolute_time = &GeneralGetAbsoluteTime;
-    pAppInterface.general.release_pixels    = &GeneralReleasePixels;
-    pAppInterface.general.get_color         = &GeneralGetColor;
-    pAppInterface.general.get_size          = &GeneralGetSize;
-
-    pAppInterface.target.get_pixels = &TargetGetPixels;
-    pAppInterface.target.get_size   = &TargetGetSize;
-
-    pAppInterface.render.circle    = &RenderDrawCircle;
-    pAppInterface.render.line      = &RenderDrawLine;
-    pAppInterface.render.triangle  = &RenderDrawTriangle;
-    pAppInterface.render.rectangle = &RenderDrawRect;
-    pAppInterface.render.pixels    = &RenderDrawPixels;
-
-    pAppInterface.settings.add = &SettingsAdd;
-    pAppInterface.settings.get = &SettingsGet;
-    pAppInterface.settings.create_surface = &SettingsCreateSurface;
-    pAppInterface.settings.destroy_surface = &SettingsDeleteSurface;
-}   
-
+void PluginAppInterface::flush_preview() const {
+    App::getApp()->layoutManager.getCurrLayout()->dropPreview();
+}

@@ -10,10 +10,9 @@
 
 //*************************************************************
 
-struct PluginEmptyWidget: public PUPPY::Widget {
+struct PluginEmptyWidget: virtual public PUPPY::Widget {
     
     PluginEmptyWidget(const PUPPY::WBody &body, ::Widget* widget, PUPPY::Widget *pluginParent = nullptr);
-    ~PluginEmptyWidget() override;
 
     void set_position(const PUPPY::Vec2f& position) override;
     void set_size(const PUPPY::Vec2f& size) override;
@@ -24,14 +23,14 @@ struct PluginEmptyWidget: public PUPPY::Widget {
     PUPPY::Widget* get_parent() const override;
     void set_parent(PUPPY::Widget* parent) override;
 
-    PUPPY::RenderTarget* get_texture() override {return nullptr;};
-    void set_texture(PUPPY::RenderTarget* texture) override {};
+    PUPPY::RenderTarget* get_texture() override;
+    void set_texture(PUPPY::RenderTarget* texture) override;
     
     bool is_active() override;
     bool is_inside(const PUPPY::Vec2f &pos) override;
 
     bool add_child(PUPPY::Widget *child) override {return false;};
-    void set_to_delete() override {};
+    void set_to_delete() override {widget->toClose = true;};
 
     bool delete_child(Widget *child) override {return false;}; 
     bool delete_from_parent() override {return false;};
@@ -59,14 +58,15 @@ struct PluginEmptyWidget: public PUPPY::Widget {
 
 //public:
     ::Widget* widget;
+
     PUPPY::Widget* pluginParent;
+    PluginTexture* pluginTexture;
 };
 
 //*************************************************************
 
 struct PluginWidgetManager: public PluginEmptyWidget {
-    PluginWidgetManager(const PUPPY::WBody &body);
-    ~PluginWidgetManager() override;
+    PluginWidgetManager(const PUPPY::WBody &body, PUPPY::Widget* pluginParent);
 
     bool add_child(PUPPY::Widget *child) override;
 };
@@ -83,7 +83,6 @@ private:
 
 struct PluginRoot: public PluginEmptyWidget {
     PluginRoot(RootWidget* rootWidget);
-    ~PluginRoot() override;
 
     bool add_child(PUPPY::Widget *child) override;
 };
@@ -93,7 +92,8 @@ struct PluginRoot: public PluginEmptyWidget {
 struct WrapperWidgetConductor: public WidgetManager {
 
     WrapperWidgetConductor(const Vector2f& size, const Vector2f& pos, PUPPY::Widget* pluginWidget);
-    
+    ~WrapperWidgetConductor();
+
     void update() override;
     void draw(ML::Texture& texture, const Vector2f& absPosWidget) override;
     
@@ -115,3 +115,36 @@ private:
 
 //*************************************************************
 
+struct PluginButton: public PUPPY::Button, public PluginEmptyWidget, virtual PUPPY::Widget {
+    PluginButton(const std::string& name, const Vector2f& size,
+                 const Vector2f& pos, PUPPY::Widget* parent);
+
+    void set_handler(const PUPPY::Button::HandlerType& handler) override;
+    PUPPY::Button::HandlerType& get_handler() override;
+
+private:
+    HandlerType handler;
+};
+
+//*************************************************************
+
+struct PluginWindow: public PUPPY::Window, public PluginEmptyWidget, virtual PUPPY::Widget {
+    PluginWindow(const std::string& name, const Vector2f& size,
+                 const Vector2f& pos, PUPPY::Widget* parent);
+    
+    void set_show_handler(HandlerType &handler_) override;
+    HandlerType &get_show_handler() override;
+
+    void set_hide_handler(HandlerType &handler_) override;
+    HandlerType &get_hide_handler() override;
+
+    bool set_name(const char *name) override;
+    const char *get_name() override;
+
+    bool add_child(PUPPY::Widget *child) override;
+
+private:
+    PUPPY::Window::HandlerType handler;
+};
+
+//*************************************************************

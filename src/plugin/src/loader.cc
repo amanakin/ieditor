@@ -8,10 +8,11 @@
 #include <loader.h>
 #include <app.h>
 
-typedef PPluginInterface* (*PluginGet)();
-
 PluginLoader::PluginLoader(const std::string& foldername) {
     std::filesystem::path folderpath(foldername);
+    if (!std::filesystem::exists(folderpath)) {
+        return;
+    }
     
     for(auto const& dir_entry: std::filesystem::directory_iterator(folderpath)) {
         if (dir_entry.is_regular_file()) {
@@ -23,9 +24,9 @@ PluginLoader::PluginLoader(const std::string& foldername) {
                     assert("Cant load plugin");
                 }
 
-                PluginGet pluginFunc;
+                PUPPY::PluginGetInterfaceType pluginFunc;
 
-                pluginFunc = (PluginGet)dlsym(handle, PGET_INTERFACE_FUNC);
+                pluginFunc = (PUPPY::PluginGetInterfaceType)dlsym(handle, PUPPY::GET_INTERFACE_FUNC);
 
                 auto res = dlerror();
                 if (res != NULL) {
@@ -40,15 +41,19 @@ PluginLoader::PluginLoader(const std::string& foldername) {
 
                 auto plugin = new Plugin(pPlugin, handle);
 
-                if (plugin->init() != PPS_OK) {
+                if (plugin->init(folderpath) != PUPPY::Status::OK) {
+                    std::cerr << "cant init plugin" << dir_entry << '\n';
                     delete plugin;
                     continue;
                 }
 
-                if (plugin->pPlugin->general.get_info()->type == PPT_TOOL) {
+                if (plugin->pPlugin->get_info()->type == PUPPY::PluginType::TOOL) {
                     App::getApp()->toolManager->addTool(plugin);
-                } else if (plugin->pPlugin->general.get_info()->type == PPT_EFFECT) {
+                } else if (plugin->pPlugin->get_info()->type == PUPPY::PluginType::EFFECT) {
                     App::getApp()->effectManager->addEffect(plugin);
+                } else {
+                    extensions.push_back(plugin);
+                    std::cout << "Extension loaded\n";
                 }
             }
         }
@@ -56,4 +61,7 @@ PluginLoader::PluginLoader(const std::string& foldername) {
 }
 
 PluginLoader::~PluginLoader() {
+    for (auto& extension: extensions) {
+        delete extension;
+    }
 }

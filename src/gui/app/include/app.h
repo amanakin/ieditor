@@ -8,8 +8,10 @@
 #include <layout_manager.h>
 #include <effect_manager.h>
 #include <tool_manager.h>
-#include <loader.h>
 #include <app_widget.h>
+
+#include <app_interface.h>
+#include <loader.h>
 
 //*************************************************************
 
@@ -18,6 +20,7 @@ struct WorkSpace {
 
     Color color;
     float size;
+    Timer timer;
 
     static constexpr float MaxBrushSize = 25;
 };
@@ -65,8 +68,9 @@ struct App {
     // Init tools and effect and load them to appWidget
     ToolManager* toolManager;
     EffectManager* effectManager;
+
+    PluginAppInterface* appInterface;
     PluginLoader* pluginLoader;
-    
 private:
     App(const Vector2f& size);
     ~App();

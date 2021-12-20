@@ -2,6 +2,7 @@
 
 #include <effect_manager.h>
 #include <selector.h>
+#include <app.h>
 
 EffectManager::EffectManager()
 {}
@@ -17,6 +18,12 @@ void EffectManager::addEffect(Effect* effect) {
     
     App::getApp()->appWidget->effectsSelector->AddSelectorButton(
         [effect](){
+            //auto plugin = dynamic_cast<Plugin*>(effect);
+            //if (plugin!= nullptr) {
+            //    plugin->pPlugin->show_settings();
+            //    printf("showing settings\n");
+            //    return;
+            //}
             effect->apply(*App::getApp()->layoutManager.getCurrLayout());
         }, 
         std::string(effect->getName())

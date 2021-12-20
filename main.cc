@@ -4,7 +4,6 @@
 
 int main() {    
     try {
-        AppInterface::init();
         App::createApp(Vector2f(1920, 1080));
         App::getApp()->init();
         App::getApp()->run();

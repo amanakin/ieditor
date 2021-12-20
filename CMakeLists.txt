@@ -84,7 +84,9 @@ set(SOURCES
     ${SOURCES}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/src/loader.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/src/app_interface.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/src/plugin_texture.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/src/plugin_utils.cc
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/src/plugin_widget.cc
     ${CMAKE_CURRENT_SOURCE_DIR}/src/plugin/src/plugin.cc
 )
 
@@ -99,4 +101,7 @@ set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 
 file(COPY resources DESTINATION .)
-file(COPY plugins DESTINATION .)
+
+if (EXISTS "./plugins")
+    file(COPY plugins DESTINATION .)
+endif()
